@@ -1,0 +1,255 @@
+\documentclass[11pt]{article}
+% Bibliographies (inline)
+\usepackage{filecontents}
+\def\withindex{0}
+\def\withnotes{0}
+\def\withcolors{0}
+
+\newcommand{\insertref}[1]{\todo[color=green!40]{#1}\xspace}
+\newcommand{\explainindetail}[1]{\todo[color=red!30]{#1}\xspace}
+\newcommand{\inlinetodo}[1]{\todo[color=blue!25,inline]{#1}\xspace}
+
+\input{packages}
+\input{preamble}
+% Algorithm environment
+\usepackage{algorithmicx,algpseudocode,  algorithm}
+
+
+% compact lists, and handy shortcuts for items
+\usepackage[shortlabels]{enumitem}
+\setitemize{noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt}
+
+
+\def\maintitle{Assouad and Le Cam -- proving distribution learning and testing lower bounds}
+\def\authorname{Cl\'ement L. Canonne}
+
+\title{\maintitle}
+\author{\authorname}
+\date{May, 2014}
+
+\makeatletter
+  \hypersetup{
+    pdftitle={\maintitle},
+    pdfauthor={\authorname}, 
+    pdfsubject={Probability Distribution Testing and Learning},
+    pdfkeywords={property testing} {distribution testing} {sublinear algorithms} {lower bounds} {Assouad} {Le Cam}
+  }
+\makeatother
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+
+In this (short) note, we focus on two techniques used to prove lower bounds for distribution \emph{learning} and \emph{testing}, respectively Assouad's lemma and Le Cam's method. (We do not cover here Fano's lemma, another and somewhat more general result than Assouad's -- the interested reader is referred to~\cite{Yu:97}.)\medskip
+
+Hereafter, we let $(\domain,\mathcal{B})$ be a measurable space, and $\distribs{\domain}$ be the set of all probability distributions on it. Let $\totalvardist{\cdot}{\cdot}$ denote the total variation distance (the theorem would actually apply to any metric $d$ on $\distribs{\domain}$), and $\hellinger{\cdot}{\cdot}$ be the \emph{Hellinger distance}, defined as
+\[
+\hellinger{\D}{\D^\prime}\eqdef\frac{1}{2}\normtwo{\sqrt{\D}-\sqrt{\D^\prime}} = \frac{1}{2}\sqrt{\sum_{x\in \domain}\left(\sqrt{\D(x)}-\sqrt{\D^\prime(x)}\right)^2} = \sqrt{1 - \sum_{x\in \domain} \sqrt{\D(x)D^\prime(x)}}
+\]
+(the last two expressions holding when $\domain$ is countable).
+
+%%%%%%%%%% Learning
+\section{Learning Lower Bounds: Assouad's Lemma}
+
+\begin{definition}[Minimax Risk]
+Let $\class\subseteq\distribs{\domain}$ be a family of probability distributions, and $m\geq 1$. The \emph{minimax risk for $\class$ with $m$ samples} (with relation to the total variation distance) is defined as
+  \begin{align}\label{eq:minimax:risk}
+    R_m(\class) &\eqdef \inf_{A\in \Algo_m} \sup_{\D\in\class } \shortexpect_{s_1,\dots,s_m\sim \D}\!\left[ \totalvardist{ \D }{ \hat{\D}_A } \right] \\
+    &= \inf_{A\in\Algo_m} \sup_{\D\in\class } \int_{\domain^m} \totalvardist{ \D }{ A(\vect{s}) }D^{\otimes m}(d\vect{s}) \notag{}
+  \end{align}
+  where $\Algo_m$ is the set of \new{(deterministic)}\todonote{Check this}{} learning algorithms $A$ which take $m$ samples and output a hypothesis distribution $\hat{\D}_A$.
+\end{definition}
+\noindent In other terms, $R_m(\class)$ is the minimum expected error of any $m$-sample learning algorithm $A$ when run on the worst possible target distribution (from $\class$) for it. It is immediate from the definition that for any $\mathcal{H}\subseteq \class$, one has $R_m(\class) \geq R_m(\mathcal{H})$.\medskip
+
+To prove lower bounds on learning a family $\class$, a very common method is to come up with a (sub)family of distributions in which, as long as a learning algorithm does not take enough samples, there always exist two (far) distributions which still could have yielded indistinguishable ``transcripts''. In other terms, after running any learning algorithm $A$ on $m$ samples, an adversary can still exhibit two very different distributions (depending on $A$)\footnote{Note that this differs from the standard methodology for proving lower bounds for property testing, where two families of distributions (\textsf{yes} and \textsf{no}-instances) are defined beforehand, and a couple of distributions is ``committed to'' \emph{before} the algorithm gets to make its move.} that \emph{ought} to be distinguished, yet \emph{could not} possibly have been from only $m$ samples. This is formalized by the following theorem, due to Assouad:
+\begin{theorem}[Assouad's Lemma~\cite{Assouad:83}]
+Let $\class\subseteq\distribs{\domain}$ be a family of probability distributions. Suppose there exists a family of $\mathcal{H}\subseteq\class$ of $2^r$ distributions and constants $\alpha,\beta > 0$ such that, writing $\mathcal{H}=\{\D_z\}_{z\in\{0,1\}^r}$,
+\begin{enumerate}[(i)]
+  \item\label{item:assouad:condition:1} for all $x,y\in\{0,1\}^r$, the distance between $D_x$ and $D_y$ is at least proportional to the Hamming distance:
+    \begin{equation}\label{eq:assouad:condition:1}
+      \totalvardist{\D_x}{\D_y} \geq \alpha \normone{x-y}
+    \end{equation}
+  \item\label{item:assouad:condition:2} for all $x,y\in\{0,1\}^r$ with  $\normone{x-y}=1$, the squared Hellinger distance of $D_x,D_y$ is small:
+    \begin{equation}\label{eq:assouad:condition:2}
+      \hellinger{\D_x}{\D_y}^2 \leq \beta
+    \end{equation}
+    (or, equivalently, $-\ln(1-\operatorname{h}^2) \leq \ln\frac{1}{1-\beta}$)
+\end{enumerate}
+Then, for all $m \geq 1$,
+    \begin{equation}\label{eq:assouad:conclusion}
+        R_m(\mathcal{H}) \geq \frac{1}{4}\alpha r (1-\beta)^{2m} = \bigOmega{\alpha r e^{-\bigO{\beta m}} }.
+    \end{equation}
+In particular, to achieve error at most $\eps$, any learning algorithm for $\class$ must have sample complexity $\bigOmega{\frac{1}{\beta}\log\frac{\alpha r}{\eps}}$.
+\end{theorem}
+\begin{remark}[High-level idea]
+Intuitively, every distribution in $\mathcal{H}$ is defined by making $r$ distinct ``choices''\footnote{E.g., by choosing, for each of $r$ intervals partitioning the support, whether the distribution \textsf{(a)} is uniform on the interval or \textsf{(b)} puts all its weight on the first half of the interval.}. With this interpretation, \autoref{item:assouad:condition:1} means that two distributions differing in many choices should be far (so that a learning algorithm has to ``figure out'' \emph{most} of the choices in order to achieve a small error), while \autoref{item:assouad:condition:2} requires that two distributions defined by almost the same choices be very close (so that a learning algorithm cannot distinguish them \emph{too easily}).
+\end{remark}
+
+\begin{remark}[Technical detail]
+The quantity $1-\hellinger{p}{q}^2$ is known as the \emph{Hellinger affinity}; as the Hellinger distance satisfies
+\begin{equation}\label{eq:dtv:hellinger}
+1 - \sqrt{1-\totalvardist{p}{q}^2} \leq \hellinger{p}{q}^2 \leq \totalvardist{p}{q}
+\end{equation}
+it is sufficient for \eqref{eq:assouad:condition:2} to show that the (sometimes easier) condition holds:
+\[
+\totalvardist{\D_x}{\D_y} \leq \beta.
+\]
+Note that, with \eqref{eq:assouad:condition:1} this imposes that $\alpha \leq \beta$; while working with the Hellinger distance only requires $\alpha^2 \leq 2\beta-\beta^2$ (from \eqref{eq:dtv:hellinger} and \eqref{eq:assouad:condition:1}).
+\end{remark}
+
+\paragraph*{An example of application.} To prove a lower bound of $\bigOmega{\frac{\log n}{\eps^3}}$ for learning monotone distributions over $[n]$, Birg\'e~\cite{Birge:87} invokes Assouad's Lemma, defining a family $\mathcal{H}$ achieving parameters $r=\bigTheta{\frac{\log n}{\eps}}$, $\alpha=\bigTheta{\eps/r}$ and $\beta=\bigTheta{\eps^2/r}$. This example shows a very neat feature of Assouad's Lemma -- \emph{it enables us to get a dependence on $\eps$ in the lower bound.}
+
+%%%%%%%%%% Testing
+\section{Testing Lower Bounds: Le Cam's Method}
+
+We now turn to another lower bound technique, better suited for proving lower bounds on property testing or parameter estimation -- i.e., where the quantity of interest is a functional of the unknown distribution, instead of the distribution itself. We begin with some terminology that will be useful in stating the main result of this section.
+\begin{definition}
+Let $\class\subseteq\distribs{\domain}$ be a family of probability distributions over \domain, and $m\geq 1$. The \emph{convex hull of $m$-product distributions from \class}, denoted $\operatorname{conv}_m(\class)$, it the set of probability distributions over $\domain^q$ defined as
+\[
+  \operatorname{conv}_m(\class) \eqdef \setOfSuchThat{ \sum_{k=1}^\ell \alpha_k \D_k^{\otimes m} }{  \ell \geq 1, \D_1,\dots,\D_\ell\in\class, \alpha_1,\dots,\alpha_\ell \geq 0, \sum_{k=1}^\ell \alpha_k =1 }.
+\]
+That is, $\operatorname{conv}_m(\class)$ is the set of mixtures of $m$-wise product distributions from $\class$. (Note that distributions in $\operatorname{conv}_m(\class)$ are not in general product distributions themselves.)
+\end{definition}
+\begin{definition}[Estimator]
+Let $\class\subseteq\distribs{\domain}$ be a family of probability distributions over \domain, and $m\geq 1$. For any real-valued functional $\varphi\colon\class\to[0,1]$ (``scalar property''), we denote by $\mathcal{E}_m$ the set of \emph{estimators} for $\varphi$: that is, the set of \new{(deterministic)} algorithms $E$ taking $m\geq 1$ independent samples from a distribution $\D\in\class$ and outputting an estimate $\hat{\varphi}_E$ of $\varphi(\D)$.
+\end{definition}
+
+We state the following lemma for estimators taking value in $[0,1]$ endowed with the distance $\abs{\cdot}$, but it holds for more general metric spaces, and in particular for $([0,1], \normtwo{\cdot})$.
+\begin{theorem}[Le Cam's Method~\cite{LeCam:73,LeCam:86,Yu:97}]\label{theo:lecam:method}
+  Let $\class\subseteq\distribs{\domain}$ be a family of probability distributions over \domain, and let $\varphi\colon\class\to[0,1]$ be a scalar property. 
+  Suppose there exists $\gamma \in [0,1]$, subsets $A_1,A_2\subseteq[0,1]$, and families $\mathcal{\D}_1,\mathcal{\D}_2\subseteq\class$ such that the following holds.
+  \begin{enumerate}[(i)]
+    \item\label{eq:lecam:condition:1} $A_1$ and $A_2$ are \emph{$\gamma$-separated}: $\abs{\alpha_1-\alpha_2} \geq \gamma$ for all $\alpha_1\in A_1, \alpha_2\in A_2$;
+    \item\label{eq:lecam:condition:2} $\varphi(\mathcal{\D}_1) \subseteq A_1$ and $\varphi(\mathcal{\D}_2) \subseteq A_2$.
+  \end{enumerate}
+  Then, for all $m\geq 1$,
+  \begin{equation}\label{eq:lecam:conclusion}
+    \inf_{E\in \mathcal{E}_m} \sup_{\D\in\class } \shortexpect_{s_1,\dots,s_m\sim \D}\!\left[ \abs{\hat{\varphi}_E - \varphi(\D)} \right] 
+    \geq \frac{\gamma}{2}\Big(1-\inf_{\substack{ p_1 \in \operatorname{conv}_m(\mathcal{\D}_1) \\ p_2 \in \operatorname{conv}_m(\mathcal{\D}_2) }} \totalvardist{p_1}{p_2}\Big).
+  \end{equation}
+\end{theorem}
+One particular interest of this result is that the infimum is taken over the \emph{convex hull} of the $m$-fold product distributions from the families $\mathcal{\D}_1$ and $\mathcal{\D}_2$, and not over the $m$-fold distributions themselves. While this makes the computations much less straightforward (as a mixture of product distributions is not in general itself a product distribution, one can no longer rely on using the Hellinger distance as a proxy for total variation and leverage its nice properties with regard to product distributions), it also usually yields much tighter bounds -- as the infimum over the convex hull is often significantly smaller.
+
+We now state an immediate corollary in terms of property testing, where a testing algorithm is said to \emph{fail} if it outputs \accept on a \no-instance or \reject on a \yes-instance. Note as usual that if the samples originate from a distribution which is neither a \yes nor \no-instance, then the any output is valid and the tester cannot fail.
+\begin{corollary}\label{coro:lecam:pt}
+  Fix $\eps\in(0,1)$, and a property $\property\subseteq\distribs{\domain}$. Let $\mathcal{\D}_1,\mathcal{\D}_2\subseteq\distribs{\domain}$ be families of respectively \yes- and \no-instances, i.e. such that $\mathcal{\D}_1\subseteq\property$, while any $\D\in\mathcal{\D}_2$ has $\totalvardist{\D}{\property} > \eps$. Then, for all $m\geq 1$,
+  \begin{equation}\label{eq:lecam:pt:conclusion}
+    \inf_{T\in \Tester_m} \sup_{\D\in\distribs{\domain} } \probaDistrOf{s_1,\dots,s_m\sim \D}{T(s_1,\dots,s_m) \text{ fails}}
+    \geq \frac{1}{2}\Big(1-\inf_{\substack{ p_1 \in \operatorname{conv}_m(\mathcal{\D}_1) \\ p_2 \in \operatorname{conv}_m(\mathcal{\D}_2) }} \totalvardist{p_1}{p_2}\Big).
+  \end{equation}
+  where $\Tester_m$ is the set of \new{(deterministic)} testing algorithms $T$ with sample complexity $m$.
+\end{corollary}
+\noindent As any (possibly randomized) \textit{bona fide} testing algorithm can only fail with probability $1/3$, the above combined with Yao's Principle implies a lower bound of $\bigOmega{m}$ as soon as $m$ and $\mathcal{\D}_1,\mathcal{\D}_2$ satisfy
+$
+\inf_{p_1,p_2} \totalvardist{p_1}{p_2} < 1/3
+$
+in~\eqref{eq:lecam:pt:conclusion}.
+\begin{proofof}{\autoref{coro:lecam:pt}}
+We apply~\autoref{theo:lecam:method} with the following parameters: $A_1=\{0\}$, $A_2=\{1\}$, $\gamma=1$, and $\varphi\colon\D\in \class\mapsto \indicSet{\property}(\D)\in\{0,1\}$, where $\class=\property\cup\setOfSuchThat{ \D\in\distribs{\domain} }{ \totalvardist{\D}{\property} > \eps }$ is the set of valid instances.
+\end{proofof}
+
+\paragraph*{An example of application.} To prove a lower bound of $\bigOmega{\sqrt{n}/\eps^2}$ for testing uniformity over~$[n]$, Paninski~\cite{Paninski:08} defines the families $\mathcal{\D}_1=\property=\{\uniform_n\}$ and $\mathcal{\D}_2$ as the set of distributions $\D$ obtained by perturbing each disjoint pair of consecutive elements $(2i-1,2i)$ by either $(\frac{\eps}{n},-\frac{\eps}{n})$ or $(-\frac{\eps}{n},\frac{\eps}{n})$ (for a total of $2^{\frac{n}{2}}$ distinct distributions). He then analyzes the total variation distance between $\uniform_n^{\otimes m}$ and the uniform mixture
+\[
+  p \eqdef \frac{1}{2^{\frac{n}{2}}} \sum_{\D\in \mathcal{\D}_2} \D^{\otimes m}.
+\]
+By an approach similar as that of \cite[Section 14.4]{Pollard:2003}, Paninski shows that $\inf_{p_2 \in \operatorname{conv}_m(\mathcal{\D}_2) } \totalvardist{\uniform_n^{\otimes m}}{p_2} \leq \totalvardist{\uniform_n^{\otimes m}}{p} \leq \frac{1}{2}\sqrt{e^{m^2\eps^4/n} -1}$, which for $m \leq \frac{c\sqrt{n}}{\eps^2}$ is less than $1/3$ -- establishing the lower bound.
+
+%%%%%%%%%% Bibliography
+\begin{filecontents}{references1.bib}
+
+@article {Assouad:83,
+    author = {Assouad, Patrice},
+     title = {Deux remarques sur l'estimation},
+   journal = {Comptes Rendus des S\'eances de l'Acad\'emie des Sciences.
+              S\'erie I. Math\'ematique},
+    volume = {296},
+      year = {1983},
+    number = {23},
+     pages = {1021--1024},
+      issn = {0249-6291},
+}
+
+@article{Birge:87,
+  ajournal = {The Annals of Statistics},
+  author = "Birg\'e, Lucien",
+  doi = "10.1214/aos/1176350488",
+  journal = "The Annals of Statistics",
+  month = "09",
+  number = "3",
+  pages = "995--1012",
+  publisher = "The Institute of Mathematical Statistics",
+  title = "Estimating a {D}ensity under {O}rder {R}estrictions: {N}onasymptotic {M}inimax {R}isk",
+  url = "http://dx.doi.org/10.1214/aos/1176350488",
+  volume = "15",
+  year = "1987"
+}
+
+@incollection{Yu:97,
+  year={1997},
+  isbn={978-1-4612-7323-3},
+  booktitle={Festschrift for Lucien Le Cam},
+  editor={Pollard, David and Torgersen, Erik and Yang, Grace L.},
+  doi={10.1007/978-1-4612-1880-7_29},
+  title={{A}ssouad, {F}ano, and {L}e {C}am},
+  url={http://dx.doi.org/10.1007/978-1-4612-1880-7_29},
+  publisher={Springer New York},
+  author={Yu, Bin},
+  pages={423-435},
+  language={English}
+}
+
+@article{LeCam:73,
+  title={Convergence of estimates under dimensionality restrictions},
+  author={Le Cam, Lucien},
+  journal={The Annals of Statistics},
+  pages={38--53},
+  year={1973},
+  volume = 1,
+  issn = {0090-5364},
+}
+
+@book{LeCam:86,
+    author = {Le Cam, Lucien},
+     title = {Asymptotic methods in statistical decision theory},
+    series = {Springer Series in Statistics},
+ publisher = {Springer-Verlag, New York},
+      year = {1986},
+     pages = {xxvi+742},
+      isbn = {0-387-96307-3},
+       doi = {10.1007/978-1-4612-4946-7},
+       url = {http://dx.doi.org/10.1007/978-1-4612-4946-7},
+}
+
+@article{Paninski:08,
+  author    = {Paninski, Liam},
+  title     = {A Coincidence-Based Test for Uniformity Given Very Sparsely
+               Sampled Discrete Data},
+  journal   = {IEEE Transactions on Information Theory},
+  volume    = {54},
+  number    = {10},
+  year      = {2008},
+  pages     = {4750-4755},
+  ee        = {http://dx.doi.org/10.1109/TIT.2008.928987}
+}
+
+@misc{Pollard:2003,
+  author = {Pollard, David},
+  title = {Asymptopia},
+  howpublished = {\url{http://www.stat.yale.edu/~pollard/Books/Asymptopia}},
+  note = {Manuscript},
+  year = 2003
+}
+
+
+\end{filecontents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\nocite{*}
+\bibliographystyle{alpha}
+\bibliography{references1}
+
+\end{document}

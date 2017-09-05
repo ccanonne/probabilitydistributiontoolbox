@@ -1,0 +1,92 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\def\withindex{0}
+\input{packages}
+\input{preamble}
+
+
+\title{A short note on learning discrete distributions}
+\date{September, 2017}
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+
+The goal of this short note is to provide simple proofs for the ``folklore facts'' on the sample complexity of learning a discrete probability distribution over a known domain of size $n$ to distance $\eps$, with error probability $\delta$, can be done with $\bigO{\frac{n+\log(1/\delta)}{\eps^2}}$. Thanks to \href{http://www.gautamkamath.com/}{Gautam Kamath} and \href{http://www.cs.cmu.edu/~jswright/}{John Wright} for suggesting ``someone should write this up as a note.''\bigskip
+
+For a given distance measure $\operatorname{d}$, we write $\Phi(\operatorname{d},n,\eps,\delta)$ for the sample complexity of learning discrete distributions over a known domain of size $n$, to accuracy $\eps>0$, with error probability $\delta\in(0,1]$. As usual, asymptotics will be taken with regard to $n$ going to infinity, $\eps$ going to $0$, and $\delta$ going to $0$, in that order.
+
+\noindent Without loss of generality, we hereafter assume the domain is the set $[n]\eqdef \{1,\dots,n\}$.
+\section{Total variation distance}
+
+Recall that $\totalvardist{p}{q} = \sup_{S\subseteq [n]} (p(S)-q(S)) = \frac{1}{2}\normone{p-q}\in[0,1]$ for any $p,q\in\distribs{[n]}$. 
+
+\begin{theorem}\label{theo:learning:tv}
+  $\Phi(\dtv,n,\eps,\delta) = \bigO{\frac{n+\log(1/\delta)}{\eps^2}}$.
+\end{theorem}
+\begin{proof}[First proof]
+Consider the empirical distribution $\tilde{p}$ obtained by drawing $m$ independent samples $s_1,\dots,s_m$ from the underlying distribution $p\in\distribs{[n]}$:
+\begin{equation}\label{def:empirical}
+\tilde{p}(i) = \frac{1}{m} \sum_{j=1}^m \indic{s_j=i}, \qquad i\in [n]
+\end{equation}
+\begin{itemize}
+  \item First, we bound the \emph{expected} total variation distance between $\tilde{p}$ and $p$, by using $\lp[2]$ distance as a proxy:
+\[
+    \expect{ \totalvardist{p}{\tilde{p}} }
+    =\frac{1}{2}\expect{ \normone{p-\tilde{p}}} 
+    =\frac{1}{2}\sum_{i=1}^n\expect{ \abs{p(i)-\tilde{p}(i)}}
+    \leq\frac{1}{2}\sum_{i=1}^n\sqrt{\expect{ (p(i)-\tilde{p}(i))^2} }
+\]
+the last inequality by Jensen. But since, for every $i\in[n]$, $m\tilde{p}(i)$ follows a $\binomial{m}{p(i)}$ distribution, we have
+$\expect{ (p(i)-\tilde{p}(i))^2} = \frac{1}{m^2}\var[m\tilde{p}(i)] = \frac{1}{m}p(i)(1-p(i))$, from which
+\[
+    \expect{ \totalvardist{p}{\tilde{p}} } \leq\frac{1}{2\sqrt{m}}\sum_{i=1}^n\sqrt{p(i)} \leq \frac{1}{2}\sqrt{\frac{n}{m}}
+\]
+the last inequality this time by Cauchy--Schwarz. Therefore, for $m\geq \frac{n}{\eps^2}$ we have $\expect{ \totalvardist{p}{\tilde{p}} }\leq \frac{\eps}{2}$.
+
+  \item Next, to convert this expected result to a \emph{high probability} guarantee, we apply McDiarmid's inequality to the random variable $f(s_1,\dots,s_m) \eqdef \totalvardist{p}{\tilde{p}}$, noting that changing any single sample cannot change its value by more than $c\eqdef 1/m$:
+\[
+    \probaOf{ \abs{f(s_1,\dots,s_m) - \expect{f(s_1,\dots,s_m)}} \geq \frac{\eps}{2} } \leq 2e^{-\frac{2\left(\frac{\eps}{2}\right)^2}{mc^2}} = 2e^{-\frac{1}{2}m\eps^2}
+\]
+and therefore as long as $m\geq \frac{2}{\eps^2}\ln\frac{2}{\delta}$, we have $\abs{f(s_1,\dots,s_m) - \expect{f(s_1,\dots,s_m)}} \leq \frac{\eps}{2}$ with probability at least $1-\delta$. 
+\end{itemize}
+Putting it all together, we obtain that $\totalvardist{p}{\tilde{p}} \leq \eps$ with probability at least $1-\delta$, as long as $m\geq \max\left( \frac{n}{\eps^2},\frac{2}{\eps^2}\ln\frac{2}{\delta} \right)$.
+\end{proof}
+
+\begin{proof}[Second proof -- the ``fun'' one]
+Again, we will analyze the behavior of the empirical distribution $\tilde{p}$ over $m$ i.i.d. samples from the unknown $p$ (cf.~\eqref{def:empirical}) -- because it is simple, efficiently computable, and \emph{it works}.  Recalling the definition of total variation distance, note that $\totalvardist{p}{\tilde{p}} > \eps$ literally means there exists a subset $S\subseteq [n]$ such that $\tilde{p}(S) > p(S) + \eps$. There are $2^n$ such subsets, so\dots{} let us do a union bound.
+
+Fix any $S\subseteq[n]$. We have
+\[
+\tilde{p}(S) = \tilde{p}(i) \operatorname*{=}^{\eqref{def:empirical}} \frac{1}{m} \sum_{i\in S} \sum_{j=1}^m \indic{s_j=i}
+\]
+and so, letting $X_j \eqdef \sum_{i\in S}\indic{s_j=i}$ for $j\in [m]$, we have
+$
+\tilde{p}(S) = \frac{1}{m}\sum_{j=1}^m X_j
+$ where the $X_j$'s are i.i.d. Bernoulli random variable with parameter $p(S)$. Here comes the Chernoff bound (actually, Hoeffding, the \emph{other} Chernoff):
+\[
+    \probaOf{ \tilde{p}(S) > p(S) + \eps } = \probaOf{ \frac{1}{m}\sum_{j=1}^m X_j > \expect{\frac{1}{m}\sum_{j=1}^m X_j} + \eps } \leq e^{-2\eps^2 m}
+\]
+and therefore $\probaOf{ \tilde{p}(S) > p(S) + \eps } \leq \frac{\delta}{2^n}$ for any $m\geq \frac{n\ln 2+\log(1/\delta)}{2\eps^2}$. A union bound over these $2^n$ possible sets $S$ concludes the proof:
+\[
+    \probaOf{ \exists S\subseteq [n] \text{ s.t. }\tilde{p}(S) > p(S) + \eps } \leq 2^n\cdot \frac{\delta}{2^n} = \delta
+\]
+and we are done. \emph{Badda bing badda boom}, as someone\footnote{John Wright.} would say.
+
+
+% OK, so what is [\sum_{i \in S} q_i] ? Well, it's you take your sample on [n] elements and every time you see a number in [S] , you throw it into a bucket.  When you're all done, you count the number of elements in your bucket and divide by [n] .  That's the sum.  It's easy to see that the count you do can be expressed as [X_1 + \cdots + X_n] , where each [X_i] is a Bernoulli random variable which is [1] with probability [\sum_{i \in S} p_i] and zero otherwise.  So what's the probability that
+%
+% [X_1 + \cdots + X_n \geq n \cdot \left( \sum_{i \in S} p_i + \epsilon\right)?]
+%
+% Well, it's just your friendly neighborhood Chernoff bound. Probability at most [e^{-2 n \epsilon^2}] .  So union bounding over all [2^d] choices of [S] , we get that the probability you get a single [S] for which [q] gives [\epsilon] more weight to this set than necessary---i.e. the probability that your L1 distance is at least [\epsilon] ---- is at most
+%
+% [2^d e^{-2n\epsilon^2}.]
+%
+% So if you want this to be at most [\delta] , you just set [n=O((d + log(1/\delta))/\epsilon^2)] .  Badda bing badda boom.
+\end{proof}
+\end{document}

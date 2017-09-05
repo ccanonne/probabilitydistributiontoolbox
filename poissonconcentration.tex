@@ -1,0 +1,175 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\def\withindex{0}
+\input{packages}
+\input{preamble}
+
+\newcommand{\bennettfunc}{h}
+\newcommand{\bennett}[1]{\bennettfunc\mleft(#1\mright)}
+
+\title{A short note on Poisson tail bounds}
+\date{February, 2016}
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+
+The goal of this short note is to provide a proof and references for the ``folklore fact'' that Poisson random variables enjoy good concentration bounds -- namely, subexponential. Thanks to \href{http://www.gautamkamath.com/}{Gautam Kamath} for bringing the topic to my attention, and making me realize I originally had neither of the two.\bigskip
+
+\noindent Let $\bennettfunc\colon[-1,\infty) \to \R$ be the function defined by $h(u)\eqdef 2\frac{(1+u)\ln(1+u)-u}{u^2}$.
+
+\begin{theorem}\label{theo:main:poisson:bounds}
+Let $X\sim\poisson{\lambda}$, for some parameter $\lambda > 0$. Then, for any $x>0$, we have
+\begin{equation}\label{eq:poisson:upper:tail}
+    \probaOf{ X \geq \lambda + x} \leq e^{-\frac{x^2}{2\lambda}\bennett{\frac{x}{\lambda}}}
+\end{equation}
+and, for any $0<x< \lambda$,
+\begin{equation}\label{eq:poisson:lower:tail}
+  \probaOf{ X \leq \lambda - x} \leq e^{-\frac{x^2}{2\lambda}\bennett{-\frac{x}{\lambda}}}.
+\end{equation}
+In particular, this implies that $\probaOf{ X \geq \lambda + x},\probaOf{ X \leq \lambda - x} \leq e^{-\frac{x^2}{\lambda+x}}$, for $x>0$; from which
+\begin{equation}\label{eq:poisson:both:tail}
+  \probaOf{ \abs{X -\lambda} \geq x} \leq 2e^{-\frac{x^2}{2(\lambda+x)}}, \qquad x>0.
+\end{equation}
+\end{theorem}
+\begin{proof}
+Equations~\eqref{eq:poisson:upper:tail} and~\eqref{eq:poisson:lower:tail} are proven in~\autoref{fact:poisson:upper:tail} and~\autoref{fact:poisson:lower:tail}, respectively. We show how they imply~\eqref{eq:poisson:both:tail}.
+
+\noindent By~\autoref{fact:bennett:function:ii}, it is the case that,  for every $x>0$, $\bennett{\frac{x}{\lambda}} \geq \frac{1}{1+\frac{x}{\lambda}}$, or equivalently
+$
+\frac{x^2}{2\lambda} \bennett{\frac{x}{\lambda}} \geq \frac{x^2}{2(\lambda+x)}
+$. Thus, from~\eqref{eq:poisson:upper:tail} we get $\probaOf{ X \geq \lambda + x} \leq \exp(-\frac{x^2}{2\lambda}\bennett{\frac{x}{\lambda}}) \leq \exp(-\frac{x^2}{2(\lambda+x)})$.
+
+\noindent Similarly, for any $0<x<\lambda$ we have $\frac{x^2}{2\lambda} > \frac{x^2}{2(\lambda+x)}$, which with~\eqref{eq:poisson:lower:tail} and~\autoref{fact:bennett:function} implies
+$
+\probaOf{ X \leq \lambda - x} \leq \exp(-\frac{x^2}{2\lambda}\bennett{-\frac{x}{\lambda}}) \leq \exp(-\frac{x^2}{2\lambda}\bennett{0}) = \exp(-\frac{x^2}{2\lambda}) \leq \exp(-\frac{x^2}{2(\lambda+x)})
+$.
+\end{proof}
+
+\noindent Thus, we are left with proving \autoref{fact:poisson:upper:tail} and~\autoref{fact:poisson:lower:tail}, which we do next.
+
+\section{Establishing~\eqref{eq:poisson:upper:tail} and~\eqref{eq:poisson:lower:tail}}
+
+\begin{fact}\label{fact:bennett:function}
+  We have $\bennett{-1}=2$, $\bennett{0}=1$, and $\bennettfunc$ decreasing on $[-1,\infty)$ with $\lim_{u\to\infty} \bennett{u}=0$. In particular, $\bennettfunc\geq 0$.
+\end{fact}
+\begin{proof}
+  The first two properties are immediate by continuity, as, for $u\notin\{-1,0\}$,
+  \begin{align*}
+      \bennett{u} &= 2\frac{(1+u)\ln(1+u)-u}{u^2} \xrightarrow[u\to-1]{} 2\frac{0-(-1)}{(-1)^2} = 2 \\
+      \bennett{u} &= 2\frac{(1+u)\ln(1+u)-u}{u^2} = 2\frac{(1+u)(u-\frac{u^2}{2}+o(u^2))-u}{u^2}
+                 = 2\frac{\frac{u^2}{2}+o(u^2)}{u^2} \xrightarrow[u\to0]{} 1
+  \end{align*}
+  The third property follows from differentiating the function on $(-1,0)\cup(0,\infty)$ and showing its derivative is negative; or, more cleverly, following~\cite[Exercise 14, (ii)]{Pollard:15}. The fourth (which together with the third implies the last) directly comes from observing that $\bennett{u} \operatorname*{\sim}_{u\to\infty} \frac{2\ln u}{u}$.
+\end{proof}
+
+\begin{fact}\label{fact:bennett:function:ii}
+  For any $u\geq 0$, we have $\bennett{u} \geq \frac{1}{1+u}$.
+\end{fact}
+\begin{proof}
+  Consider the function $g\colon [0,\infty) \to \R$ defined by $g(u) = (1+u)\bennett{u}$. We then have $g(0)=1$, and $g(u) \operatorname*{\sim}_{u\to\infty} 2\ln u \xrightarrow[u\to\infty]{} \infty$. Moreover, by differentiation(s) (and tedious computations), one can show that $g$ is increasing on $[0,\infty)$, which implies the claim.
+\end{proof}
+
+We follow the outline of~\cite[Exercise 15]{Pollard:15}. For a random variable $X$, we denote by $M$ its moment-generating function, i.e. $M_X\colon \theta\in\R \mapsto \expect{e^{\theta X}}$ (provided it is well-defined). In what follows, $X$ is a random variable following a $\poisson{\lambda}$ distribution.
+
+\begin{fact}\label{fact:mgf:poisson}
+  We have $M_X(\theta) = e^{\lambda(e^\theta-1)}$ for every $\theta \in \R$.
+\end{fact}
+\begin{proof}
+This is a standard fact, we give the derivation for completeness. For any $\theta\in\R$,
+\[
+    M_X(\theta) = \expect{e^{\theta X}} = e^{-\lambda}\sum_{n=0}^\infty e^{\theta n}\frac{\lambda^n}{n!} = e^{-\lambda}\sum_{n=0}^\infty \frac{(e^\theta \lambda)^n}{n!} = e^{-\lambda} e^{e^\theta \lambda}
+    = e^{\lambda(e^\theta-1)}.
+\]
+\end{proof}
+
+\begin{fact}\label{fact:poisson:upper:tail}
+  For any $x>0$, $\probaOf{ X \geq \lambda + x} \leq e^{-\frac{x^2}{2\lambda}\bennett{\frac{x}{\lambda}}}$.
+\end{fact}
+\begin{proof}
+Fix $x> 0$. For any $\theta\in\R$,
+\begin{align*}
+    \probaOf{ X \geq \lambda + x}
+    &= \probaOf{ e^{\theta X} \geq e^{\theta(\lambda + x)} }
+    = \probaOf{ e^{\theta(X - \lambda -x)} \geq 1}
+    \leq \expect{ e^{\theta(X - \lambda -x)} } 
+\end{align*}
+recalling that if $Y$ is a discrete random variable taking values in $\N$, $\probaOf{Y > 0}=\probaOf{Y \geq 1} = \sum_{n=1}^\infty \probaOf{Y = n} \leq \sum_{n=1}^\infty n\probaOf{Y = n} = \expect{Y}$. Rearranging the terms and taking the infimum over all $\theta > 0$, we have
+\begin{align*}
+    \probaOf{ X \geq \lambda + x}
+    &\leq \inf_{\theta > 0}\expect{ e^{\theta X} }e^{-\theta(\lambda+x)} = \inf_{\theta > 0}e^{\lambda(e^\theta-1)}e^{-\theta(\lambda+x)} \tag{\autoref{fact:mgf:poisson}} \\
+    &= \inf_{\theta > 0}e^{\lambda(e^\theta-1) -\theta(\lambda+x)}
+    = e^{\inf_{\theta > 0}( \lambda(e^\theta-1) -\theta(\lambda+x))}.
+\end{align*}
+It is a simple matter of calculus to find that $\inf_{\theta > 0}( \lambda(e^\theta-1) -\theta(\lambda+x))$ is attained for $\theta^\ast \eqdef \ln(1+\frac{x}{\lambda}) > 0$, from which
+\begin{align*}
+    \probaOf{ X \geq \lambda + x}
+    &\leq e^{\lambda(e^{\theta^\ast}-1) -\theta^\ast(\lambda+x)}
+    = e^{-\lambda((1+\frac{x}{\lambda})\ln(1+\frac{x}{\lambda})-\frac{x}{\lambda})} 
+    = e^{-\frac{x^2}{2\lambda}\bennett{\frac{x}{\lambda}}} 
+\end{align*}
+as claimed.
+\end{proof}
+
+
+\begin{fact}\label{fact:poisson:lower:tail}
+  For any $0 < x< \lambda$, $\probaOf{ X \leq \lambda - x} \leq e^{-\frac{x^2}{2\lambda}\bennett{-\frac{x}{\lambda}}}\leq e^{-\frac{x^2}{2\lambda}}$.
+\end{fact}
+\begin{proof}
+Fix $0 < x< \lambda$. As before, for any $\theta\in\R$,
+\begin{align*}
+    \probaOf{ X \leq \lambda - x}
+    &= \probaOf{ e^{\theta X} \leq e^{\theta(\lambda - x)} }
+    = \probaOf{ e^{\theta(\lambda -x - X)} \geq 1}
+    \leq \expect{ e^{-\theta X} } e^{\theta(\lambda -x) }. 
+\end{align*}
+Rearranging the terms and taking the infimum over all $\theta > 0$, we have
+\begin{align*}
+    \probaOf{ X \leq \lambda - x}
+    &\leq \inf_{\theta > 0}\expect{ e^{-\theta X} }e^{\theta(\lambda-x)} = \inf_{\theta > 0}e^{\lambda(e^{-\theta}-1)}e^{\theta(\lambda-x)} \tag{\autoref{fact:mgf:poisson}} \\
+    &= e^{\inf_{\theta > 0}( \lambda(e^{-\theta}-1) + \theta(\lambda-x))}.
+\end{align*}
+It is again straightforward to check, e.g. by differentiation, that $\inf_{\theta > 0}( \lambda(e^{-\theta}-1) + \theta(\lambda-x))$ is attained for $\theta^\ast \eqdef -\ln(1-\frac{x}{\lambda}) > 0$, from which
+\begin{align*}
+    \probaOf{ X \leq \lambda - x}
+    &\leq e^{\lambda(e^{-\theta^\ast}-1) +\theta^\ast(\lambda-x)}
+    = e^{-x -(\lambda-x)\ln(1-\frac{x}{\lambda})} 
+    = e^{-\lambda( (1-\frac{x}{\lambda})\ln(1-\frac{x}{\lambda}) + \frac{x}{\lambda})} 
+    = e^{-\frac{x^2}{2\lambda}\bennett{-\frac{x}{\lambda}}} 
+\end{align*}
+as claimed. The last step is to observe that, by~\autoref{fact:bennett:function}, $e^{-\frac{x^2}{2\lambda}\bennett{-\frac{x}{\lambda}}} \leq e^{-\frac{x^2}{2\lambda}\bennett{0}} = e^{-\frac{x^2}{2\lambda}}$.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{An alternative proof of~\eqref{eq:poisson:upper:tail}}
+\footnotetext{This approach is inspired by~\cite[Exercise 16]{Pollard:15}).}
+Recall that if $(Y^{(n)})_{n\geq 1}$ is a sequence of independent random variables such that $Y^{(n)}$ follows a $\binomial{n}{\frac{\lambda}{n}}$ distribution, then $(Y^{(n)})_{n\geq 1}$ converges in law to $X$, a random variable with $\poisson{\lambda}$ distribution.\footnotemark{} In particular, since convergence in law corresponds to pointwise convergence of distribution functions, this implies that, for any $t\in \R$,
+\begin{equation}\label{eq:convergence:law:poisson}
+  \probaOf{Y^{(n)} \geq t } \xrightarrow[n\to\infty]{}  \probaOf{X \geq t }.
+\end{equation}
+
+For any fixed $n\geq 1$, we can by definition write $Y^{(n)}$ as $Y^{(n)}=\sum_{k=1}^n Y_k^{(n)}$, where $Y^{(n)}_1,\dots,Y^{(n)}_n$ are i.i.d. random variables with $\bernoulli{\frac{\lambda}{n}}$ distribution. Note that $\expect{Y^{(n)}}=\lambda$ and $\var[Y^{(n)}] = \lambda(1-\frac{\lambda}{n}) \leq \lambda$. As
+$\expect{Y_k^{(n)}} = \frac{\lambda}{n}$ and $\dabs{Y_k^{(n)}}\leq 1$ for all $1\leq k\leq n$, we can apply Bennett's inequality (\cite[Chapter 2]{Boucheron:13},\cite[Chapter 2.5]{Pollard:15}), to obtain, for any $t\geq 0$,
+\[
+    \probaOf{ Y^{(n)} \geq \lambda + x }
+    = \probaOf{ Y^{(n)} \geq \expect{Y^{(n)}} + x }
+    \leq e^{ -\frac{x^2}{2\lambda} \bennett{\frac{x}{\lambda}} }
+\]
+Taking the limit as $n$ goes to $\infty$, we obtain by~\eqref{eq:convergence:law:poisson} that $\probaOf{X \geq \lambda + x } \leq e^{ -\frac{x^2}{2\lambda} \bennett{\frac{x}{\lambda}} }$, re-establishing~\eqref{eq:poisson:upper:tail}.
+
+\begin{remark}
+We note that a qualitatively similar statement (yet quantitatively weaker) can be obtained by observing that Poisson distributions are in particular (discrete) log-concave, and that any log-concave (discrete or continuous) has subexponential tail~\cite{An:95}.
+\end{remark}
+
+\begin{remark}
+As another way to establish the result, we refer the reader to~\cite[Proposition 11.15]{Gol:17}, where bounds on individual summands of the Poisson tails are obtained. From there, one can attempt to derive~\autoref{theo:main:poisson:bounds}, specifically~\eqref{eq:poisson:both:tail}.
+\end{remark}
+%\nocite{*}
+  \bibliographystyle{alpha}
+  \bibliography{poissonconcentration} 
+\end{document}

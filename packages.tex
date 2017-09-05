@@ -1,0 +1,79 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+%% Eye-candy
+\usepackage{lmodern}
+\usepackage{xspace}                                     % Smart spacing with \xspace
+\usepackage[protrusion=true,expansion=true]{microtype}  % Improve font rendering
+
+% Striking out text
+\usepackage[normalem]{ulem}
+
+%% Math
+\usepackage{amsfonts,amsmath,amssymb, amsthm, mathtools}
+\usepackage{thm-restate}
+\usepackage{dsfont} % For the indicator symbol
+
+% Algorithm environment
+\usepackage{algorithmicx,algpseudocode,algorithm}
+
+% Colors (with names)
+\usepackage[usenames,dvipsnames,table]{xcolor}
+
+% Quotes: \blockquote command
+\usepackage{csquotes}
+
+% Relative sizes for text
+\usepackage{relsize}
+
+% Bibliography
+%\usepackage[numbers]{natbib}
+
+% Required for the table of results
+\usepackage{multirow}
+\usepackage{chngpage} % allows for temporary adjustment of side margins
+
+% For the commands such as \capitalisewords
+\usepackage{mfirstuc}
+
+% Graphics
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc,decorations.pathmorphing,patterns}
+
+% For indexing
+\ifnum\withindex=1
+  \usepackage{makeidx}
+  \usepackage{ifthen}
+  \newcommand\indexed[2][]{\ifthenelse{\equal{#1}{}}{#2\index{#2}}{#2\index{#1}}}
+  \makeindex %%%% Enable indexing
+\fi
+%%\usepackage{showidx} % To debug; does not play well with hyperref
+
+% References and links
+\usepackage[backref,colorlinks,citecolor=blue,bookmarks=true,linktocpage]{hyperref}
+\usepackage{aliascnt}
+\usepackage[numbered]{bookmark}
+
+% Full pages
+\usepackage{fullpage}
+
+% Titling
+\usepackage{titling}
+
+% Compressed lists
+\usepackage[shortlabels]{enumitem}
+  \setitemize{noitemsep,topsep=3pt,parsep=2pt,partopsep=2pt} % Uncomment for compact item lists
+  \setenumerate{itemsep=1pt,topsep=2pt,parsep=2pt,partopsep=2pt}
+  \setdescription{itemsep=1pt}
+  
+% Package for todo notes.
+\ifnum\withnotes=1
+  \usepackage[colorinlistoftodos,textsize=scriptsize]{todonotes}
+\fi
+
+% Verbatim inputs and code
+\usepackage{verbatim}
+
+% Resizable parentheses that work (without the space between \left(#1\right)
+\usepackage{mleftright} % \mleft( #1 \mright)
