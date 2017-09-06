@@ -77,16 +77,5 @@ and therefore $\probaOf{ \tilde{p}(S) > p(S) + \eps } \leq \frac{\delta}{2^n}$ f
     \probaOf{ \exists S\subseteq [n] \text{ s.t. }\tilde{p}(S) > p(S) + \eps } \leq 2^n\cdot \frac{\delta}{2^n} = \delta
 \]
 and we are done. \emph{Badda bing badda boom}, as someone\footnote{John Wright.} would say.
-
-
-% OK, so what is [\sum_{i \in S} q_i] ? Well, it's you take your sample on [n] elements and every time you see a number in [S] , you throw it into a bucket.  When you're all done, you count the number of elements in your bucket and divide by [n] .  That's the sum.  It's easy to see that the count you do can be expressed as [X_1 + \cdots + X_n] , where each [X_i] is a Bernoulli random variable which is [1] with probability [\sum_{i \in S} p_i] and zero otherwise.  So what's the probability that
-%
-% [X_1 + \cdots + X_n \geq n \cdot \left( \sum_{i \in S} p_i + \epsilon\right)?]
-%
-% Well, it's just your friendly neighborhood Chernoff bound. Probability at most [e^{-2 n \epsilon^2}] .  So union bounding over all [2^d] choices of [S] , we get that the probability you get a single [S] for which [q] gives [\epsilon] more weight to this set than necessary---i.e. the probability that your L1 distance is at least [\epsilon] ---- is at most
-%
-% [2^d e^{-2n\epsilon^2}.]
-%
-% So if you want this to be at most [\delta] , you just set [n=O((d + log(1/\delta))/\epsilon^2)] .  Badda bing badda boom.
 \end{proof}
 \end{document}
