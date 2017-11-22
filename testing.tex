@@ -1,0 +1,81 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\def\withindex{0}
+\input{packages}
+\input{preamble}
+
+\usepackage{filecontents}
+
+
+\title{A short note on distinguishing discrete distributions}
+\date{November, 2017}
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+
+The goal of this short note is to provide simple proofs or references for the ``folklore facts'' on the sample complexity of distinguishing between two fixed discrete probability distributions, with constant error probability. Thanks to \href{http://www.gautamkamath.com/}{Gautam Kamath} for parts and possibly whole of it.\bigskip
+
+For two \emph{fixed} probability distributions $p,q\in\distribs{\domain}$ over a known discrete domain $\Omega$, we write $\Psi(p,q)$ for the sample complexity of deciding, with probability at least $2/3$, which of these two distributions a sequence of i.i.d. samples from an (unknown) probability distribution $r\in\{p,q\}$ originates from.
+\section{Total variation distance}
+
+Recall that $\totalvardist{p}{q} = \sup_{S\subseteq \domain} (p(S)-q(S)) = \frac{1}{2}\normone{p-q}\in[0,1]$ for any $p,q\in\distribs{\domain}$. 
+
+\begin{theorem}\label{theo:testing:tv}
+  $\Psi(p,q) = \bigO{1/\totalvardist{p}{q}^2}$ and $\Psi(p,q) = \bigOmega{1/\totalvardist{p}{q}}$.
+\end{theorem}
+\begin{proof}
+  We start with the upper bound. Let $S_{p,q}\eqdef \arg\!\sup_{S\subseteq \domain} (p(S)-q(S))$, and consider the obvious algorithm which, given $n$ samples from $r\in\{p,q\}$, computes the fraction $\tau$ that falls in $S_{p,q}$ and returns \accept if, and only if, $\tau \geq \frac{1}{2}\left(p(S_{p,q})+q(S_{p,q})\right)$ (and \reject otherwise). Since $p(S_{p,q}) = q(S_{p,q})+\totalvardist{p}{q}$ by definition, the test will be correct if we estimate $r(S_{p,q})$ to an additive $\frac{1}{2}\totalvardist{p}{q}$; which by a standard Hoeffding bound can be done with probability $2/3$ with $n=O(1/\totalvardist{p}{q}^2)$ samples, as claimed.
+  
+  Now, for the lower bound it is enough to observe that any distinguisher $A$ which takes $n$ samples is intrinsically the indicator of a specific event $S_A\subseteq \domain^n$. Therefore, to be successful~--~i.e., correct with probability at least $2/3$--it must be the case that $\abs{ p^{\otimes n}(S_A)-q^{\otimes n}(S_A) } \geq \frac{1}{3}$. But since, again by definition and then by subadditivity of total variation,
+  \[
+        \abs{ p^{\otimes n}(S_A)-q^{\otimes n}(S_A) } \leq \totalvardist{p^{\otimes n}}{q^{\otimes n}} \leq n \totalvardist{p}{q}
+  \]
+  we need $n\geq \frac{1}{3 \totalvardist{p}{q}}$.
+\end{proof}
+
+\section{Hellinger distance}
+
+Recall that $\hellinger{p}{q} = \frac{1}{\sqrt{2}}\left(\sum_{x\in\domain} \left(\sqrt{p(x)}-\sqrt{q(x)}\right)^2\right)^{1/2} = \frac{1}{\sqrt{2}}\normtwo{\sqrt{p}-\sqrt{q}}\in[0,1]$ for any $p,q\in\distribs{\domain}$. 
+
+\begin{theorem}\label{theo:testing:hellinger}
+  $\Psi(p,q) = \bigTheta{1/\hellinger{p}{q}^2}$.
+\end{theorem}
+\begin{proof}
+  The lower bound can be found in~\cite[Theorem 4.7]{BarYossef:02}; we only here establish the upper bound. We will rely on the following two relatively straightforward facts about Hellinger distance, with respect to total variation:
+  \begin{equation}\label{eq:tv:hellinger}
+    1-\sqrt{1-\totalvardist{p}{q}^2} \leq \hellinger{p}{q}^2 \leq \totalvardist{p}{q}
+  \end{equation}
+ and products (tensoring):
+\begin{equation}\label{eq:hellinger:product}
+\hellinger{p^{\otimes n}}{q^{\otimes n}}^2 = 1 - \left(1-\hellinger{p}{q}^2\right)^n\,.
+\end{equation}
+For convenience, let $\eps\eqdef \hellinger{p}{q}$. By~\eqref{eq:hellinger:product}, this implies 
+\[
+    \hellinger{p^{\otimes n}}{q^{\otimes n}}^2 = 1 - \left(1-\eps^2\right)^n = 1-e^{n\ln(1-\eps^2)}  \geq 1-e^{-n\eps^2}
+\]
+and therefore $\totalvardist{p^{\otimes n}}{q^{\otimes n}} \geq 1-e^{-n\eps^2}$ by~\eqref{eq:tv:hellinger}. For $n\geq \frac{\ln 2}{\eps^2}$, we therefore have $\totalvardist{p^{\otimes n}}{q^{\otimes n}} \geq 1/2$, which by~\autoref{theo:testing:tv} implies that $O(1)$ samples from $r^{\otimes n}$ suffice to decide whether $r^{\otimes n}=p^{\otimes n}$ or $r^{\otimes n}=q^{\otimes n}$ with probability $2/3$. Equivalently, this means that $O(n) = O(1/\hellinger{p}{q}^2)$ from $r$ suffice to decide whether $r=p$ or $r=q$.  
+  \end{proof}
+\begin{remark}
+  In both~\autoref{theo:testing:tv} and~\autoref{theo:testing:hellinger}, the upper bound can easily be, by standard repetition arguments, generalized to allow error probability $\delta$ instead of $1/3$, at the price of a factor $\log(1/\delta)$ in the sample complexity. Moreover, the lower bound of~\autoref{theo:testing:hellinger}, as proven in~\cite[Theorem 4.7]{BarYossef:02}, also features this $\log(1/\delta)$ factor.
+\end{remark}
+
+%%%%%%%%%% Bibliography
+\begin{filecontents}{references1.bib}
+@phdthesis{BarYossef:02,
+  author = {Bar-Yossef, Ziv},
+  title = {The Complexity of Massive Data Set Computations},
+  school = {UC Berkeley},
+  year = {2002},
+  note = {Adviser: Christos Papadimitriou. Available at~\url{http://webee.technion.ac.il/people/zivby/index_files/Page1489.html}.}
+}
+\end{filecontents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{references1}
+\end{document}
