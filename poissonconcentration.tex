@@ -14,12 +14,13 @@
 \begin{document}
 \begin{flushleft}\sf\footnotesize
 \makeatletter
-\@date~- \today \hfill \@title
+\@date~- \today~(Latest version) \hfill \@title
 \makeatother
 \end{flushleft}
 \vspace{5mm}
 
-The goal of this short note is to provide a proof and references for the ``folklore fact'' that Poisson random variables enjoy good concentration bounds -- namely, subexponential. Thanks to \href{http://www.gautamkamath.com/}{Gautam Kamath} for bringing the topic to my attention, and making me realize I originally had neither of the two.\bigskip
+The goal of this short note is to provide a proof and references for the ``folklore fact'' that Poisson random variables enjoy good concentration bounds -- namely, subexponential. Thanks to \href{http://www.gautamkamath.com/}{Gautam Kamath} for bringing the topic to my attention, and making me realize I originally had neither of the two.\\
+\textit{May 2019:} Further thanks to Vitaly Feldman for pointing out a typo in the statement of~\autoref{theo:main:poisson:bounds}.\bigskip
 
 \noindent Let $\bennettfunc\colon[-1,\infty) \to \R$ be the function defined by $h(u)\eqdef 2\frac{(1+u)\ln(1+u)-u}{u^2}$.
 
@@ -32,7 +33,7 @@ and, for any $0<x< \lambda$,
 \begin{equation}\label{eq:poisson:lower:tail}
   \probaOf{ X \leq \lambda - x} \leq e^{-\frac{x^2}{2\lambda}\bennett{-\frac{x}{\lambda}}}.
 \end{equation}
-In particular, this implies that $\probaOf{ X \geq \lambda + x},\probaOf{ X \leq \lambda - x} \leq e^{-\frac{x^2}{\lambda+x}}$, for $x>0$; from which
+In particular, this implies that $\probaOf{ X \geq \lambda + x},\probaOf{ X \leq \lambda - x} \leq e^{-\frac{x^2}{2(\lambda+x)}}$, for $x>0$; from which
 \begin{equation}\label{eq:poisson:both:tail}
   \probaOf{ \abs{X -\lambda} \geq x} \leq 2e^{-\frac{x^2}{2(\lambda+x)}}, \qquad x>0.
 \end{equation}
