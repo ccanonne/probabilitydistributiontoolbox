@@ -122,12 +122,15 @@
 
 % Distance
 \newcommand{\dtv}{\operatorname{d}_{\rm TV}}
-\newcommand{\hellinger}[2]{{\operatorname{d_{\rm{}H}}\!\left({#1, #2}\right)}}
-\newcommand{\kolmogorov}[2]{{\operatorname{d_{\rm{}K}}\!\left({#1, #2}\right)}}
-\newcommand{\totalvardistrestr}[3][]{{\dtv^{#1}\!\left({#2, #3}\right)}}
+\newcommand{\kl}{\operatorname{KL}}
+\newcommand{\dhell}{\operatorname{d_{\rm{}H}}}
+\newcommand{\hellinger}[2]{{\dhell\mleft({#1, #2}\mright)}}
+\newcommand{\kldiv}[2]{{\kl\mleft({#1 \,\|\, #2}\mright)}}
+\newcommand{\kolmogorov}[2]{{\operatorname{d_{\rm{}K}}\mleft({#1, #2}\mright)}}
+\newcommand{\totalvardistrestr}[3][]{{\dtv^{#1}\mleft({#2, #3}\mright)}}
 \newcommand{\totalvardist}[2]{\totalvardistrestr[]{#1}{#2}}
-\newcommand{\chisquarerestr}[3][]{{\operatorname{d}^{#1}_{\chi^2}\!\left({#2 \mid\mid #3}\right)}}
-\newcommand{\chisquare}[2]{\chisquarerestr[]{#1}{#2}}
+%\newcommand{\chisquarerestr}[3][]{{\operatorname{d}^{#1}_{\chi^2}\mleft({#2 \mid\mid #3}\mright)}}
+\newcommand{\chisquare}[2]{{\chi^2\mleft({#1 \mid\mid #2}\mright)}}
 \newcommand{\dist}[2]{\operatorname{dist}\mleft({#1, #2}\mright)}
 
 % Restriction (functions, sequences, etc.)

@@ -5,9 +5,14 @@
 \input{packages}
 \input{preamble}
 
+\newcommand{\dst}{\varepsilon}
+\newcommand{\ab}{k}
+\newcommand{\ns}{n}
+
+\usepackage{filecontents}
 
 \title{A short note on learning discrete distributions}
-\date{September, 2017}
+\date{February, 2020}
 
 \begin{document}
 \begin{flushleft}\sf\footnotesize
@@ -17,65 +22,232 @@
 \end{flushleft}
 \vspace{5mm}
 
-The goal of this short note is to provide simple proofs for the ``folklore facts'' on the sample complexity of learning a discrete probability distribution over a known domain of size $n$ to distance $\eps$, with error probability $\delta$, can be done with $\bigO{\frac{n+\log(1/\delta)}{\eps^2}}$. Thanks to \href{http://www.gautamkamath.com/}{Gautam Kamath} and \href{http://www.cs.cmu.edu/~jswright/}{John Wright} for suggesting ``someone should write this up as a note.''\bigskip
+The goal of this short note is to provide simple proofs for the ``folklore facts'' on the sample complexity of learning a discrete probability distribution over a known domain of size $\ab$ to total variation distance $\dst$, with error probability $\delta$. Thanks to \href{http://www.gautamkamath.com/}{Gautam Kamath} and \href{http://www.mit.edu/~jswright/}{John Wright} for suggesting ``someone should write this up as a note,'' and to \href{https://people.eecs.berkeley.edu/~jiantao/}{Jiantao Jiao} for discussions about the Hellinger case.\bigskip
 
-For a given distance measure $\operatorname{d}$, we write $\Phi(\operatorname{d},n,\eps,\delta)$ for the sample complexity of learning discrete distributions over a known domain of size $n$, to accuracy $\eps>0$, with error probability $\delta\in(0,1]$. As usual, asymptotics will be taken with regard to $n$ going to infinity, $\eps$ going to $0$, and $\delta$ going to $0$, in that order.
+For a given distance measure $\operatorname{d}$, we write $\Phi(\operatorname{d},\ab,\dst,\delta)$ for the sample complexity of learning discrete distributions over a known domain of size $\ab$, to accuracy $\dst>0$, with error probability $\delta\in(0,1]$. As usual, asymptotics will be taken with regard to $\ab$ going to infinity, $\dst$ going to $0$, and $\delta$ going to $0$, in that order.
 
-\noindent Without loss of generality, we hereafter assume the domain is the set $[n]\eqdef \{1,\dots,n\}$.
+\noindent Without loss of generality, we hereafter assume the domain is the set $[\ab]\eqdef \{1,\dots,\ab\}$.
 \section{Total variation distance}
 
-Recall that $\totalvardist{p}{q} = \sup_{S\subseteq [n]} (p(S)-q(S)) = \frac{1}{2}\normone{p-q}\in[0,1]$ for any $p,q\in\distribs{[n]}$. 
-
+Recall that $\totalvardist{p}{q} = \sup_{S\subseteq [\ab]} (p(S)-q(S)) = \frac{1}{2}\normone{p-q}\in[0,1]$ for any $p,q\in\distribs{[\ab]}$. 
 \begin{theorem}\label{theo:learning:tv}
-  $\Phi(\dtv,n,\eps,\delta) = \bigO{\frac{n+\log(1/\delta)}{\eps^2}}$.
+  $\Phi(\dtv,\ab,\dst,\delta) = \bigTheta{\frac{\ab+\log(1/\delta)}{\dst^2}}$.
 \end{theorem}
+\noindent We focus here on the upper bound. The lower bound can be proven, e.g., via Assouad's lemma (for the $\ab/\dst^2$ term), and from the hardness of estimating the bias of a coin ($\ab=2$) with high probability (for the $\log(1/\delta)/\dst^2$ term).
 \begin{proof}[First proof]
-Consider the empirical distribution $\tilde{p}$ obtained by drawing $m$ independent samples $s_1,\dots,s_m$ from the underlying distribution $p\in\distribs{[n]}$:
+Consider the empirical distribution $\tilde{p}$ obtained by drawing $\ns$ independent samples $s_1,\dots,s_\ns$ from the underlying distribution $p\in\distribs{[\ab]}$:
 \begin{equation}\label{def:empirical}
-\tilde{p}(i) = \frac{1}{m} \sum_{j=1}^m \indic{s_j=i}, \qquad i\in [n]
+\tilde{p}(i) = \frac{1}{\ns} \sum_{j=1}^\ns \indic{s_j=i}, \qquad i\in [\ab]
 \end{equation}
 \begin{itemize}
   \item First, we bound the \emph{expected} total variation distance between $\tilde{p}$ and $p$, by using $\lp[2]$ distance as a proxy:
 \[
     \expect{ \totalvardist{p}{\tilde{p}} }
     =\frac{1}{2}\expect{ \normone{p-\tilde{p}}} 
-    =\frac{1}{2}\sum_{i=1}^n\expect{ \abs{p(i)-\tilde{p}(i)}}
-    \leq\frac{1}{2}\sum_{i=1}^n\sqrt{\expect{ (p(i)-\tilde{p}(i))^2} }
+    =\frac{1}{2}\sum_{i=1}^\ab\expect{ \abs{p(i)-\tilde{p}(i)}}
+    \leq\frac{1}{2}\sum_{i=1}^\ab\sqrt{\expect{ (p(i)-\tilde{p}(i))^2} }
 \]
-the last inequality by Jensen. But since, for every $i\in[n]$, $m\tilde{p}(i)$ follows a $\binomial{m}{p(i)}$ distribution, we have
-$\expect{ (p(i)-\tilde{p}(i))^2} = \frac{1}{m^2}\var[m\tilde{p}(i)] = \frac{1}{m}p(i)(1-p(i))$, from which
+the last inequality by Jensen. But since, for every $i\in[\ab]$, $\ns\tilde{p}(i)$ follows a $\binomial{\ns}{p(i)}$ distribution, we have
+$\expect{ (p(i)-\tilde{p}(i))^2} = \frac{1}{\ns^2}\var[\ns\tilde{p}(i)] = \frac{1}{\ns}p(i)(1-p(i))$, from which
 \[
-    \expect{ \totalvardist{p}{\tilde{p}} } \leq\frac{1}{2\sqrt{m}}\sum_{i=1}^n\sqrt{p(i)} \leq \frac{1}{2}\sqrt{\frac{n}{m}}
+    \expect{ \totalvardist{p}{\tilde{p}} } \leq\frac{1}{2\sqrt{\ns}}\sum_{i=1}^\ab\sqrt{p(i)} \leq \frac{1}{2}\sqrt{\frac{\ab}{\ns}}
 \]
-the last inequality this time by Cauchy--Schwarz. Therefore, for $m\geq \frac{n}{\eps^2}$ we have $\expect{ \totalvardist{p}{\tilde{p}} }\leq \frac{\eps}{2}$.
+the last inequality this time by Cauchy--Schwarz. Therefore, for $\ns\geq \frac{\ab}{\dst^2}$ we have $\expect{ \totalvardist{p}{\tilde{p}} }\leq \frac{\dst}{2}$.
 
-  \item Next, to convert this expected result to a \emph{high probability} guarantee, we apply McDiarmid's inequality to the random variable $f(s_1,\dots,s_m) \eqdef \totalvardist{p}{\tilde{p}}$, noting that changing any single sample cannot change its value by more than $c\eqdef 1/m$:
+  \item Next, to convert this expected result to a \emph{high probability} guarantee, we apply McDiarmid's inequality to the random variable $f(s_1,\dots,s_\ns) \eqdef \totalvardist{p}{\tilde{p}}$, noting that changing any single sample cannot change its value by more than $c\eqdef 1/\ns$:
 \[
-    \probaOf{ \abs{f(s_1,\dots,s_m) - \expect{f(s_1,\dots,s_m)}} \geq \frac{\eps}{2} } \leq 2e^{-\frac{2\left(\frac{\eps}{2}\right)^2}{mc^2}} = 2e^{-\frac{1}{2}m\eps^2}
+    \probaOf{ \abs{f(s_1,\dots,s_\ns) - \expect{f(s_1,\dots,s_\ns)}} \geq \frac{\dst}{2} } \leq 2e^{-\frac{2\left(\frac{\dst}{2}\right)^2}{\ns c^2}} = 2e^{-\frac{1}{2}\ns\dst^2}
 \]
-and therefore as long as $m\geq \frac{2}{\eps^2}\ln\frac{2}{\delta}$, we have $\abs{f(s_1,\dots,s_m) - \expect{f(s_1,\dots,s_m)}} \leq \frac{\eps}{2}$ with probability at least $1-\delta$. 
+and therefore as long as $\ns\geq \frac{2}{\dst^2}\ln\frac{2}{\delta}$, we have $\abs{f(s_1,\dots,s_\ns) - \expect{f(s_1,\dots,s_\ns)}} \leq \frac{\dst}{2}$ with probability at least $1-\delta$. 
 \end{itemize}
-Putting it all together, we obtain that $\totalvardist{p}{\tilde{p}} \leq \eps$ with probability at least $1-\delta$, as long as $m\geq \max\left( \frac{n}{\eps^2},\frac{2}{\eps^2}\ln\frac{2}{\delta} \right)$.
+Putting it all together, we obtain that $\totalvardist{p}{\tilde{p}} \leq \dst$ with probability at least $1-\delta$, as long as $\ns\geq \max\left( \frac{\ab}{\dst^2},\frac{2}{\dst^2}\ln\frac{2}{\delta} \right)$.
 \end{proof}
 
 \begin{proof}[Second proof -- the ``fun'' one]
-Again, we will analyze the behavior of the empirical distribution $\tilde{p}$ over $m$ i.i.d. samples from the unknown $p$ (cf.~\eqref{def:empirical}) -- because it is simple, efficiently computable, and \emph{it works}.  Recalling the definition of total variation distance, note that $\totalvardist{p}{\tilde{p}} > \eps$ literally means there exists a subset $S\subseteq [n]$ such that $\tilde{p}(S) > p(S) + \eps$. There are $2^n$ such subsets, so\dots{} let us do a union bound.
+Again, we will analyze the behavior of the empirical distribution $\tilde{p}$ over $\ns$ i.i.d. samples from the unknown $p$ (cf.~\eqref{def:empirical}) -- because it is simple, efficiently computable, and \emph{it works}.  Recalling the definition of total variation distance, note that $\totalvardist{p}{\tilde{p}} > \dst$ literally means there exists a subset $S\subseteq [\ab]$ such that $\tilde{p}(S) > p(S) + \dst$. There are $2^\ab$ such subsets, so\dots{} let us do a union bound.
 
-Fix any $S\subseteq[n]$. We have
+Fix any $S\subseteq[\ab]$. We have
 \[
-\tilde{p}(S) = \tilde{p}(i) \operatorname*{=}^{\eqref{def:empirical}} \frac{1}{m} \sum_{i\in S} \sum_{j=1}^m \indic{s_j=i}
+\tilde{p}(S) = \tilde{p}(i) \operatorname*{=}^{\eqref{def:empirical}} \frac{1}{\ns} \sum_{i\in S} \sum_{j=1}^\ns \indic{s_j=i}
 \]
-and so, letting $X_j \eqdef \sum_{i\in S}\indic{s_j=i}$ for $j\in [m]$, we have
+and so, letting $X_j \eqdef \sum_{i\in S}\indic{s_j=i}$ for $j\in [\ns]$, we have
 $
-\tilde{p}(S) = \frac{1}{m}\sum_{j=1}^m X_j
+\tilde{p}(S) = \frac{1}{\ns}\sum_{j=1}^\ns X_j
 $ where the $X_j$'s are i.i.d. Bernoulli random variable with parameter $p(S)$. Here comes the Chernoff bound (actually, Hoeffding, the \emph{other} Chernoff):
 \[
-    \probaOf{ \tilde{p}(S) > p(S) + \eps } = \probaOf{ \frac{1}{m}\sum_{j=1}^m X_j > \expect{\frac{1}{m}\sum_{j=1}^m X_j} + \eps } \leq e^{-2\eps^2 m}
+    \probaOf{ \tilde{p}(S) > p(S) + \dst } = \probaOf{ \frac{1}{\ns}\sum_{j=1}^\ns X_j > \expect{\frac{1}{\ns}\sum_{j=1}^\ns X_j} + \dst } \leq e^{-2\dst^2 \ns}
 \]
-and therefore $\probaOf{ \tilde{p}(S) > p(S) + \eps } \leq \frac{\delta}{2^n}$ for any $m\geq \frac{n\ln 2+\log(1/\delta)}{2\eps^2}$. A union bound over these $2^n$ possible sets $S$ concludes the proof:
+and therefore $\probaOf{ \tilde{p}(S) > p(S) + \dst } \leq \frac{\delta}{2^\ab}$ for any $\ns\geq \frac{\ab\ln 2+\log(1/\delta)}{2\dst^2}$. A union bound over these $2^\ab$ possible sets $S$ concludes the proof:
 \[
-    \probaOf{ \exists S\subseteq [n] \text{ s.t. }\tilde{p}(S) > p(S) + \eps } \leq 2^n\cdot \frac{\delta}{2^n} = \delta
+    \probaOf{ \exists S\subseteq [\ab] \text{ s.t. }\tilde{p}(S) > p(S) + \dst } \leq 2^\ab\cdot \frac{\delta}{2^\ab} = \delta
 \]
 and we are done. \emph{Badda bing badda boom}, as someone\footnote{John Wright.} would say.
 \end{proof}
+
+\section{Hellinger distance}
+
+Recall that $\hellinger{p}{q} = \frac{1}{\sqrt{2}}\sqrt{\sum_{i=1}^\ab (\sqrt{p(i)}-\sqrt{q(i)})^2} = \frac{1}{\sqrt{2}}\normtwo{p-q}\in[0,1]$ for any $p,q\in\distribs{[\ab]}$. The Hellinger distance has many nice properties: it is well-suited to manipulating product distributions, its square is subadditive, and is always within a quadratic factor of the total variation distance; see, e.g.,~\cite[Appendix~C.2]{Canonne:15}.
+
+\begin{theorem}\label{theo:learning:hellinger}
+  $\Phi(\dhell,\ab,\dst,\delta) = \bigTheta{\frac{\ab+\log(1/\delta)}{\dst^2}}$.
+\end{theorem}
+
+This theorem is ``highly non-trivial'' to establish, however; for the sake of exposition, we will show increasingly stronger bounds, starting with the easiest to establish.
+\begin{proposition}[Easy bound]\label{theo:learning:hellinger:easy}
+  $\Phi(\dhell,\ab,\dst,\delta) = \bigO{\frac{\ab+\log(1/\delta)}{\dst^4}}$, and $\Phi(\dhell,\ab,\dst,\delta) = \bigOmega{\frac{\ab+\log(1/\delta)}{\dst^2}}$.
+\end{proposition}
+\begin{proof}
+    This is immediate from~\autoref{theo:learning:tv}, recalling that $\frac{1}{2}\dtv^2\leq \dhell^2\leq \dtv$.
+\end{proof}
+\begin{proposition}[More involved bound]\label{theo:learning:hellinger:intermediate}
+  $\Phi(\dhell,\ab,\dst,\delta) = \bigO{\frac{\ab}{\dst^2}+\frac{\log(1/\delta)}{\dst^4}}$.
+\end{proposition}
+\begin{proof}
+    As for total variation distance, we consider the empirical distribution $\widehat{p}$ (cf.~\eqref{def:empirical}) obtained by drawing $\ns$ independent samples $s_1,\dots,s_\ns$ from $p\in\distribs{[\ab]}$.
+    
+    \begin{itemize}
+      \item First, we bound the \emph{expected} squared Hellinger distance between $\widehat{p}$ and $p$: using the simple fact that
+      $\hellinger{p}{q}^2 = 1-\sum_{i=1}^\ab \sqrt{p(i)q(i)}$ for any $p,q\in\distribs{[\ab]}$,
+      \[
+          \expect{ \hellinger{p}{\widehat{p}}^2 } = 1-\sum_{i=1}^\ab \sqrt{p(i)}\cdot \expect{\sqrt{\widehat{p}(i)}}\,.
+      \]
+      Now we would like to handle the square root inside the expectation, and \emph{of course} Jensen's inequality is in the wrong direction. However, for every nonnegative r.v. $X$ with positive expectation, letting $Y\eqdef X/\expect{X}$, we have that
+      \begin{align*}
+          \expect{\sqrt{X}} 
+          &= \sqrt{\expect{X}}\cdot\expect{\sqrt{Y}}
+          = \sqrt{\expect{X}}\cdot\expect{\sqrt{1+(Y-\expect{Y})})} \\
+          &\geq \sqrt{\expect{X}} \mleft( 1+ \frac{1}{2}\expect{Y-\expect{Y}} - \frac{1}{6} \expect{(Y-\expect{Y})^2} \mright)
+          = \sqrt{\expect{X}}\mleft(1-\frac{\var X}{6\expect{X}^2}\mright)
+      \end{align*}
+      where we used the inequality $\sqrt{1+x} \geq 1+\frac{x}{2}-\frac{x^2}{6}$, which holds for $x\geq 0$.\footnote{And is inspired by the Tayor expansion $\sqrt{1+x} = 1+\frac{x}{2} - \frac{x^2}{8} +o(x^2)$: there is \emph{some} intuition for it.}{} Since, for every $i\in[\ab]$, $\ns\widehat{p}(i)$ follows a $\binomial{\ns}{p(i)}$ distribution, we get
+      \[
+          \expect{ \hellinger{p}{\widehat{p}}^2 } \leq 1-\frac{1}{\sqrt{\ns}}\sum_{i=1}^\ab \sqrt{p(i)}\cdot\sqrt{\ns p(i)} \mleft(1-\frac{\ns p(i)(1-\ns p(i))}{6\ns^2 p(i)^2}\mright)
+          \leq 1 - \sum_{i=1}^\ab p(i) \mleft(1-\frac{1}{6\ns p(i)}\mright) = \frac{\ab}{6\ns}\,.
+      \]
+      Therefore, for $\ns\geq \frac{\ab}{3\dst^2}$, we have $\expect{ \hellinger{p}{\widehat{p}}^2 }\leq \frac{\dst^2}{2}$.
+      \item Next, to convert this expected result to a high probability guarantee, we \emph{would like} to apply McDiarmid's inequality to the random variable $f(s_1,\dots,s_\ns) \eqdef \hellinger{p}{\widehat{p}}^2$ as in the (first) proof of~\autoref{theo:learning:tv}; unfortunately, changing a sample can change the value by up to $c \approx 1/\sqrt{\ns}$, and McDiarmid will yield
+only a vacuous bound.\footnote{Try it: it's a real bummer.}{} Instead, we will use a stronger, more involved concentration inequality:
+      \begin{theorem}[{\cite[Theorem~8.6]{BLM:13}}]\label{theo:stronger:mcdiarmid}
+          Let $f\colon \mathcal{X}^\ns \to \R$ be a measurable function, and let $X_1,\dots,X_\ns$ be independent random variables taking values in $\mathcal{X}$. Define $Z\eqdef f(X_1,\dots,X_\ns)$. Assume that there exist measurable functions $c_i\colon \mathcal{X}^\ns \to [0,\infty)$ such that, for all $x,y\in\mathcal{X}^\ns$,
+          \[
+              f(y) - f(x) \leq \sum_{i=1}^\ns c_i(x) \indic{x_i \neq y_i}\,.
+          \]
+          Then, setting $v \eqdef \shortexpect \sum_{i=1}^\ns c_i(x)^2$ and $v_\infty \eqdef \sup_{x\in\mathcal{X}^\ns} \sum_{i=1}^\ns c_i(x)^2$, we have, for all $t>0$,
+          \[
+              \probaOf{ Z \geq \expect{Z} + t } \leq e^{-\frac{t^2}{2v}}\,\qquad \probaOf{ Z \leq \expect{Z} - t } \leq e^{-\frac{t^2}{2v_\infty}}\,.
+          \]
+      \end{theorem}
+      For our $f$ above, we have, for two any different $x, y \in [\ab]^\ns$ , that
+      \begin{align*}
+        f(y)-f(x) 
+        &= \frac{1}{\sqrt{\ns}} \sum_{i=1}^\ab \sqrt{p(i)} \mleft( \sqrt{\sum_{j=1}^\ns \indic{x_j=i}} - \sqrt{\sum_{j=1}^\ns \indic{y_j=i}} \mright) \\
+        &= \frac{1}{\sqrt{\ns}} \sum_{i=1}^\ab \sqrt{p(i)} \frac{\sum_{j=1}^\ns (\indic{x_j=i}-\indic{y_j=i})}{ \sqrt{\sum_{j=1}^\ns \indic{x_j=i}} + \sqrt{\sum_{j=1}^\ns \indic{y_j=i}} } \\
+        &\leq \frac{1}{\sqrt{\ns}} \sum_{i=1}^\ab \sqrt{p(i)} \frac{\sum_{j=1}^\ns \indic{x_j=i}\indic{y_j\neq x_j}}{ \sqrt{\sum_{j=1}^\ns \indic{x_j=i}} }
+        = \sum_{j=1}^\ns \underbrace{\sqrt{ \frac{ p_{x_j} }{ \ns\sum_{\ell=1}^\ns \indic{x_\ell=x_j} } }}_{c_j(x)} \cdot \indic{x_j\neq y_j}\,.
+      \end{align*}
+      In view of~\autoref{theo:stronger:mcdiarmid}, we then must evaluate
+      \[
+          v \eqdef \sum_{j=1}^\ns \expect{c_j(X)^2} = \frac{1}{\ns} \sum_{j=1}^\ns  \sum_{i=1}^\ab p(i)^2 \cdot \expect{ \frac{1}{1+ \sum_{\ell\neq j} \indic{X_\ell=i} } }
+      \]
+      where that last expectation is over $(x_\ell)_{\ell\neq j}$ drawn from $p^{\otimes(\ns-1)}$. Since $\sum_{\ell\neq j} \indic{X_\ell=i}$ is Binomially distributed with parameters $\ns-1$ and $p(i)$, we can use the simple fact that, for $N\sim\binomial{r}{\rho}$,
+      \[
+          \expect{\frac{1}{N+1}} = \frac{1-(1-\rho)^{r+1}}{\rho(r+1)} \leq \frac{1}{\rho(r+1)}
+      \]
+      to conclude that $v \leq \frac{1}{\ns^2} \sum_{j=1}^\ns \sum_{i=1}^\ab p(i)  = \frac{1}{\ns}$. By~\autoref{theo:stronger:mcdiarmid}, we obtain
+      \[
+          \probaOf{ \abs{f(s_1,\dots,s_\ns)-\expect{f(s_1,\dots,s_\ns)}} \geq \frac{\dst^2}{2} } \leq e^{-\frac{1}{8}\ns\dst^4}
+      \]
+      and therefore, as long as $\ns \geq \frac{8}{\dst^4}\ln\frac{1}{\delta}$, we have $\abs{f(s_1,\dots,s_\ns)-\expect{f(s_1,\dots,s_\ns)}} \leq \frac{\dst^2}{2}$ with probability at least $1-\delta$.
+    \end{itemize}
+    Putting it all together, we obtain that $\hellinger{p}{\widehat{p}}^2 \leq \dst^2$ with probability at least $1-\delta$, as long as $\ns \geq \max\mleft( \frac{\ab}{3\dst^2}, \frac{8}{\dst^4}\ln\frac{1}{\delta}\mright)$.
+\end{proof}
+\noindent We finally get to the final, optimal bound:
+\begin{proofof}{\autoref{theo:learning:hellinger}}
+We will rely on a recent~--~and quite involved~--~result due to Agrawal [Agr19], analyzing the concentration of the empirical distribution $\widehat{p}$ in terms of its Kullback--Leibler (KL) divergence with regard to the true $p$,
+\[
+    \kldiv{\widehat{p}}{p} = \sum_{i=1}^\ab \widehat{p}(i) \ln \frac{\widehat{p}(i)}{p(i)} \in[0,\infty]\,.
+\]
+Observing that $\hellinger{p}{q}^2 \leq \frac{1}{2} \kldiv{p}{q}$ for any distributions $p, q$, the aforementioned result is actually stronger than what we need:
+\begin{theorem}[{\cite[Theorem~1.2]{Agrawal:19}}]
+  Suppose $\ns \geq \frac{\ab-1}{\alpha}$. Then
+  \[
+      \probaOf{ \kldiv{\widehat{p}}{p} \geq \alpha } \leq e^{-\ns\alpha}\mleft(\frac{e\alpha\ns}{\ab-1}\mright)^{\ab-1}\,.
+  \]
+\end{theorem}
+\noindent In view of the above relation between Hellinger and KL, we will apply this convergence result with $\alpha \eqdef 2\dst^2$, obtaining
+  \[
+      \probaOf{ \hellinger{\widehat{p}}{p} \geq \dst } \leq e^{-2\ns\dst^2 + (\ab-1)\ln\frac{2e\ns\dst^2}{\ab-1}}\,.
+  \]
+  \begin{fact}
+      For $\ns \geq \frac{15}{2e}\frac{\ab}{\dst^2}$, we have $(\ab-1)\ln\frac{2e\ns\dst^2}{\ab-1}\leq \ns\dst^2$. 
+  \end{fact}
+  \begin{proof}
+  The conclusion is equivalent to $2e\cdot\ln\frac{2e\ns\dst^2}{\ab-1}\leq \frac{2e\ns\dst^2}{\ab-1}$, and the conclusion follows from the fact that $x\geq 2e \ln x$ for $x\geq 15$.
+  \end{proof}
+  \noindent This fact implies that, for $\ns \geq \frac{15\ab}{2\dst^2}$, $\probaOf{ \hellinger{\widehat{p}}{p} \geq \dst } \leq e^{-\ns\dst^2}$. Overall, we obtain that $\hellinger{p}{\widehat{p}} \leq \dst$ with probability at least $1-\delta$ as long as $\ns \geq \max\mleft( \frac{15\ab}{2e\dst^2}, \frac{1}{\dst^2}\ln\frac{1}{\delta}\mright)$, as desired.
+\end{proofof}
+
+\section{$\chi^2$ and Kullback–-Leibler divergences}
+To conclude, some remarks on Kullback--Leibler (KL) and chi-squared ($\chi^2$) divergences. Recall their definition, for $p,q\in\distribs{[\ab]}$,
+\[
+    \kldiv{p}{q} = \sum_{i=1}^\ab p(i) \ln \frac{p(i)}{q(i)}\,,\qquad \chisquare{p}{q} = \sum_{i=1}^\ab \frac{(p(i)-q(i))^2}{q(i)}
+\]
+both taking values in $[0,\infty]$; as well as the chain of (easily checked) inequalities
+\[
+    2\totalvardist{p}{q}^2 \leq \kldiv{p}{q} %\leq \ln(1+\chisquare{p}{q}) 
+    \leq \chisquare{p}{q}\,,
+\]
+where the first one is Pinsker's. Importantly, KL and $\chi^2$ divergences are unbounded and asymmetric, so
+the order of p and q matters \emph{a lot}: for instance, it is easy to show that, without strong assumptions on the
+unknown distribution $p\in\distribs{[\ab]}$, the empirical estimator $\widehat{p}$ cannot achieve $\kldiv{p}{\widehat{p}} < \infty$ (resp., $\chisquare{p}{\widehat{p}} < \infty$) with any finite number of samples.\footnote{You can verify this: intuitively, the issue boils down to having to non-trivially learn even the elements of the support of $p$ that have arbitrarily small probability.}{} So, that's uplifting. (On the other hand, \emph{other} estimators than the empirical one, e.g., add-constant estimators, do provide good learning guarantees for those distance measures: see for instance~\cite{Kamath:15}).\smallskip
+
+We are going to focus here on getting $\kldiv{\widehat{p}}{p}$ and $\chisquare{\widehat{p}}{p}$ down to $\dst$. Of course, in view of the inequalities above, the latter is at least as hard as the former, and a lower bound on both follows from that on $\dtv$: $\bigOmega{(\ab+\log(1/\delta))/\dst^2}$. And, behold! The result of Agrawal~\cite{Agrawal:19} used in the proof of~\autoref{theo:learning:hellinger} does provide the optimal upper bound on learning in KL divergence~--~and it is achieved by the usual suspect, the empirical estimator:
+\begin{theorem}\label{theo:learning:kl}
+  $\Phi(\kl,\ab,\dst,\delta) = \bigTheta{\frac{\ab+\log(1/\delta)}{\dst}}$, where by $\kl$ we refer to minimizing $\kldiv{\widehat{p}}{p}$.
+\end{theorem}
+\noindent The optimal sample complexity of learning in $\chi^2$ as a function of $\ab,\dst,\delta$, however, remains open.
+%%%%%%%%%% Bibliography
+\begin{filecontents}{references-learning.bib}
+@article{Agrawal:19,
+  author    = {Rohit Agrawal},
+  title     = {Multinomial Concentration in Relative Entropy at the Ratio of Alphabet and Sample Sizes},
+  journal   = {CoRR},
+  volume    = {abs/1904.02291},
+  year      = {2019}
+}
+
+@book{BLM:13,
+  title={Concentration inequalities: A nonasymptotic theory of independence},
+  author={Boucheron, St{\'e}phane and Lugosi, G{\'a}bor and Massart, Pascal},
+  year={2013},
+  publisher={Oxford University Press}
+}
+
+
+@article{Canonne:15,
+  author    = {Cl{\'{e}}ment L. Canonne},
+  title     = {{A Survey on Distribution Testing: Your Data is Big. But is it Blue?}},
+  journal   = {Electronic Colloquium on Computational Complexity {(ECCC)}},
+  volume    = {22},
+  pages     = {63},
+  year      = {2015}
+}
+
+
+
+@inproceedings{Kamath:15,
+  title = 	 {On Learning Distributions from their Samples},
+  author = 	 {Sudeep Kamath and Alon Orlitsky and Dheeraj Pichapati and Ananda Theertha Suresh},
+  booktitle = 	 {Proceedings of The 28th Conference on Learning Theory},
+  pages = 	 {1066--1100},
+  year = 	 {2015},
+  volume = 	 {40},
+  series = 	 {Proceedings of Machine Learning Research},
+  publisher = 	 {PMLR}
+}
+
+\end{filecontents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{references-learning}
 \end{document}
