@@ -182,7 +182,7 @@ Observing that $\hellinger{p}{q}^2 \leq \frac{1}{2} \kldiv{p}{q}$ for any distri
       For $\ns \geq \frac{15}{2e}\frac{\ab}{\dst^2}$, we have $(\ab-1)\ln\frac{2e\ns\dst^2}{\ab-1}\leq \ns\dst^2$. 
   \end{fact}
   \begin{proof}
-  The conclusion is equivalent to $2e\cdot\ln\frac{2e\ns\dst^2}{\ab-1}\leq \frac{2e\ns\dst^2}{\ab-1}$, and the conclusion follows from the fact that $x\geq 2e \ln x$ for $x\geq 15$.
+  The conclusion is equivalent to $2e\cdot\ln\frac{2e\ns\dst^2}{\ab-1}\leq \frac{2e\ns\dst^2}{\ab-1}$, and thus follows from the fact that $x\geq 2e \ln x$ for $x\geq 15$.
   \end{proof}
   \noindent This fact implies that, for $\ns \geq \frac{15\ab}{2\dst^2}$, $\probaOf{ \hellinger{\widehat{p}}{p} \geq \dst } \leq e^{-\ns\dst^2}$. Overall, we obtain that $\hellinger{p}{\widehat{p}} \leq \dst$ with probability at least $1-\delta$ as long as $\ns \geq \max\mleft( \frac{15\ab}{2e\dst^2}, \frac{1}{\dst^2}\ln\frac{1}{\delta}\mright)$, as desired.
 \end{proofof}
