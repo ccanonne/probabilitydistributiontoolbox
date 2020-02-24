@@ -22,11 +22,12 @@
 \end{flushleft}
 \vspace{5mm}
 
-The goal of this short note is to provide simple proofs for the ``folklore facts'' on the sample complexity of learning a discrete probability distribution over a known domain of size $\ab$ to total variation distance $\dst$, with error probability $\delta$. Thanks to \href{http://www.gautamkamath.com/}{Gautam Kamath} and \href{http://www.mit.edu/~jswright/}{John Wright} for suggesting ``someone should write this up as a note,'' and to \href{https://people.eecs.berkeley.edu/~jiantao/}{Jiantao Jiao} for discussions about the Hellinger case.\bigskip
+The goal of this short note is to provide simple proofs for the ``folklore facts'' on the sample complexity of learning a discrete probability distribution over a known domain of size $\ab$ to various distances $\dst$, with error probability $\delta$. Thanks to \href{http://www.gautamkamath.com/}{Gautam Kamath} and \href{http://www.mit.edu/~jswright/}{John Wright} for suggesting ``someone should write this up as a note,'' and to \href{https://people.eecs.berkeley.edu/~jiantao/}{Jiantao Jiao} for discussions about the Hellinger case.\medskip
 
 For a given distance measure $\operatorname{d}$, we write $\Phi(\operatorname{d},\ab,\dst,\delta)$ for the sample complexity of learning discrete distributions over a known domain of size $\ab$, to accuracy $\dst>0$, with error probability $\delta\in(0,1]$. As usual, asymptotics will be taken with regard to $\ab$ going to infinity, $\dst$ going to $0$, and $\delta$ going to $0$, in that order.
 
 \noindent Without loss of generality, we hereafter assume the domain is the set $[\ab]\eqdef \{1,\dots,\ab\}$.
+
 \section{Total variation distance}
 
 Recall that $\totalvardist{p}{q} = \sup_{S\subseteq [\ab]} (p(S)-q(S)) = \frac{1}{2}\normone{p-q}\in[0,1]$ for any $p,q\in\distribs{[\ab]}$. 
@@ -188,7 +189,7 @@ Observing that $\hellinger{p}{q}^2 \leq \frac{1}{2} \kldiv{p}{q}$ for any distri
 \end{proofof}
 
 \section{$\chi^2$ and Kullback–-Leibler divergences}
-To conclude, some remarks on Kullback--Leibler (KL) and chi-squared ($\chi^2$) divergences. Recall their definition, for $p,q\in\distribs{[\ab]}$,
+In view of the previous section, some remarks on Kullback--Leibler (KL) and chi-squared ($\chi^2$) divergences. Recall their definition, for $p,q\in\distribs{[\ab]}$,
 \[
     \kldiv{p}{q} = \sum_{i=1}^\ab p(i) \ln \frac{p(i)}{q(i)}\,,\qquad \chisquare{p}{q} = \sum_{i=1}^\ab \frac{(p(i)-q(i))^2}{q(i)}
 \]
@@ -206,6 +207,42 @@ We are going to focus here on getting $\kldiv{\widehat{p}}{p}$ and $\chisquare{\
   $\Phi(\kl,\ab,\dst,\delta) = \bigTheta{\frac{\ab+\log(1/\delta)}{\dst}}$, where by $\kl$ we refer to minimizing $\kldiv{\widehat{p}}{p}$.
 \end{theorem}
 \noindent The optimal sample complexity of learning in $\chi^2$ as a function of $\ab,\dst,\delta$, however, remains open.
+
+\section{Briefly: Kolmogorov, $\lp[\infty]$, and $\lp[2]$ distances}
+To conclude, let us briefly discuss three other distance measures: Kolmogorov (a.k.a., ``$\lp[\infty]$ between cumulative distribution functions''), $\lp[\infty]$, and $\lp[2]$:
+\[
+    \kolmogorov{p}{q} = \max_{i\in[\ab]} \abs{\sum_{j=1}^i p(i) - \sum_{j=1}^i q(i)} 
+\] and
+\[
+    \lp[2](p,q) = \normtwo{p-q} = \sqrt{\sum_{i=1}^\ab (p(i)-q(i))^2},\qquad
+    \lp[\infty](p,q) = \norminf{p-q} = \max_{i\in[\ab]} \abs{p(i)-q(i)}\,.
+\]
+A few remarks first. The Kolmogorov distance is actually defined for any distribution on $\R$, not necessarily discrete; one can equivalently define it as
+$
+\kolmogorov{p}{q} =\sup_{i} ( \shortexpect_p[\indicSet{(-\infty,i]}] - \shortexpect_q[\indicSet{(-\infty,i]}] )$. This has a nice interpretation: recalling the definition of TV distance, both are of the form $\sup_{f \in\mathcal{C}} (\shortexpect_p[f] - \shortexpect_q[f])
+$ where $\mathcal{C}$ is a class of measurable functions. For TV distance, $\mathcal{C}$ is the class of indicators of all measurable subsets; for Kolmogorov, this is the (smaller) class of indicators of intervals of the form $(-\infty, a]$. (For Wasserstein/EMD distance, this will be the class of continuous, $1$-Lipschitz functions.)
+
+Second, because of the above, and also monotonicity of $\lp[p]$ norms, Cauchy--Schwarz, the fact that $\lp[1](p,q) = 2\totalvardist{p}{q}$, and elementary manipulations, we have
+\[
+    \lp[\infty](p,q)\leq \lp[2](p,q)\leq 2\totalvardist{p}{q} \leq \sqrt{\ab}\lp[2](p,q), \quad 
+    \lp[2](p,q)\leq \sqrt{\lp[\infty](p,q)}, \quad  \frac{1}{2}\lp[\infty](p,q)\leq \kolmogorov{p}{q} \leq \totalvardist{p}{q}\,.
+\]
+That can be useful sometimes. Now, I will only briefly sketch the proof of the next theorem: the lower bounds follow from the simple case $\ab=2$ (estimating the bias of a biased coin), the upper bounds are achieved by the empirical estimator (again). Importantly, the result for Kolmogorov distance \emph{still applies to continuous, arbitrary distributions}.
+\begin{theorem}\label{theo:learning:tv}
+  $\Phi(\operatorname{d_{\rm{}K}},\ab,\dst,\delta),\Phi(\lp[\infty],\ab,\dst,\delta),\Phi(\lp[2],\ab,\dst,\delta) = \bigTheta{\frac{\log(1/\delta)}{\dst^2}}$, independent of $\ab$.
+\end{theorem}
+\begin{proof}[Sketch]
+The proof for Kolmogorov distance is the most involved, and follows from a \emph{very} useful and non-elementary theorem due to Dvoretzky, Kiefer, and Wolfowitz from 1956 (with the optimal constant due to Massart, in 1990):
+\begin{theorem}[DKW Inequality]
+  Let $\hat{p}$ denote the empirical distribution on $\ns$ i.i.d. samples from $p$ (an \emph{arbitrary} distribution on $\R$). Then, for every $\dst > 0$,
+  \[
+      \probaOf{ \kolmogorov{\hat{p}}{p} > \dst } \leq 2e^{-2\ns \dst^2 }\,.
+  \]
+  Note, again, that this holds even if $p$ is a \emph{continuous} (or arbitrary) distribution on an unbounded support.
+\end{theorem}
+The proof for $\lp[\infty]$ just follows the Kolmogorov upper bound and the aforementioned inequality $\lp[\infty](p,q) \leq 2\kolmogorov{p}{q}$ (which hinges on the fact that $p(i) = \sum_{j=1}^i p(i) - \sum_{j=1}^{i-1} p(i)$ and the triangle inequality). Finally, the proof for $\lp[2]$ is a nice exercise involving analyzing the expectation of the $\lp[2]^2$ distance achieved by the empirical estimator, and McDiarmid's inequality.
+\end{proof}
+
 %%%%%%%%%% Bibliography
 \begin{filecontents}{references-learning.bib}
 @article{Agrawal:19,
