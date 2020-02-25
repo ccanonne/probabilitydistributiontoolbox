@@ -211,7 +211,7 @@ We are going to focus here on getting $\kldiv{\widehat{p}}{p}$ and $\chisquare{\
 \section{Briefly: Kolmogorov, $\lp[\infty]$, and $\lp[2]$ distances}
 To conclude, let us briefly discuss three other distance measures: Kolmogorov (a.k.a., ``$\lp[\infty]$ between cumulative distribution functions''), $\lp[\infty]$, and $\lp[2]$:
 \[
-    \kolmogorov{p}{q} = \max_{i\in[\ab]} \abs{\sum_{j=1}^i p(i) - \sum_{j=1}^i q(i)} 
+    \kolmogorov{p}{q} = \max_{i\in[\ab]} \abs{\sum_{j=1}^i p(j) - \sum_{j=1}^i q(j)} 
 \] and
 \[
     \lp[2](p,q) = \normtwo{p-q} = \sqrt{\sum_{i=1}^\ab (p(i)-q(i))^2},\qquad
@@ -220,7 +220,7 @@ To conclude, let us briefly discuss three other distance measures: Kolmogorov (a
 A few remarks first. The Kolmogorov distance is actually defined for any distribution on $\R$, not necessarily discrete; one can equivalently define it as
 $
 \kolmogorov{p}{q} =\sup_{i} ( \shortexpect_p[\indicSet{(-\infty,i]}] - \shortexpect_q[\indicSet{(-\infty,i]}] )$. This has a nice interpretation: recalling the definition of TV distance, both are of the form $\sup_{f \in\mathcal{C}} (\shortexpect_p[f] - \shortexpect_q[f])
-$ where $\mathcal{C}$ is a class of measurable functions. For TV distance, $\mathcal{C}$ is the class of indicators of all measurable subsets; for Kolmogorov, this is the (smaller) class of indicators of intervals of the form $(-\infty, a]$. (For Wasserstein/EMD distance, this will be the class of continuous, $1$-Lipschitz functions.)
+$ where $\mathcal{C}$ is a class of measurable functions.\footnote{Such metrics on the space of probability distributions are called \emph{integral probability metrics}.}{} For TV distance, $\mathcal{C}$ is the class of indicators of all measurable subsets; for Kolmogorov, this is the (smaller) class of indicators of intervals of the form $(-\infty, a]$. (For Wasserstein/EMD distance, this will be the class of continuous, $1$-Lipschitz functions.)
 
 Second, because of the above, and also monotonicity of $\lp[p]$ norms, Cauchy--Schwarz, the fact that $\lp[1](p,q) = 2\totalvardist{p}{q}$, and elementary manipulations, we have
 \[
@@ -232,7 +232,7 @@ That can be useful sometimes. Now, I will only briefly sketch the proof of the n
   $\Phi(\operatorname{d_{\rm{}K}},\ab,\dst,\delta),\Phi(\lp[\infty],\ab,\dst,\delta),\Phi(\lp[2],\ab,\dst,\delta) = \bigTheta{\frac{\log(1/\delta)}{\dst^2}}$, independent of $\ab$.
 \end{theorem}
 \begin{proof}[Sketch]
-The proof for Kolmogorov distance is the most involved, and follows from a \emph{very} useful and non-elementary theorem due to Dvoretzky, Kiefer, and Wolfowitz from 1956 (with the optimal constant due to Massart, in 1990):
+The proof for Kolmogorov distance is the most involved, and follows from a \emph{very} useful and non-elementary theorem due to Dvoretzky, Kiefer, and Wolfowitz from 1956~\cite{DKW:56} (with the optimal constant due to Massart, in 1990~\cite{Massart:90}):
 \begin{theorem}[DKW Inequality]
   Let $\hat{p}$ denote the empirical distribution on $\ns$ i.i.d. samples from $p$ (an \emph{arbitrary} distribution on $\R$). Then, for every $\dst > 0$,
   \[
@@ -281,6 +281,36 @@ The proof for $\lp[\infty]$ just follows the Kolmogorov upper bound and the afor
   volume = 	 {40},
   series = 	 {Proceedings of Machine Learning Research},
   publisher = 	 {PMLR}
+}
+
+@article{DKW:56,
+    AUTHOR = {Dvoretzky, A. and Kiefer, J. and Wolfowitz, J.},
+     TITLE = {Asymptotic minimax character of the sample distribution
+              function and of the classical multinomial estimator},
+   JOURNAL = {Ann. Math. Statist.},
+  FJOURNAL = {Annals of Mathematical Statistics},
+    VOLUME = {27},
+      YEAR = {1956},
+     PAGES = {642--669},
+      ISSN = {0003-4851},
+   MRCLASS = {62.0X},
+  MRNUMBER = {83864},
+       DOI = {10.1214/aoms/1177728174}
+}
+
+@article{Massart:90,
+    AUTHOR = {Massart, P.},
+     TITLE = {The tight constant in the {D}voretzky-{K}iefer-{W}olfowitz
+              inequality},
+   JOURNAL = {Ann. Probab.},
+  FJOURNAL = {The Annals of Probability},
+    VOLUME = {18},
+      YEAR = {1990},
+    NUMBER = {3},
+     PAGES = {1269--1283},
+      ISSN = {0091-1798},
+   MRCLASS = {60E15 (60G50 62G30)},
+  MRNUMBER = {1062069}
 }
 
 \end{filecontents}
