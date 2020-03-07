@@ -117,15 +117,15 @@ This theorem is ``highly non-trivial'' to establish, however; for the sake of ex
           \expect{\sqrt{X}} 
           &= \sqrt{\expect{X}}\cdot\expect{\sqrt{Y}}
           = \sqrt{\expect{X}}\cdot\expect{\sqrt{1+(Y-\expect{Y})})} \\
-          &\geq \sqrt{\expect{X}} \mleft( 1+ \frac{1}{2}\expect{Y-\expect{Y}} - \frac{1}{6} \expect{(Y-\expect{Y})^2} \mright)
+          &\geq \sqrt{\expect{X}} \mleft( 1+ \frac{1}{2}\expect{Y-\expect{Y}} - \frac{1}{2} \expect{(Y-\expect{Y})^2} \mright)
           = \sqrt{\expect{X}}\mleft(1-\frac{\var X}{6\expect{X}^2}\mright)
       \end{align*}
-      where we used the inequality $\sqrt{1+x} \geq 1+\frac{x}{2}-\frac{x^2}{6}$, which holds for $x\geq 0$.\footnote{And is inspired by the Tayor expansion $\sqrt{1+x} = 1+\frac{x}{2} - \frac{x^2}{8} +o(x^2)$: there is \emph{some} intuition for it.}{} Since, for every $i\in[\ab]$, $\ns\widehat{p}(i)$ follows a $\binomial{\ns}{p(i)}$ distribution, we get
+      where we used the inequality $\sqrt{1+x} \geq 1+\frac{x}{2}-\frac{x^2}{2}$, which holds for $x\geq -1$.\footnote{And is inspired by the Tayor expansion $\sqrt{1+x} = 1+\frac{x}{2} - \frac{x^2}{8} +o(x^2)$: there is \emph{some} intuition for it.}{} Since, for every $i\in[\ab]$, $\ns\widehat{p}(i)$ follows a $\binomial{\ns}{p(i)}$ distribution, we get
       \[
-          \expect{ \hellinger{p}{\widehat{p}}^2 } \leq 1-\frac{1}{\sqrt{\ns}}\sum_{i=1}^\ab \sqrt{p(i)}\cdot\sqrt{\ns p(i)} \mleft(1-\frac{\ns p(i)(1-\ns p(i))}{6\ns^2 p(i)^2}\mright)
-          \leq 1 - \sum_{i=1}^\ab p(i) \mleft(1-\frac{1}{6\ns p(i)}\mright) = \frac{\ab}{6\ns}\,.
+          \expect{ \hellinger{p}{\widehat{p}}^2 } \leq 1-\frac{1}{\sqrt{\ns}}\sum_{i=1}^\ab \sqrt{p(i)}\cdot\sqrt{\ns p(i)} \mleft(1-\frac{\ns p(i)(1-\ns p(i))}{2\ns^2 p(i)^2}\mright)
+          \leq 1 - \sum_{i=1}^\ab p(i) \mleft(1-\frac{1}{2\ns p(i)}\mright) = \frac{\ab}{2\ns}\,.
       \]
-      Therefore, for $\ns\geq \frac{\ab}{3\dst^2}$, we have $\expect{ \hellinger{p}{\widehat{p}}^2 }\leq \frac{\dst^2}{2}$.
+      Therefore, for $\ns\geq \frac{\ab}{\dst^2}$, we have $\expect{ \hellinger{p}{\widehat{p}}^2 }\leq \frac{\dst^2}{2}$.
       \item Next, to convert this expected result to a high probability guarantee, we \emph{would like} to apply McDiarmid's inequality to the random variable $f(s_1,\dots,s_\ns) \eqdef \hellinger{p}{\widehat{p}}^2$ as in the (first) proof of~\autoref{theo:learning:tv}; unfortunately, changing a sample can change the value by up to $c \approx 1/\sqrt{\ns}$, and McDiarmid will yield
 only a vacuous bound.\footnote{Try it: it's a real bummer.}{} Instead, we will use a stronger, more involved concentration inequality:
       \begin{theorem}[{\cite[Theorem~8.6]{BLM:13}}]\label{theo:stronger:mcdiarmid}
@@ -160,7 +160,7 @@ only a vacuous bound.\footnote{Try it: it's a real bummer.}{} Instead, we will u
       \]
       and therefore, as long as $\ns \geq \frac{8}{\dst^4}\ln\frac{1}{\delta}$, we have $\abs{f(s_1,\dots,s_\ns)-\expect{f(s_1,\dots,s_\ns)}} \leq \frac{\dst^2}{2}$ with probability at least $1-\delta$.
     \end{itemize}
-    Putting it all together, we obtain that $\hellinger{p}{\widehat{p}}^2 \leq \dst^2$ with probability at least $1-\delta$, as long as $\ns \geq \max\mleft( \frac{\ab}{3\dst^2}, \frac{8}{\dst^4}\ln\frac{1}{\delta}\mright)$.
+    Putting it all together, we obtain that $\hellinger{p}{\widehat{p}}^2 \leq \dst^2$ with probability at least $1-\delta$, as long as $\ns \geq \max\mleft( \frac{\ab}{\dst^2}, \frac{8}{\dst^4}\ln\frac{1}{\delta}\mright)$.
 \end{proof}
 \noindent We finally get to the final, optimal bound:
 \begin{proofof}{\autoref{theo:learning:hellinger}}
