@@ -118,7 +118,7 @@ This theorem is ``highly non-trivial'' to establish, however; for the sake of ex
           &= \sqrt{\expect{X}}\cdot\expect{\sqrt{Y}}
           = \sqrt{\expect{X}}\cdot\expect{\sqrt{1+(Y-\expect{Y})})} \\
           &\geq \sqrt{\expect{X}} \mleft( 1+ \frac{1}{2}\expect{Y-\expect{Y}} - \frac{1}{2} \expect{(Y-\expect{Y})^2} \mright)
-          = \sqrt{\expect{X}}\mleft(1-\frac{\var X}{6\expect{X}^2}\mright)
+          = \sqrt{\expect{X}}\mleft(1-\frac{\var X}{2\expect{X}^2}\mright)
       \end{align*}
       where we used the inequality $\sqrt{1+x} \geq 1+\frac{x}{2}-\frac{x^2}{2}$, which holds for $x\geq -1$.\footnote{And is inspired by the Tayor expansion $\sqrt{1+x} = 1+\frac{x}{2} - \frac{x^2}{8} +o(x^2)$: there is \emph{some} intuition for it.}{} Since, for every $i\in[\ab]$, $\ns\widehat{p}(i)$ follows a $\binomial{\ns}{p(i)}$ distribution, we get
       \[
