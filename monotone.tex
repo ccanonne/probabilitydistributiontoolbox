@@ -126,7 +126,7 @@ The lower bound also follows from the learning lower bound for (arbitrary) discr
 
 \section{Consequences for testing and distance estimation}
 
-Let's now turn to testing, starting with identity and closeness testing (a.k.a. one- and two-sample testing). Actually, let us first look at the most fundamental case, \emph{uniformity} testing: without any monotonicity assumption, this has sample complexity $\bigTheta{\frac{\sqrt{\ab}}{\dst^2}}$~\cite{Paninski:08,VV:17}:
+Let's now turn to testing, starting with identity and closeness testing (a.k.a. one- and two-sample testing). Actually, let us first look at the most fundamental case, \emph{uniformity} testing: without any monotonicity assumption, this has sample complexity $\bigTheta{\frac{\sqrt{\ab}}{\dst^2}}$~\cite{Paninski:08,VV:17}:\footnote{Note that here we consider the tasks of testing properties of distributions \emph{assumed} to be monotone. Testing \emph{whether} an arbitrary distribution is monotone is a completely different question, with wildly different sample complexity~\cite{BKR:04,Canonne:15,ADK:15,CDGR:18}.}
 \begin{theorem}\label{theo:testing:uniformity:monotone}
   Given i.i.d. samples from an arbitrary \emph{monotone non-increasing} distribution $\p$ over $[\ab]$, testing whether $\p=\uniform$ vs. $\totalvardist{\p}{\uniform} > \dst$ (with success probability at least $2/3$) has sample complexity $\bigTheta{1/\dst^2}$, \emph{independent of $\ab$}. 
 \end{theorem}
@@ -198,7 +198,26 @@ As a final remark, note that this has similar implications for \emph{distance es
   publisher = {{PMLR}},
   year      = {2019}
 }
+@inproceedings{ADK:15,
+  author    = {Jayadev Acharya and
+               Constantinos Daskalakis and
+               Gautam Kamath},
+  title     = {Optimal Testing for Properties of Distributions},
+  booktitle = {{NeurIPS}},
+  pages     = {3591--3599},
+  year      = {2015}
+}
 
+@inproceedings{BKR:04,
+  author    = {Tugkan Batu and
+               Ravi Kumar and
+               Ronitt Rubinfeld},
+  title     = {Sublinear algorithms for testing monotone and unimodal distributions},
+  booktitle = {{STOC}},
+  pages     = {381--390},
+  publisher = {{ACM}},
+  year      = {2004}
+}
 @article{Birge:87,
     AUTHOR = {Birg\'{e}, Lucien},
      TITLE = {On the risk of histograms for estimating decreasing densities},
@@ -215,6 +234,29 @@ MRREVIEWER = {Eswar G. Phadia},
        DOI = {10.1214/aos/1176350489},
        URL = {https://doi.org/10.1214/aos/1176350489},
 }
+@inproceedings{Canonne:15,
+  author    = {Cl{\'{e}}ment L. Canonne},
+  title     = {Big Data on the Rise? - Testing Monotonicity of Distributions},
+  booktitle = {{ICALP} {(1)}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {9134},
+  pages     = {294--305},
+  publisher = {Springer},
+  year      = {2015}
+}
+@article{CDGR:18,
+  author    = {Cl{\'{e}}ment L. Canonne and
+               Ilias Diakonikolas and
+               Themis Gouleakis and
+               Ronitt Rubinfeld},
+  title     = {Testing Shape Restrictions of Discrete Distributions},
+  journal   = {Theory Comput. Syst.},
+  volume    = {62},
+  number    = {1},
+  pages     = {4--62},
+  year      = {2018}
+}
+
 @inproceedings{CDVV:14,
     AUTHOR = {Chan, Siu-On and Diakonikolas, Ilias and Valiant, Gregory and
               Valiant, Paul},
