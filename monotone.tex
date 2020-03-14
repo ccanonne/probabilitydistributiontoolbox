@@ -1,0 +1,343 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\def\withcolors{0}
+\def\withnotes{0}
+\def\withindex{1}
+\def\withbiblioconversion{1} % long names for the journals
+
+\input{packages}
+\input{preamble}
+
+\usepackage{filecontents}
+
+\newcommand{\birgered}[2][\D]{\Psi_{#2}(#1)}
+
+\newcommand{\dst}{\varepsilon}
+\newcommand{\ab}{k}
+\newcommand{\ns}{n}
+\renewcommand{\eqdef}{\coloneqq}
+\newcommand{\p}{p}
+\newcommand{\q}{q}
+\renewcommand{\uniform}{\mathbf{u}}
+
+\title{Monotone probability distributions and the Birg\'e decomposition}
+\date{February, 2020}
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+
+%\listoftodos\subsection{About monotone distributions}
+We state here a few structural results about (discrete) monotone distributions and their consequences; starting with the very useful fact that they admit a \emph{succinct} approximation, itself monotone, close in total variation distance. Most results here are for discrete distributions, although they admit a continuous counterpart: every non-trivial result stated in this note is from~\cite{DDSVV:12,DDS:14} (for the discrete case, and the implications for testing and learning).\footnote{We state all the results for non-increasing probability distributions: a straightforward analogue holds for non-decreasing ones.}
+
+\section{Structural result: Birg\'e's oblivious decomposition}
+
+\begin{definition}[Oblivious decomposition]\label{def:birge:obl:decomp}
+  Given a parameter $\dst>0$, the corresponding \emph{oblivious decomposition of $[\ab]$} is the partition $\mathcal{I}_\dst$ in $\ell$ consecutive intervals $I_1,\dots,I_\ell$, where $\ell=\bigTheta{\frac{\log( \dst \ab + 1)}{\dst}}$ is the smallest integer such that $\sum_{j=1}^{\ell} \flr{(1+\dst)^j} \geq \ab$ and\footnotemark{} $\abs{I_{j}}=\flr{(1+\dst)^j}$ for $1\leq j < \ell$. % (with $\abs{I_{\ell}} = \ab - \sum_{j=1}^{\ell-1} \flr{(1+\dst)^j}$).
+\end{definition}
+\footnotetext{We will often ignore the floors in the definition of the oblivious partition, to avoid more cumbersome analyses and the technicalities that would otherwise arise. However, note that this does not affect the correctness of the proofs: after the first $\approx\frac{1}{\dst}\log\frac{1}{\dst}$ intervals, we do have indeed $\abs{I_{k+1}}\in[1+\frac{\dst}{2},1+2\dst]\abs{I_{k}}$. This multiplicative property, in turn, is the key aspect we shall rely on.}
+
+\noindent For a distribution $\p$ and parameter $\dst$, define $\birge[\p]{\dst}$ to be the \emph{flattened distribution} with respect to the oblivious decomposition $\mathcal{I}_\dst$:
+\begin{equation}\label{eq:flattening}
+    \forall j\in [\ell], \forall i\in I_j,\quad \birge[\p]{\dst}(i) = \frac{\p(I_j)}{\abs{I_j}}
+\end{equation}
+Note that while $\birge[\p]{\dst}$ (obviously) depends on $\p$, the partition $\mathcal{I}_\dst$ itself does not; in particular, it can be computed \emph{prior to getting any sample or information about $\p$}. 
+
+\begin{theorem}[\cite{Birge:87,DDSVV:12}]\label{theorem:birge:obl:decomp}
+ If $\p$ is monotone non-increasing, then $\totalvardist{\p}{\birge[\p]{c\dst}} \leq \dst$ (where $c>0$ is an absolute constant). Furthermore, $\birge[\p]{c\dst}$ is also monotone non-increasing.
+\end{theorem}
+
+\begin{corollary}[Robustness]\label{coro:birge:decomposition:robust}
+  Suppose $\p$ is $\dst$-close to monotone non-increasing. Then $\totalvardist{\p}{\birge[\p]{c\alpha}} \leq 2\dst+\alpha$. Furthermore,  $\birge[\p]{c\alpha}$ is also $\dst$-close to monotone non-increasing.
+\end{corollary}
+\begin{proof}
+Let $\q$ be a monotone non-increasing distribution such that $\totalvardist{\p}{\q} \leq \dst$. By the triangle inequality,
+\[
+    \totalvardist{\p}{\birge[\p]{c\alpha}} \leq \totalvardist{\p}{\q} + \totalvardist{\q}{\birge[\q]{c\alpha}} + \totalvardist{\birge[\q]{c\alpha}}{\birge[\p]{c\alpha}}
+    \leq \dst + \alpha + \totalvardist{\birge[\q]{c\alpha}}{\birge[\p]{c\alpha}}
+\]
+where the last inequality uses the assumption on $\p$ and~\autoref{theorem:birge:obl:decomp} applied to it. It only remains to bound the last term: by definition,
+\begin{align*}
+  2\totalvardist{\birge[\q]{c\alpha}}{\birge[\p]{c\alpha}} 
+  &= \sum_{i=1}^\ab \abs{\birge[\p]{c\alpha}(i) - \birge[\q]{c\alpha}(i)} 
+  = \sum_{j=1}^\ell\sum_{i\in I_j} \abs{\birge[\p]{c\alpha}(i) - \birge[\q]{c\alpha}(i)} \\
+  &= \sum_{j=1}^\ell\sum_{i\in I_j} \abs{ \frac{\p(I_j) - \q(I_j)}{\abs{I_j}} } 
+  = \sum_{j=1}^\ell \abs{ \p(I_j) - \q(I_j) } 
+  = \sum_{j=1}^\ell \dabs{ \sum_{i\in I_j}\left(  \p(i) - \q(i)  \right)} \\
+  &\leq \sum_{j=1}^\ell \sum_{i\in I_j} \abs{ \p(i) - \q(i)} = 2\totalvardist{\p}{\q}
+  \leq 2\dst
+\end{align*}
+(showing in particular the second part of the claim, as $\birge[\q]{c\alpha}$ is monotone) and thus
+\[
+    \totalvardist{\p}{\birge[\p]{c\alpha}} \leq 2\dst+\alpha
+\]
+as claimed.
+\end{proof}
+One can interpret this corollary as saying that the Birg\'e decomposition provides a tradeoff between becoming \emph{simpler} (and at least as close to monotone) while not staying too far from the original distribution.\medskip
+
+\noindent Incidentally, the last step of the proof above implies the following easy fact:
+\begin{fact}\label{fact:birge:shrinking}
+  For all $\alpha\in(0,1]$,
+  \begin{equation}
+  \totalvardist{\birge[\p]{c\alpha}}{\birge[\q]{c\alpha}} \leq \totalvardist{\p}{\q}
+  \end{equation}
+  and in particular, for any property $\mathcal{P}$ left invariant by the Birg\'e transformation (such as monotonicity)
+  \begin{equation}
+  \totalvardist{\birge[\p]{c\alpha}}{\mathcal{P}} \leq \totalvardist{\p}{\mathcal{P}}
+  \end{equation}
+  (where, as usual, $\totalvardist{\p}{\mathcal{P}} \eqdef \inf_{\q\in\mathcal{P} }\totalvardist{\p}{\q}$).
+\end{fact}
+
+\section{Consequences for learning (density estimation)}
+
+Write $\Phi_{\rm mon}(\ab,\dst,\delta)$ for the sample complexity of learning discrete \emph{non-increasing} distributions over a known domain of size $\ab$, to accuracy $\dst>0$, with error probability $\delta\in(0,1]$.
+
+\begin{theorem}\label{theo:learning:tv}
+  $\Phi_{\rm mon}(\ab,\dst,\delta) = \bigTheta{\frac{\log(\dst\ab+1)}{\dst^3}+\frac{\log(1/\delta)}{\dst^2}}$, where the lower bound hold for $\dst \gtrsim 1/\ab$.
+\end{theorem}
+\noindent Note that when $\dst \ll 1/\ab$, this becomes $\bigTheta{(\ab+\log(1/\delta))/\dst^2}$ and we get back to the sample complexity of learning \emph{arbitrary} distributions over a known domain of size $\ab$. (I.e., for very small $\dst$, the oblivious decomposition becomes trivial and does not buy us anything.)
+
+\begin{proof}
+The upper bound is a direct consequence of~\autoref{theorem:birge:obl:decomp} and the sample complexity of learning (arbitrary) discrete distributions. Specifically, letting $\ell(\ab,\dst)$ denote the number of intervals in the obvious decomposition with parameters $\ab$ and $c\frac{\dst}{2}$, we have (i)~$\totalvardist{\p}{\birge[\p]{c\dst/2}} \leq \frac{\dst}{2}$ and (ii)~$\birge[\p]{c\dst/2}$ being a distribution fully determined by the $\ell(\ab,\dst)$ values $\p(I_1), \dots, \p(I_{\ell(\ab,\dst)})$. Let $\q$ be the distribution on $[\ell(\ab,\dst)]$ with $\q(i) = \p(I_i)$ for all $i\in[\ell(\ab,\dst)]$.
+
+Given $\ns$ i.i.d. samples from $\p$, it is immediate to generate $\ns$ i.i.d. samples from $\q$ (simply map each sample from $\p$ to the index of the interval $I_i$ it fell into). Thus, with $\bigO{\frac{\ell(\ab,\dst)+\log(1/\delta)}{\dst^2}}$ samples from $\p$, one can learn $\q$ to total variation distance $\frac{\dst}{2}$ with probability at least $1-\delta$, obtaining a hypothesis distribution $\hat{\q}$ on $[\ell(\ab,\dst)]$. Now, one can transform this $\hat{\q}$ into a piecewise-constant distribution $\hat{\p}$ on $[\ab]$ in the natural way:
+\begin{equation}\label{eq:expanding}
+  \forall j\in [\ell], \forall i\in I_j,\quad \hat{\p}(i) = \frac{\hat{\q}(j)}{\abs{I_j}}\,.
+\end{equation}
+It is immediate to see that, by construction, $\totalvardist{\birge[\p]{c\dst/2}}{\hat{\p}} = \totalvardist{\q}{\hat{\q}}$ (as they both are piecewise constant on the same partition). Therefore, we get
+\[
+    \totalvardist{\p}{\hat{\p}} \leq \totalvardist{\p}{\birge[\p]{c\dst/2}}+\totalvardist{\birge[\p]{c\dst/2}}{\hat{\p}} \leq 2\cdot \frac{\dst}{2}
+\]
+with probability at least $1-\delta$.\medskip
+
+The lower bound also follows from the learning lower bound for (arbitrary) discrete distributions, with one small caveat. Namely, it uses the same construction over domain $[\ell(\ab,c'\dst)]$ analyzed with Assouad's lemma, then ``ported over'' domain $[\ab]$ via the Birg\'e oblivious decomposition. In more detail, letting $\ell \eqdef \ell(\ab,c'\dst)$ (for some constant $c'>0$) be as before the number of intervals in the corresponding Birg'e decomposition, the lower bound construction is the family of $2^{\ell/2}$ distributions $\{\q_z\}_{z\in\{-1,1\}^{\ell/2}}$ over $[\ell]$ such that
+\begin{equation}\label{eq:paninski}
+    \forall i\in[\ell/2], \quad \q_z(2i-1) = \frac{1+2z_i \dst}{\ell}, \quad \p_z(2i)= \frac{1-2z_i \dst}{\ell}\,,
+\end{equation}
+(which we will sometimes refer to as the ``Paninski construction,'' in view of its use in~\cite{Paninski:08}.) Similarly as for the upper bound (cf.~\eqref{eq:expanding}), one can map these distributions in a distance-preserving fashion to piecewise-constant distributions $\{\p_z\}_{z\in\{-1,1\}^{\ell/2}}$ over $[\ab]$, so the lower bound of $\bigOmega{\frac{\ell+\log(1/\delta)}{\dst^2}}$ samples obtained by analyzing this family yields a lower bound for our problem. The only subtlety is to make sure the distributions $\{\p_z\}_{z\in\{-1,1\}^{\ell/2}}$ obtained by this mapping are indeed monotone non-increasing. This can be done by choosing a suitable constant $c'$ in the Birg\'e decomposition, to ensure that $\frac{1-2z_i\dst}{|I_j|} \geq \frac{1+2z_i\dst}{|I_{j+1}|}$ for all $1/\dst\lesssim j<\ell$.
+\end{proof} 
+
+
+\section{Consequences for testing and distance estimation}
+
+Let's now turn to testing, starting with identity and closeness testing (a.k.a. one- and two-sample testing). Actually, let us first look at the most fundamental case, \emph{uniformity} testing: without any monotonicity assumption, this has sample complexity $\bigTheta{\frac{\sqrt{\ab}}{\dst^2}}$~\cite{Paninski:08,VV:17}:
+\begin{theorem}\label{theo:testing:uniformity:monotone}
+  Given i.i.d. samples from an arbitrary \emph{monotone non-increasing} distribution $\p$ over $[\ab]$, testing whether $\p=\uniform$ vs. $\totalvardist{\p}{\uniform} > \dst$ (with success probability at least $2/3$) has sample complexity $\bigTheta{1/\dst^2}$, \emph{independent of $\ab$}. 
+\end{theorem}
+\begin{proof}
+  The idea is actually quite simple: we will show that the only way a monotone distribution can be far from uniform is by ``putting significantly too much probability weight on the first half of the domain.'' To do so, assume without loss of generality that $\ab$ is even.\footnote{Otherwise, one can, e.g., treat separately the last element of the domain and test that $\p(\ab) \ll \dst$, which is a little annoying but does not affect the sample complexity.} Let $H\eqdef \{1,\dots,\ab/2\}$. On the one hand, if $\p=\uniform$, then $\p(H) = 1/2$. On the other hand, if $\totalvardist{\p}{\uniform} > \dst$, then by definition of total variation distance there the set $S\eqdef \setOfSuchThat{ i \in [\ab] }{ \p(i) > \uniform(i) }$ is such that $\p(S) > \uniform(S)+\dst = |S|/\ab+\dst$. By monotonicity, this set $S$ is an interval of the form $\{1,\dots,|S|\}$ (since $\p(m) > 1/\ab$ implies $\p(m-1) > 1/\ab$).
+\begin{itemize}
+  \item If $|S| \leq \ab/2$, then by monotonicity $\p(H^c) \leq \frac{\ab}{2}\cdot \frac{1-\p(S)}{\ab-|S|} < \frac{1}{2}\cdot \frac{1-\frac{|S|}{\ab}-\dst}{1-\frac{|S|}{\ab}}
+  = \frac{1}{2} \mleft(1-\frac{\dst}{1-\frac{|S|}{\ab}}\mright) \leq \frac{1}{2} - \frac{\dst}{2}$
+  \item If $|S| > \ab/2$, then by monotonicity $\p(H) \geq \frac{\ab}{2}\cdot \frac{\p(S)}{|S|} > \frac{1}{2} + \dst\cdot \frac{\ab}{2|S|} \geq \frac{1}{2} + \frac{\dst}{2}$.
+\end{itemize}
+In both cases, we have $\p(H) > \frac{1}{2} + \frac{\dst}{2}$. This shows that, mapping each sample from $\p$ to the half of the domain it belongs to, the problem boils down to distinguishing a fair coin ($\p(H) = 1/2$) from an $\frac{\dst}{2}$-biased one ($\p(H) > \frac{1}{2} + \frac{\dst}{2}$). This can be performed with $\bigO{1/\dst^2}$ samples, giving the upper bound. (The lower bound also follows by a straightforward reduction to this very same biased coin question.)
+\end{proof}
+
+This looks quite surprising: the shape assumption (monotonicity) allowed us to entirely get rid of the dependence on the domain size when testing for uniformity! Since uniformity testing is a special case of the more general \emph{identity} testing, and in the arbitrary (non-monotone) it is known that the two are equivalent~\cite{DK:16,Goldreich:16,ACT:19}, one can wonder what happens next\dots{} As it turns out, maybe not exactly what one would expect.
+\begin{theorem}\label{theo:testing:identity:monotone}
+  Given a known reference (monotone non-increasing) distribution $\q$ on $[\ab]$ and i.i.d. samples from an arbitrary \emph{monotone non-increasing} distribution $\p$ over $[\ab]$, testing whether $\p=\q$ vs. $\totalvardist{\p}{\q} > \dst$ (with success probability at least $2/3$) has sample complexity $\bigTheta{\sqrt{\log(\dst\ab + 1)}/\dst^{5/2}}$, where the lower bound hold for $\dst \gtrsim 1/\ab$.
+\end{theorem}
+For the proof of this theorem (and the next results), it will be convenient to introduce one more piece of notation. Recall that the flattened distribution of a distribution $\p$ (for parameters $\ab,\dst$) was a piecewise-constant distribution $\birge[\p]{\dst}$ on $[\ab]$ with $\ell\eqdef \abs{\mathcal{I}_\dst}$ pieces (cf.~\eqref{eq:flattening}). We now also define the \emph{reduction} $\birgered[\p]{\dst}$ of a distribution $\p$ with regard to the Birg\'e decomposition as the corresponding distribution on $[\ell]$:
+\begin{equation}\label{eq:reducing}
+    \forall j\in [\ell],\quad \birgered[\p]{\dst}(i) = \p(I_j)\,.
+\end{equation}
+It is immediate to check (and we have done so before, implicitly) that $\totalvardist{\birgered[\p]{\dst}}{\birgered[\q]{\dst}} = \totalvardist{\birge[\p]{\dst}}{\birge[\q]{\dst}}$ for any two distributions $\p,\q$ on $[\ab]$.
+With this in hand, we can proceed with the proof.
+\begin{proofof}{\autoref{theo:testing:identity:monotone}}
+We will invoke the Birg\'e decomposition and~\autoref{theorem:birge:obl:decomp}: with the right parameter $\alpha \asymp \dst$, we have that $\p' \eqdef \birge[\p]{\alpha}$ and $\q' \eqdef \birge[\q]{\alpha}$ are such that: (i)~$\totalvardist{\p}{\p'} \leq \frac{\dst}{3}$, (ii)~$\totalvardist{\q}{\q'} \leq \frac{\dst}{3}$, (iii)~$\p',\q'$ are both monotone, (iv)~$\q'$ is explicitly known, and (v)~i.i.d. samples from $\p$ can be mapped to i.i.d. samples from $\p'$ (here, relying crucially on the fact that the decomposition is oblivious and explicit). Further, if $\p=\q$ then clearly $\p'=\q'$, while by the triangle inequality if $\totalvardist{\p}{\q} > \dst$ then $\totalvardist{\p'}{\q'} > \dst - 2\cdot \frac{\dst}{3} = \frac{\dst}{3}$.  
+It is therefore sufficient to test identity of $\p'$ and $\q'$ with parameter $\frac{\dst}{3}$. But by the above discussion, this is equivalent to testing identity of $\p'' \eqdef \birgered[\p]{\alpha}$ and $\q'' \eqdef \birgered[\q]{\alpha}$ with parameter $\frac{\dst}{3}$: since these two distributions have domain $\ell\eqdef \ell(\ab,\dst/3)$, this can be done with $\bigO{\sqrt{\ell}/\dst^2} = \bigO{\sqrt{\log(\dst\ab+1)}/\dst^{5/2}}$ samples, as claimed.
+
+The lower bound, as for~\autoref{theo:learning:tv}, follows directly from the corresponding testing lower bound construction and analysis for arbitrary distributions (over support size $[\ell]$), namely, the ``Paninski family'' defined in~\eqref{eq:paninski}. Here too, one only needs to set the parameters of the Birg\'e partition so that when mapping the distributions of this family (which are over $[\ell]$) to the larger domain $[\ab]$, the resulting probability distributions are monotone non-increasing.
+\end{proofof}
+
+\noindent In summary, we showed the following:
+\[
+    \text{$\p\stackrel{?}{=}\q$, with $\ab,\dst$} \longrightarrow \text{$\birge[\p]{\alpha}\stackrel{?}{=}\birge[\q]{\alpha}$, with $\ab,\dst/3$} \longleftrightarrow \text{$\birgered[\p]{\alpha}\stackrel{?}{=}\birgered[\q]{\alpha}$, with $\ell,\dst/3$}
+\]
+which is the template of reductions we will rely on again for the next two results.
+
+\begin{remark}
+Note that, again, when $\dst \ll 1/\ab$, the sample complexity of~\autoref{theo:testing:identity:monotone} becomes $\bigTheta{\sqrt{\ab}/\dst^2}$ and we get back to the sample complexity of identity testing \emph{arbitrary} distributions over a known domain of size $\ab$. But, interestingly, under the monotonicity assumption identity testing is no longer equivalent to uniformity testing! Roughly, this is because the aforementioned reductions from~\cite{DK:16,Goldreich:16,ACT:19} do not preserve monotonicity, so one cannot use~\autoref{theo:testing:uniformity:monotone} at the end.
+\end{remark}
+
+Now, unto two-sample (i.e., closeness) testing:
+\begin{theorem}\label{theo:testing:identity:monotone}
+  Given i.i.d. samples from two arbitrary \emph{monotone non-increasing} distributions $\p,\q$ over $[\ab]$, testing whether $\p=\q$ vs. $\totalvardist{\p}{\q} > \dst$ (with success probability at least $2/3$) has sample complexity $\bigO{\max\mleft( \log(\dst\ab + 1)^{2/3}/\dst^{2}, \sqrt{\log(\dst\ab + 1)}/\dst^{5/2} \mright)}$ and, as long as $\dst \gtrsim 1/\ab$, $\bigOmega{\max\mleft( \log(\dst\ab + 1)^{2/3}/(\log\log(\dst\ab + 1)\dst^{4/3}), \sqrt{\log(\dst\ab + 1)}/\dst^{5/2} \mright)}$.
+\end{theorem}
+\begin{proof}
+The upper bound follows verbatim the same template of reductions, and the argument of~\autoref{theo:testing:identity:monotone} goes through with the difference that now both $\p,\q$ are unknown: so that the result invoked at the end is the fact that closeness testing for two arbitrary distributions over $[\ell]$ has sample complexity $\bigTheta{\max\mleft( \ell^{2/3}/\dst^{4/3}, \sqrt{\ell}/\dst^{2} \mright)}$~\cite{CDVV:14}.
+
+The lower bound, however, is not as straightforward: indeed, the lower bound constructions for arbitrary distributions over $[\ell]$ from~\cite{Valiant:08,CDVV:14}, which we would like to use as a near-blackbox similarly to what we did in~\autoref{theo:learning:tv} and~\autoref{theo:testing:identity:monotone} (there with the Paninski construction), are not immediately amenable to this. However, we can rely on the more involved reduction from~\cite[Proposition 6]{DDSVV:12}, here adapted for the case of monotone distributions:
+Let $\rho \eqdef \frac{\rho_{\max}}{\rho_{\min}}$, $\alpha \eqdef c\cdot\frac{\dst}{2}$ (where $c>0$ is as in~\autoref{theorem:birge:obl:decomp}), and $\lambda_{\rho,\dst} \eqdef 1+\log_{1+\alpha} \rho$. Define the geometric distribution $\gamma_{\rho,\dst}$ on $[\lambda_{\rho,\dst}]$ as the one such that $\gamma_{\rho,\dst}(j) \propto (1+\alpha)^j$ for $j\in[\lambda_{\rho,\dst}]$. Now, given any distribution $\p$ on $[\ab]$, we can define the distribution $\p\odot\gamma_{\rho,\dst}$ on $[\lambda_{\rho,\dst}\cdot\ab]$ by
+\[
+      \forall i \in[\ab], \forall j\in[\lambda_{\rho,\dst}], \quad \p\odot\gamma_{\rho,\dst}( \lambda_{\rho,\dst}\cdot (i-1) + j ) = \p(i)\gamma_{\rho,\dst}(j)\,.
+\]
+This seemingly contrived construction has the following key property, easy to check by definition of $\gamma_{\rho,\dst}$ and our choice of $\lambda_{\rho,\dst}$: if $\frac{\max_i \p(i)}{\min_i \p(i)} \leq \rho$, then $\p\odot\gamma_{\rho,\dst}(i-1)\leq (1+\alpha)\p\odot\gamma_{\rho,\dst}(i)$ for all $2\leq i \leq \lambda_{\rho,\dst}\cdot\ab$. With that in hand, we can proceed as in the lower bound proof of~\autoref{theo:testing:identity:monotone}, but this time leveraging the $\bigOmega{m^{2/3}/\dst^{4/3}}$ lower bound construction of~\cite{CDVV:14}, straightforwardly modified so that $\rho_{\max} \asymp \dst/\ab^{2/3}$ and $\rho_{\min} = 1/(2\ab)$ (instead of $0$). The end result loses an $\frac{1}{\dst}\log\log(\dst\ab + 1)$ factor due to the first domain expansion of size $\lambda_{\rho,\dst} = 1+\log_{1+\alpha} \dst\ell$. (The other term of the lower bound follows directly from~\autoref{theo:testing:identity:monotone}, since closeness testing is at least at hard as identity testing.)
+\end{proof}
+
+As a final remark, note that this has similar implications for \emph{distance estimation} between two distinct monotone distributions $\p,\q$, i.e., the task of estimating $\totalvardist{\p}{\q}$ up to an additive $\dst$. The interested (or bored) reader may check by themselves what upper and lower bound one obtains, from the fact that the corresponding task for \emph{arbitrary} distributions over domain size $m$ has sample complexity $\bigTheta{\frac{m}{\dst^2\log m}}$~\cite{VV:11,JHW:18}.
+
+%%%%%%%%%% Bibliography
+\begin{filecontents}{references-learning.bib}
+@inproceedings{ACT:19,
+  author    = {Jayadev Acharya and
+               Cl{\'{e}}ment L. Canonne and
+               Himanshu Tyagi},
+  title     = {Communication-Constrained Inference and the Role of Shared Randomness},
+  booktitle = {{ICML}},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {97},
+  pages     = {30--39},
+  publisher = {{PMLR}},
+  year      = {2019}
+}
+
+@article{Birge:87,
+    AUTHOR = {Birg\'{e}, Lucien},
+     TITLE = {On the risk of histograms for estimating decreasing densities},
+   JOURNAL = {Ann. Statist.},
+  FJOURNAL = {The Annals of Statistics},
+    VOLUME = {15},
+      YEAR = {1987},
+    NUMBER = {3},
+     PAGES = {1013--1022},
+      ISSN = {0090-5364},
+   MRCLASS = {62G05},
+  MRNUMBER = {902242},
+MRREVIEWER = {Eswar G. Phadia},
+       DOI = {10.1214/aos/1176350489},
+       URL = {https://doi.org/10.1214/aos/1176350489},
+}
+@inproceedings{CDVV:14,
+    AUTHOR = {Chan, Siu-On and Diakonikolas, Ilias and Valiant, Gregory and
+              Valiant, Paul},
+     TITLE = {Optimal algorithms for testing closeness of discrete
+              distributions},
+ BOOKTITLE = {Proceedings of the {T}wenty-{F}ifth {A}nnual {ACM}-{SIAM}
+              {S}ymposium on {D}iscrete {A}lgorithms},
+     PAGES = {1193--1203},
+ PUBLISHER = {ACM, New York},
+      YEAR = {2014},
+   MRCLASS = {68W20 (62B10 62G10)},
+  MRNUMBER = {3376448},
+       DOI = {10.1137/1.9781611973402.88},
+       URL = {https://doi.org/10.1137/1.9781611973402.88},
+}
+@inproceedings{DDSVV:12,
+    AUTHOR = {Daskalakis, Constantinos and Diakonikolas, Ilias and Servedio,
+              Rocco A. and Valiant, Gregory and Valiant, Paul},
+     TITLE = {Testing {$k$}-modal distributions: optimal algorithms via
+              reductions},
+ BOOKTITLE = {Proceedings of the {T}wenty-{F}ourth {A}nnual {ACM}-{SIAM}
+              {S}ymposium on {D}iscrete {A}lgorithms},
+     PAGES = {1833--1852},
+ PUBLISHER = {SIAM, Philadelphia, PA},
+      YEAR = {2012},
+   MRCLASS = {68W25 (62B10 62F03)},
+  MRNUMBER = {3221282},
+}
+@article{DDS:14,
+    AUTHOR = {Daskalakis, Constantinos and Diakonikolas, Ilias and Servedio,
+              Rocco A.},
+     TITLE = {Learning {$k$}-modal distributions via testing},
+   JOURNAL = {Theory Comput.},
+  FJOURNAL = {Theory of Computing. An Open Access Journal},
+    VOLUME = {10},
+      YEAR = {2014},
+     PAGES = {535--570},
+   MRCLASS = {68Q32 (62G07 68Q25 68W20)},
+  MRNUMBER = {3294507},
+       DOI = {10.4086/toc.2014.v010a020},
+       URL = {https://doi.org/10.4086/toc.2014.v010a020},
+}
+@inproceedings{DK:16,
+  author    = {Ilias Diakonikolas and
+               Daniel M. Kane},
+  title     = {A New Approach for Testing Properties of Discrete Distributions},
+  booktitle = {{FOCS}},
+  pages     = {685--694},
+  publisher = {{IEEE} Computer Society},
+  year      = {2016}
+}
+@article{Goldreich:16,
+  author    = {Oded Goldreich},
+  title     = {The uniform distribution is complete with respect to testing identity
+               to a fixed distribution},
+  journal   = {Electronic Colloquium on Computational Complexity {(ECCC)}},
+  volume    = {23},
+  pages     = {15},
+  year      = {2016}
+}
+
+@article{JHW:18,
+  author    = {Jiantao Jiao and
+               Yanjun Han and
+               Tsachy Weissman},
+  title     = {Minimax Estimation of the L\({}_{\mbox{1}}\) Distance},
+  journal   = {{IEEE} Trans. Inf. Theory},
+  volume    = {64},
+  number    = {10},
+  pages     = {6672--6706},
+  year      = {2018}
+}
+@article{Paninski:08,
+    AUTHOR = {Paninski, Liam},
+     TITLE = {A coincidence-based test for uniformity given very sparsely
+              sampled discrete data},
+   JOURNAL = {IEEE Trans. Inform. Theory},
+  FJOURNAL = {Institute of Electrical and Electronics Engineers.
+              Transactions on Information Theory},
+    VOLUME = {54},
+      YEAR = {2008},
+    NUMBER = {10},
+     PAGES = {4750--4755},
+      ISSN = {0018-9448},
+   MRCLASS = {62F03 (94A12)},
+  MRNUMBER = {2591136},
+       DOI = {10.1109/TIT.2008.928987},
+       URL = {https://doi.org/10.1109/TIT.2008.928987},
+}
+@incollection {Valiant:08,
+    AUTHOR = {Valiant, Paul},
+     TITLE = {Testing symmetric properties of distributions},
+ BOOKTITLE = {S{TOC}'08},
+     PAGES = {383--392},
+ PUBLISHER = {ACM, New York},
+      YEAR = {2008},
+   MRCLASS = {68Q87 (68W20)},
+  MRNUMBER = {2582903},
+       DOI = {10.1145/1374376.1374432},
+       URL = {https://doi.org/10.1145/1374376.1374432},
+}
+@inproceedings{VV:11,
+  author    = {Gregory Valiant and
+               Paul Valiant},
+  title     = {Estimating the unseen: an n/log(n)-sample estimator for entropy and
+               support size, shown optimal via new CLTs},
+  booktitle = {{STOC}},
+  pages     = {685--694},
+  publisher = {{ACM}},
+  year      = {2011}
+}
+@article{VV:17,
+  author    = {Gregory Valiant and
+               Paul Valiant},
+  title     = {An Automatic Inequality Prover and Instance Optimal Identity Testing},
+  journal   = {{SIAM} J. Comput.},
+  volume    = {46},
+  number    = {1},
+  pages     = {429--455},
+  year      = {2017}
+}
+\end{filecontents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{references-learning} 
+\end{document}
