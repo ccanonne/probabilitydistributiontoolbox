@@ -169,7 +169,7 @@ Note that, again, when $\dst \ll 1/\ab$, the sample complexity of~\autoref{theo:
 
 Now, unto two-sample (i.e., closeness) testing:
 \begin{theorem}\label{theo:testing:identity:monotone}
-  Given i.i.d. samples from two arbitrary \emph{monotone non-increasing} distributions $\p,\q$ over $[\ab]$, testing whether $\p=\q$ vs. $\totalvardist{\p}{\q} > \dst$ (with success probability at least $2/3$) has sample complexity $\bigO{\max\mleft( \log(\dst\ab + 1)^{2/3}/\dst^{2}, \sqrt{\log(\dst\ab + 1)}/\dst^{5/2} \mright)}$ and, as long as $\dst \gtrsim 1/\ab$, $\bigOmega{\max\mleft( \log(\dst\ab + 1)^{2/3}/(\log\log(\dst\ab + 1)\dst^{4/3}), \sqrt{\log(\dst\ab + 1)}/\dst^{5/2} \mright)}$.
+  Given i.i.d. samples from two arbitrary \emph{monotone non-increasing} distributions $\p,\q$ over $[\ab]$, testing whether $\p=\q$ vs. $\totalvardist{\p}{\q} > \dst$ (with success probability at least $2/3$) has sample complexity $\bigO{\max\mleft( \log(\dst\ab + 1)^{2/3}/\dst^{2}, \sqrt{\log(\dst\ab + 1)}/\dst^{5/2} \mright)}$ and, as long as $\dst \gtrsim 1/\ab$, $\bigOmega{\max\mleft( \log(\dst\ab + 1)^{2/3}/((\log\log(\dst\ab + 1))^{2/3}\dst^{4/3}), \sqrt{\log(\dst\ab + 1)}/\dst^{5/2} \mright)}$.
 \end{theorem}
 \begin{proof}
 The upper bound follows verbatim the same template of reductions, and the argument of~\autoref{theo:testing:identity:monotone} goes through with the difference that now both $\p,\q$ are unknown: so that the result invoked at the end is the fact that closeness testing for two arbitrary distributions over $[\ell]$ has sample complexity $\bigTheta{\max\mleft( \ell^{2/3}/\dst^{4/3}, \sqrt{\ell}/\dst^{2} \mright)}$~\cite{CDVV:14}.
