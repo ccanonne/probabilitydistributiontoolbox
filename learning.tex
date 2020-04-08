@@ -87,7 +87,7 @@ and we are done. \emph{Badda bing badda boom}, as someone\footnote{John Wright.}
 
 \section{Hellinger distance}
 
-Recall that $\hellinger{p}{q} = \frac{1}{\sqrt{2}}\sqrt{\sum_{i=1}^\ab (\sqrt{p(i)}-\sqrt{q(i)})^2} = \frac{1}{\sqrt{2}}\normtwo{p-q}\in[0,1]$ for any $p,q\in\distribs{[\ab]}$. The Hellinger distance has many nice properties: it is well-suited to manipulating product distributions, its square is subadditive, and is always within a quadratic factor of the total variation distance; see, e.g.,~\cite[Appendix~C.2]{Canonne:15}.
+Recall that $\hellinger{p}{q} = \frac{1}{\sqrt{2}}\sqrt{\sum_{i=1}^\ab (\sqrt{p(i)}-\sqrt{q(i)})^2} = \frac{1}{\sqrt{2}}\normtwo{\sqrt{p}-\sqrt{q}}\in[0,1]$ for any $p,q\in\distribs{[\ab]}$. The Hellinger distance has many nice properties: it is well-suited to manipulating product distributions, its square is subadditive, and is always within a quadratic factor of the total variation distance; see, e.g.,~\cite[Appendix~C.2]{Canonne:15}.
 
 \begin{theorem}\label{theo:learning:hellinger}
   $\Phi(\dhell,\ab,\dst,\delta) = \bigTheta{\frac{\ab+\log(1/\delta)}{\dst^2}}$.
@@ -122,7 +122,7 @@ This theorem is ``highly non-trivial'' to establish, however; for the sake of ex
       \end{align*}
       where we used the inequality $\sqrt{1+x} \geq 1+\frac{x}{2}-\frac{x^2}{2}$, which holds for $x\geq -1$.\footnote{And is inspired by the Tayor expansion $\sqrt{1+x} = 1+\frac{x}{2} - \frac{x^2}{8} +o(x^2)$: there is \emph{some} intuition for it.}{} Since, for every $i\in[\ab]$, $\ns\widehat{p}(i)$ follows a $\binomial{\ns}{p(i)}$ distribution, we get
       \[
-          \expect{ \hellinger{p}{\widehat{p}}^2 } \leq 1-\frac{1}{\sqrt{\ns}}\sum_{i=1}^\ab \sqrt{p(i)}\cdot\sqrt{\ns p(i)} \mleft(1-\frac{\ns p(i)(1-\ns p(i))}{2\ns^2 p(i)^2}\mright)
+          \expect{ \hellinger{p}{\widehat{p}}^2 } \leq 1-\frac{1}{\sqrt{\ns}}\sum_{i=1}^\ab \sqrt{p(i)}\cdot\sqrt{\ns p(i)} \mleft(1-\frac{\ns p(i)(1-p(i))}{2\ns^2 p(i)^2}\mright)
           \leq 1 - \sum_{i=1}^\ab p(i) \mleft(1-\frac{1}{2\ns p(i)}\mright) = \frac{\ab}{2\ns}\,.
       \]
       Therefore, for $\ns\geq \frac{\ab}{\dst^2}$, we have $\expect{ \hellinger{p}{\widehat{p}}^2 }\leq \frac{\dst^2}{2}$.
@@ -228,7 +228,7 @@ Second, because of the above, and also monotonicity of $\lp[p]$ norms, Cauchy--S
     \lp[2](p,q)\leq \sqrt{\lp[\infty](p,q)}, \quad  \frac{1}{2}\lp[\infty](p,q)\leq \kolmogorov{p}{q} \leq \totalvardist{p}{q}\,.
 \]
 That can be useful sometimes. Now, I will only briefly sketch the proof of the next theorem: the lower bounds follow from the simple case $\ab=2$ (estimating the bias of a biased coin), the upper bounds are achieved by the empirical estimator (again). Importantly, the result for Kolmogorov distance \emph{still applies to continuous, arbitrary distributions}.
-\begin{theorem}\label{theo:learning:tv}
+\begin{theorem}\label{theo:learning:kolmogorov}
   $\Phi(\operatorname{d_{\rm{}K}},\ab,\dst,\delta),\Phi(\lp[\infty],\ab,\dst,\delta),\Phi(\lp[2],\ab,\dst,\delta) = \bigTheta{\frac{\log(1/\delta)}{\dst^2}}$, independent of $\ab$.
 \end{theorem}
 \begin{proof}[Sketch]
