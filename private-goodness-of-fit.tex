@@ -1,0 +1,416 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\def\withindex{0}
+\input{packages}
+\input{preamble}
+
+\newcommand{\dst}{\alpha}
+\newcommand{\ab}{k}
+\newcommand{\ns}{n}
+\newcommand{\errproba}{\beta}
+\newcommand{\p}{\mathbf{p}}
+\newcommand{\q}{\mathbf{q}}
+\newcommand{\priv}{\varepsilon}
+\newcommand{\privdelta}{\delta}
+
+\usepackage{filecontents}
+
+\title{Private goodness-of-fit(s) of discrete distributions\\
+(a very short review)}
+\date{April, 2020}
+\author{Cl\'ement L. Canonne}
+
+\usepackage{utopia}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The goal of this short note is to provide a short overview of the sample complexity of \emph{identity testing} (also known as one-sample testing, or goodness-of-fit) under various types of privacy constraints, and map the current landscape in view of the flurry of recent works on this question.
+\end{abstract}
+
+The main focus of this document is the question of \emph{identity testing} (i.e., one-sample testing, or goodness-of-fit) of probability distributions over a known discrete domain of size $\ab$\footnote{Without loss of generality, the set $[\ab]=\{1,2,\dots,\ab\}$} {under various privacy constraints}. The reader interested in discovering more on this formulation and similar questions absent the privacy component is referred to the recent surveys~\cite{Canonne15,BalakrishnanW18} on distribution testing.
+
+\paragraph{Our identity problem.} Identity testing is the question of deciding, based on observing a sequence of i.i.d.\ observations from some unknown probability distribution, whether this distribution conforms to a purported (and fixed in advance) model~--~or, in the contrary, is statistically quite far from this model. Formally, it is defined as follows:
+\begin{definition}[Identity Testing]
+  Given a fixed, known distribution $\q$ over $[\ab]$, an \emph{identity testing algorithm for $\q$ with sample complexity $\ns$} takes as input a parameter $\dst \in(0,1]$ and $\ns$ i.i.d.\ samples from an unknown distribution $\p$ over $[\ab]$, and outputs either \accept or \reject. The algorithm must satisfy the following, where the probability is over the randomness of the samples:
+  \begin{itemize}
+    \item If $\p=\q$, then the algorithm outputs \accept with probability at least $2/3$;
+    \item If $\totalvardist{\p}{\q}>\dst$, then the algorithm outputs \reject with probability at least $2/3$.
+  \end{itemize}
+The sample complexity of identity testing to $\q$ is then the minimum sample complexity over all identity testing algorithms for $\q$; and the \emph{sample complexity of identity testing} is the maximum sample complexity, over all reference distributions $\q$.
+\end{definition}
+A couple remarks are in order: first, the above can be rephrased as a composite hypothesis testing (in a minimax setting), where $\mathcal{H}_0 = \{\q\}$ and $\mathcal{H}_1 = \setOfSuchThat{\p}{\totalvardist{\p}{\q} > \dst}$. Second, for simplicity, we focused in the above on a constant error probability (equal for both Type I and Type II), set to $1/3$. By standard arguments, one can in all settings considered here decrease this to an arbitrarily small $\errproba\in(0,1]$ at the price of a mere multiplicative $\log(1/\beta)$ factor in the sample complexity,\footnote{Which is not optimal, as a $\sqrt{\log(1/\beta)}$ is achievable instead~\cite{DiakonikolasGPP18}; but is good enough.} by repeating the test independently and taking the majority outcome.
+
+\paragraph{Our different Differential Privacies.} We will consider this problem in seven different settings of privacy,\footnote{There are quite a few other notions, or variants of the ones listed here, which we will not touch upon in this note.} outlined (informally) below. All are parameterized by a \emph{privacy parameter} $\priv>0$, which we will think of as being in $(0,1]$: the smaller the $\priv$, the better the privacy guarantee.
+\begin{description}
+  \item[No privacy:] The $\ns$ samples from the unknown distribution $\p$ are held by $\ns$ different users, who send their data to a central server running a testing algorithm whose output is then revealed to the world, no constraints enforced. \emph{Everyone fully trusts everyone.}
+  \item[(Central) differential privacy:] The $\ns$ samples from the unknown distribution $\p$ are held by $\ns$ different users, who send their data to a central server running a testing algorithm whose output is then revealed to the world, under the constraint that this output does not reveal too much about any single user's data. \emph{Users fully trust the server, but not the outside world.} Introduced in~\cite{DworkMNS06}.
+  \item[Local differential privacy:] The $\ns$ samples from the unknown distribution $\p$ are held by $\ns$ different users, who based on their sample send a message to a central server running a testing algorithm whose output is then revealed to the world. The constraint that any user's message to the server does not reveal too much about this user's data. \emph{Users trust neither the server nor the outside world.} Introduced in~\cite{KasiviswanathanLNRS11}; later reformulated in~\cite{DuchiJW13}.\\
+    We will further consider three subsettings, depending on whether the users share some additional common random seed (e.g., broadcast ahead of time by the central server) or send all their messages simultaneously or sequentially:\footnote{We will not discuss here the setting of \emph{fully interactive} Local DP, which allows for arbitrary (not just sequential) rounds of messages. Indeed, to the best of our knowledge there is no identity testing result specific to this setting (except, of course, the upper bounds from the models mentioned here, which of course carry over).}
+    \begin{description}
+      \item[Private-coin:] The users only have their own personal (trusted) randomness, and don't have anything in common. All send their message in parallel.
+      \item[Public-coin:] The users have their own personal (trusted) randomness, as well as a common shared (not necessarily trusted) random seed. All send their message in parallel.
+      \item[Interactive:] The users have their own personal (trusted) randomness. They send their message sequentially, so that the $i$-th user is aware of the messages sent by users $1,2,\dots,i-1$ (in particular, they can use this to also have a common shared random seed).
+    \end{description}
+  \item[Pan-privacy against one intrusion:] The $\ns$ samples from the unknown distribution $\p$ are held by $\ns$ different users, who independently send their data one by one to a central server running a testing algorithm whose output is then revealed to the world. The constraint is that any adversary that breaches the server to look at the internal state of the algorithm \emph{at most once} does not learn too much about any single user's data. \emph{Users trust the server at the time they send their data}, but are not too sure the server will not be compromised in the future; and \emph{definitely do not trust the outside world.} Introduced in~\cite{DworkNPRY10}.
+  \item[Shuffle privacy:] The $\ns$ samples from the unknown distribution $\p$ are held by $\ns$ different users, who based on their sample send some messages to a trusted third party which shuffles all the messages. The third party then sends the (permuted) messages to a  central server running a testing algorithm whose output is then revealed to the world. The constraint is that the list of shuffled messages does not reveal too much about any single user's data, even when a small fraction of users are corrupted and deviate adversarially from the protocol.\footnote{We note that the earlier definitions of shuffle privacy did not include that last, arguably very natural, robustness requirement. As discussed in~\cite{BalcerCJM20} (and in said earlier literature), this is, however, a natural condition and how one ought to think of shuffle privacy: if one user goes amok, the privacy of everyone else should not immediatey be threatened.} \emph{Users trust the third party, but not the server nor the outside world.} Introduced in~\cite{CheuSUZZ19}; see~\cite{Cheu2020} for a useful timeline.
+\end{description}
+Of all these notions, aside from the ``no privacy'' one, the central differential privacy (DP) is the least stringent in terms of privacy while the local differential privacy (LDP) is the most. Pan-privacy and shuffle privacy are somewhere in the middle. Of course, better privacy comes at a price: DP typically allows for much more sample-efficient algorithms, while LDP requires a rather enormous sample size for the same task/utility.
+
+\paragraph{The lay of the land.}
+We now summarize what is known about identity testing in the above privacy models, and point to the papers where the bounds were established.
+\begin{table}[H]\centering
+  \def\arraystretch{2.75}%  1 is the default, change whatever you need
+  \begin{adjustwidth}{-0.5in}{1in}% adjust the L and R margins by 1 inch
+  \begin{tabular}{|c|c|c|c|}
+  \hline
+     & \bf Upper bound (UB) & \bf Lower bound (LB) & \bf References \\\hline
+    \bf No privacy & \multicolumn{2}{c|}{$\dfrac{\ab^{1/2}}{\dst^2}$} & \cite{ValiantV17} (UB), \cite{Paninski08} (LB) \\\hline
+    \bf Central DP & \multicolumn{2}{c|}{$\dfrac{\ab^{1/2}}{\dst^2}+\dfrac{\ab^{1/2}}{\dst\priv^{1/2}}+\dfrac{\ab^{1/3}}{\dst^{4/3}\priv^{2/3}}+\dfrac{1}{\dst\priv}$} & \cite{AcharyaSZ18,AliakbarpourDR18} \\\hline
+    \bf Local DP, private-coin & \multicolumn{2}{c|}{$\dfrac{\ab^{3/2}}{\dst^2\priv^2}$} & \cite{AcharyaCFT19,AcharyaCT19,AcharyaCHST19}\footnotemark \\\hline
+    \bf Local DP, public-coin & \multicolumn{2}{c|}{$\dfrac{\ab}{\dst^2\priv^2}$} & \cite{AcharyaCFT19} (UB, LB) \cite{AcharyaCT19} (LB) \\\hline
+    \bf Local DP, interactive & \multicolumn{2}{c|}{$\dfrac{\ab}{\dst^2\priv^2}$} & \cite{AcharyaCFT19} (UB), \cite{KareemMJ19} (LB) \\\hline
+    \bf Pan-privacy 
+    & $\dfrac{\ab^{1/2}}{\dst^2}+\dfrac{\ab^{2/3}}{\dst^{4/3}\priv^{2/3}}+\dfrac{\ab^{1/2}}{\dst\priv}$ 
+    & $\dfrac{\ab^{1/2}}{\dst^2}+\dfrac{\ab^{2/3}}{\dst^{4/3}\priv^{2/3}}+\dfrac{1}{\dst\priv}$ 
+    & \cite{KareemMJ19} \\\hline
+    \bf Shuffle privacy & $\left(\dfrac{\ab^{1/2}}{\dst^2}+\dfrac{\ab^{2/3}}{\dst^{4/3}\priv^{4/3}}+\dfrac{\ab^{1/2}}{\dst\priv^2}\right)\log^{1/2}\ab$ 
+    & $\dfrac{\ab^{1/2}}{\dst^2}+\dfrac{\ab^{2/3}}{\dst^{4/3}\priv^{2/3}}+\dfrac{1}{\dst\priv}$ & \cite{BalcerCJM20} \\\hline
+  \end{tabular}
+  \end{adjustwidth}
+  \caption{The current landscape of identity testing, in the various models of privacy outlined above. For ease of reading, we omit the $O(\cdot)$, $\Theta(\cdot)$, and $\Omega(\cdot)$'s from the table: all results should be read as asymptotic with regard to the parameters, up to absolute constants.}
+\end{table}
+\footnotetext{\cite{AcharyaCFT19} establishes the upper bound, and shows the matching lower bound for some special cases of protocols (algorithms).~\cite{AcharyaCT19} proves the lower bound for all private-coin LDP protocols.~\cite{AcharyaCHST19} provides an alternative protocol achieving the upper bound, which significantly improves on the amount of communication (message length) required.}
+It is worth noting that some of the papers referenced above do not claim to address the general case of identity testing, focusing instead on the special case of \emph{uniformity} testing, wher the reference distribution is uniform. However, an argument of Diakonikolas and Kane~\cite{DiakonikolasK16} and Goldreich~\cite{Goldreich16}, generalized to various settings by Acharya, Canonne, and Tyagi~\cite[Appendix~A]{AcharyaCT19b}, shows that identity testing is essentialy equivalent to this special case of uniformity testing.
+
+%%%%%%%%%% Bibliography
+\begin{filecontents}{references-private-identity.bib}
+
+@InProceedings{AliakbarpourDR18,
+  title = 	 {Differentially Private Identity and Equivalence Testing of Discrete Distributions},
+  author = 	 {Aliakbarpour, Maryam and Diakonikolas, Ilias and Rubinfeld, Ronitt},
+  booktitle = 	 {Proceedings of the 35th International Conference on Machine Learning},
+  pages = 	 {169--178},
+  year = 	 {2018},
+  editor = 	 {Dy, Jennifer and Krause, Andreas},
+  volume = 	 {80},
+  series = 	 {Proceedings of Machine Learning Research},
+  address = 	 {Stockholmsmässan, Stockholm Sweden},
+  month = 	 {10--15 Jul},
+  publisher = 	 {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v80/aliakbarpour18a/aliakbarpour18a.pdf},
+  url = 	 {http://proceedings.mlr.press/v80/aliakbarpour18a.html}
+}
+
+@incollection{AcharyaSZ18,
+  title = {Differentially Private Testing of Identity and Closeness of Discrete Distributions},
+  author = {Acharya, Jayadev and Sun, Ziteng and Zhang, Huanyu},
+  booktitle = {Advances in Neural Information Processing Systems 31},
+  editor = {S. Bengio and H. Wallach and H. Larochelle and K. Grauman and N. Cesa-Bianchi and R. Garnett},
+  pages = {6878--6891},
+  year = {2018},
+  publisher = {Curran Associates, Inc.},
+  url = {http://papers.nips.cc/paper/7920-differentially-private-testing-of-identity-and-closeness-of-discrete-distributions.pdf}
+}
+
+@article{ValiantV17,
+    AUTHOR = {Valiant, Gregory and Valiant, Paul},
+     TITLE = {An automatic inequality prover and instance optimal identity
+              testing},
+   JOURNAL = {SIAM J. Comput.},
+  FJOURNAL = {SIAM Journal on Computing},
+    VOLUME = {46},
+      YEAR = {2017},
+    NUMBER = {1},
+     PAGES = {429--455},
+      ISSN = {0097-5397},
+   MRCLASS = {68Q30 (26D15 62G10 68Q25 68T15)},
+  MRNUMBER = {3614697},
+MRREVIEWER = {Gilles Teyssi\`ere},
+       DOI = {10.1137/151002526},
+       URL = {https://doi.org/10.1137/151002526},
+      NOTE = {Journal version of~\cite{ValiantValiant14}.}
+}
+
+@incollection{ValiantValiant14,
+    AUTHOR = {Valiant, Gregory and Valiant, Paul},
+     TITLE = {An automatic inequality prover and instance optimal identity
+              testing},
+ BOOKTITLE = {55th {A}nnual {IEEE} {S}ymposium on {F}oundations of
+              {C}omputer {S}cience---{FOCS} 2014},
+     PAGES = {51--60},
+ PUBLISHER = {IEEE Computer Soc., Los Alamitos, CA},
+      YEAR = {2014},
+   MRCLASS = {62E15 (94A15)},
+  MRNUMBER = {3344854},
+       DOI = {10.1109/FOCS.2014.14},
+       URL = {https://doi.org/10.1109/FOCS.2014.14},
+}
+
+@article{Paninski08,
+    AUTHOR = {Paninski, Liam},
+     TITLE = {A coincidence-based test for uniformity given very sparsely
+              sampled discrete data},
+   JOURNAL = {IEEE Trans. Inform. Theory},
+  FJOURNAL = {Institute of Electrical and Electronics Engineers.
+              Transactions on Information Theory},
+    VOLUME = {54},
+      YEAR = {2008},
+    NUMBER = {10},
+     PAGES = {4750--4755},
+      ISSN = {0018-9448},
+   MRCLASS = {62F03 (94A12)},
+  MRNUMBER = {2591136},
+       DOI = {10.1109/TIT.2008.928987},
+       URL = {https://doi.org/10.1109/TIT.2008.928987},
+}
+
+@inproceedings{DiakonikolasGPP18,
+    AUTHOR = {Diakonikolas, Ilias and Gouleakis, Themis and Peebles, John
+              and Price, Eric},
+     TITLE = {Sample-optimal identity testing with high probability},
+ BOOKTITLE = {45th {I}nternational {C}olloquium on {A}utomata, {L}anguages,
+              and {P}rogramming},
+    SERIES = {LIPIcs. Leibniz Int. Proc. Inform.},
+    VOLUME = {107},
+     PAGES = {Art. No. 41, 14},
+ PUBLISHER = {Schloss Dagstuhl. Leibniz-Zent. Inform., Wadern},
+      YEAR = {2018},
+   MRCLASS = {68W20},
+  MRNUMBER = {3829972},
+}
+
+@inproceedings{AcharyaCT19,
+  author    = {Jayadev Acharya and
+               Cl{\'{e}}ment L. Canonne and
+               Himanshu Tyagi},
+  title     = {Inference under Information Constraints: Lower Bounds from Chi-Square
+               Contraction},
+  booktitle = {{COLT}},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {99},
+  pages     = {3--17},
+  publisher = {{PMLR}},
+  year      = {2019}
+}
+
+
+@inproceedings{AcharyaCFT19,
+  author    = {Jayadev Acharya and
+               Cl{\'{e}}ment L. Canonne and
+               Cody Freitag and
+               Himanshu Tyagi},
+  title     = {Test without Trust: Optimal Locally Private Distribution Testing},
+  booktitle = {{AISTATS}},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {89},
+  pages     = {2067--2076},
+  publisher = {{PMLR}},
+  year      = {2019}
+}
+
+@article{KareemMJ19,
+  author    = {Kareem Amin and
+               Matthew Joseph and
+               Jieming Mao},
+  title     = {Pan-Private Uniformity Testing},
+  journal   = {CoRR},
+  volume    = {abs/1911.01452},
+  year      = {2019}
+}
+
+@article{BalcerCJM20,
+  author    = {Victor Balcer and
+               Albert Cheu and
+               Matthew Joseph and
+               Jieming Mao},
+  title     = {Connecting Robust Shuffle Privacy and Pan-Privacy},
+  journal   = {CoRR},
+  volume    = {abs/2004.09481},
+  year      = {2020}
+}
+
+@incollection{Goldreich16,
+  author    = {Oded Goldreich},
+  title     = {The Uniform Distribution Is Complete with Respect to Testing Identity
+               to a Fixed Distribution},
+  booktitle = {Computational Complexity and Property Testing},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {12050},
+  pages     = {152--172},
+  publisher = {Springer},
+  year      = {2020}
+}
+@article{BalakrishnanW18,
+    AUTHOR = {Balakrishnan, Sivaraman and Wasserman, Larry},
+     TITLE = {Hypothesis testing for high-dimensional multinomials: a
+              selective review},
+   JOURNAL = {Ann. Appl. Stat.},
+  FJOURNAL = {The Annals of Applied Statistics},
+    VOLUME = {12},
+      YEAR = {2018},
+    NUMBER = {2},
+     PAGES = {727--749},
+      ISSN = {1932-6157},
+   MRCLASS = {62H15 (62-02)},
+  MRNUMBER = {3834283},
+       DOI = {10.1214/18-AOAS1155SF},
+       URL = {https://doi.org/10.1214/18-AOAS1155SF},
+}
+
+@incollection{DiakonikolasK16,
+    AUTHOR = {Diakonikolas, Ilias and Kane, Daniel M.},
+     TITLE = {A new approach for testing properties of discrete
+              distributions},
+ BOOKTITLE = {57th {A}nnual {IEEE} {S}ymposium on {F}oundations of
+              {C}omputer {S}cience---{FOCS} 2016},
+     PAGES = {685--694},
+ PUBLISHER = {IEEE Computer Soc., Los Alamitos, CA},
+      YEAR = {2016},
+   MRCLASS = {68W20 (68Q87)},
+  MRNUMBER = {3631031},
+}
+
+@InProceedings{AcharyaCT19b,
+  title = 	 {Communication-Constrained Inference and the Role of Shared Randomness},
+  author = 	 {Acharya, Jayadev and Canonne, Clement and Tyagi, Himanshu},
+  booktitle = 	 {Proceedings of the 36th International Conference on Machine Learning},
+  pages = 	 {30--39},
+  year = 	 {2019},
+  editor = 	 {Chaudhuri, Kamalika and Salakhutdinov, Ruslan},
+  volume = 	 {97},
+  series = 	 {Proceedings of Machine Learning Research},
+  address = 	 {Long Beach, California, USA},
+  month = 	 {09--15 Jun},
+  publisher = 	 {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v97/acharya19a/acharya19a.pdf},
+  url = 	 {http://proceedings.mlr.press/v97/acharya19a.html}
+}
+
+@article{AcharyaCHST19,
+  author    = {Jayadev Acharya and
+               Cl{\'{e}}ment L. Canonne and
+               Yanjun Han and
+               Ziteng Sun and
+               Himanshu Tyagi},
+  title     = {Domain Compression and its Application to Randomness-Optimal Distributed
+               Goodness-of-Fit},
+  journal   = {CoRR},
+  volume    = {abs/1907.08743},
+  year      = {2019}
+}
+
+% Privacy models
+@inproceedings{DworkMNS06,
+  author        = {Dwork, Cynthia and McSherry, Frank and Nissim, Kobbi and Smith, Adam},
+  title         = {Calibrating Noise to Sensitivity in Private Data Analysis},
+  booktitle     = {Proceedings of the 3rd Conference on Theory of Cryptography},
+  series        = {TCC '06},
+  year          = {2006},
+  pages         = {265--284},
+  publisher     = {Springer},
+  address       = {Berlin, Heidelberg}
+}
+
+
+@article{KasiviswanathanLNRS11,
+    AUTHOR = {Kasiviswanathan, Shiva Prasad and Lee, Homin K. and Nissim,
+              Kobbi and Raskhodnikova, Sofya and Smith, Adam},
+     TITLE = {What can we learn privately?},
+   JOURNAL = {SIAM J. Comput.},
+  FJOURNAL = {SIAM Journal on Computing},
+    VOLUME = {40},
+      YEAR = {2011},
+    NUMBER = {3},
+     PAGES = {793--826},
+      ISSN = {0097-5397},
+   MRCLASS = {68Q32},
+  MRNUMBER = {2823508},
+MRREVIEWER = {Martin Anthony},
+       DOI = {10.1137/090756090},
+       URL = {https://doi.org/10.1137/090756090},
+      NOTE = {Journal version of~\cite{KasiviswanathanLNRS08}.}
+}
+
+@inproceedings{KasiviswanathanLNRS08,
+  author    = {Shiva Prasad Kasiviswanathan and
+               Homin K. Lee and
+               Kobbi Nissim and
+               Sofya Raskhodnikova and
+               Adam D. Smith},
+  title     = {What Can We Learn Privately?},
+  booktitle = {49th Annual IEEE Symposium on Foundations of Computer Science---{FOCS} 2008}, 
+  pages     = {531--540},
+  publisher = {{IEEE} Computer Society},
+  year      = {2008}
+}
+
+@inproceedings{DuchiJW13,
+  author    = {John C. Duchi and
+               Michael I. Jordan and
+               Martin J. Wainwright},
+  title     = {Local Privacy and Statistical Minimax Rates},
+  booktitle = {54th Annual IEEE Symposium on Foundations of Computer Science---{FOCS} 2013}, 
+  pages     = {429--438},
+  publisher = {{IEEE} Computer Society},
+  year      = {2013}
+}
+
+@inproceedings{DworkNPRY10,
+  author    = {Cynthia Dwork and
+               Moni Naor and
+               Toniann Pitassi and
+               Guy N. Rothblum and
+               Sergey Yekhanin},
+  title     = {Pan-Private Streaming Algorithms},
+  booktitle = {{ICS}},
+  pages     = {66--80},
+  publisher = {Tsinghua University Press},
+  year      = {2010}
+}
+
+@misc{Cheu2020,
+     title = {{The Sudden Surge of Shuffling in the Privacy Literature}},
+    author = {Cheu, Albert},
+    url    = {http://ccis.northeastern.edu/home/albertcheu/shuffledmodel.html},
+    note   = {Online; accessed 24 April 2020}, 
+    year   = {2020}
+}
+
+@incollection{CheuSUZZ19,
+    AUTHOR = {Cheu, Albert and Smith, Adam and Ullman, Jonathan and Zeber,
+              David and Zhilyaev, Maxim},
+     TITLE = {Distributed differential privacy via shuffling},
+ BOOKTITLE = {Advances in cryptology---{EUROCRYPT} 2019. {P}art {I}},
+    SERIES = {Lecture Notes in Comput. Sci.},
+    VOLUME = {11476},
+     PAGES = {375--403},
+ PUBLISHER = {Springer, Cham},
+      YEAR = {2019},
+   MRCLASS = {94A62},
+  MRNUMBER = {3964546},
+       DOI = {10.1007/978-3-030-17653-2_13},
+       URL = {https://doi.org/10.1007/978-3-030-17653-2_13},
+}
+
+% To update once published in ToC
+@article{Canonne15,
+  author    = {Cl{\'{e}}ment L. Canonne},
+  title     = {A Survey on Distribution Testing: Your Data is Big. But is it Blue?},
+  journal   = {Electronic Colloquium on Computational Complexity {(ECCC)}},
+  volume    = {22},
+  pages     = {63},
+  year      = {2015},
+  url       = {http://eccc.hpi-web.de/report/2015/063},
+  timestamp = {Tue, 14 Aug 2018 17:08:05 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/eccc/Canonne15},
+  bibsource = {dblp computer science bibliography, https://dblp.org},
+  note = {To appear as a graduate student survey in Theory of Computing}
+}
+\end{filecontents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{references-private-identity}
+\end{document}
