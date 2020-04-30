@@ -1,0 +1,284 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\def\withindex{0}
+\input{packages}
+\input{preamble}
+
+\newcommand{\p}{\mathbf{p}}
+\newcommand{\q}{\mathbf{q}}
+\newcommand{\bigp}{\mathbf{P}}
+\newcommand{\bigq}{\mathbf{Q}}
+\newcommand{\dst}{\varepsilon}
+\newcommand{\ns}{n}
+
+
+
+\title{A theorem of Valiant and Valiant}
+\date{April, 2020}
+
+\begin{filecontents}{testinglowerbound-useful.bib}
+@article{GibbsS02,
+  author = {Gibbs, Alison L. and Su, Francis Edward},
+  title = {On Choosing and Bounding Probability Metrics},
+  journal = {International Statistical Review},
+  volume = {70},
+  number = {3},
+  pages = {419-435},
+  doi = {10.1111/j.1751-5823.2002.tb00178.x},
+  url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1751-5823.2002.tb00178.x},
+  eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1751-5823.2002.tb00178.x},
+  year = {2002}
+}
+
+@inproceedings{DaskalakisKW17,
+    AUTHOR = {Daskalakis, Constantinos and Kamath, Gautam and Wright, John},
+     TITLE = {Which distribution distances are sublinearly testable?},
+ BOOKTITLE = {Proceedings of the {T}wenty-{N}inth {A}nnual {ACM}-{SIAM}
+              {S}ymposium on {D}iscrete {A}lgorithms},
+     PAGES = {2747--2764},
+ PUBLISHER = {SIAM, Philadelphia, PA},
+      YEAR = {2018},
+   MRCLASS = {68Q87 (62B10 62G10)},
+  MRNUMBER = {3775963},
+       DOI = {10.1137/1.9781611975031.175},
+       URL = {https://doi.org/10.1137/1.9781611975031.175},
+}
+
+@article{ValiantV17,
+    AUTHOR = {Valiant, Gregory and Valiant, Paul},
+     TITLE = {An automatic inequality prover and instance optimal identity
+              testing},
+   JOURNAL = {SIAM J. Comput.},
+  FJOURNAL = {SIAM Journal on Computing},
+    VOLUME = {46},
+      YEAR = {2017},
+    NUMBER = {1},
+     PAGES = {429--455},
+      ISSN = {0097-5397},
+   MRCLASS = {68Q30 (26D15 62G10 68Q25 68T15)},
+  MRNUMBER = {3614697},
+MRREVIEWER = {Gilles Teyssi\`ere},
+       DOI = {10.1137/151002526},
+       URL = {https://doi.org/10.1137/151002526},
+      NOTE = {Journal version of~\cite{ValiantValiant14}.}
+}
+
+@incollection{ValiantValiant14,
+    AUTHOR = {Valiant, Gregory and Valiant, Paul},
+     TITLE = {An automatic inequality prover and instance optimal identity
+              testing},
+ BOOKTITLE = {55th {A}nnual {IEEE} {S}ymposium on {F}oundations of
+              {C}omputer {S}cience---{FOCS} 2014},
+     PAGES = {51--60},
+ PUBLISHER = {IEEE Computer Soc., Los Alamitos, CA},
+      YEAR = {2014},
+   MRCLASS = {62E15 (94A15)},
+  MRNUMBER = {3344854},
+       DOI = {10.1109/FOCS.2014.14},
+       URL = {https://doi.org/10.1109/FOCS.2014.14},
+}
+
+@InProceedings{AcharyaCT19,
+  title = 	 {Inference under Information Constraints: Lower Bounds from Chi-Square Contraction},
+  author = 	 {Acharya, Jayadev and Canonne, Cl{\'{e}}ment L and Tyagi, Himanshu},
+  booktitle = 	 {Proceedings of the Thirty-Second Conference on Learning Theory},
+  pages = 	 {3--17},
+  year = 	 {2019},
+  editor = 	 {Beygelzimer, Alina and Hsu, Daniel},
+  volume = 	 {99},
+  series = 	 {Proceedings of Machine Learning Research},
+  address = 	 {Phoenix, USA},
+  month = 	 {25--28 Jun},
+  publisher = 	 {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v99/acharya19a/acharya19a.pdf},
+  url = 	 {http://proceedings.mlr.press/v99/acharya19a.html},
+}
+
+@misc{Pollard03,
+  author = {Pollard, David},
+  title = {Asymptopia},
+  url = {http://www.stat.yale.edu/~pollard/Books/Asymptopia/},
+  note = {Manuscript},
+  year = 2003,
+  urldate = {2016-11-08}
+}
+
+\end{filecontents} 
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+The goal of this short document is to highlight a very useful result due to Valiant and Valiant~\cite{ValiantV17}, and slightly simplify a component of their proof (\autoref{lemma:hellinger:poisson}) by using the chi-squared distance instead of Hellinger. (We also discuss, in~\autoref{sec:hell:yeah:chisquare}, the advantage of the former over the latter.) Throughout, we write $\N$ for the set of non-negative integers, and $a\land b$ (resp. $a\lor b$) to denote the minimum (resp. maximum) of $a$ and $b$.
+
+\begin{theorem}[{\cite[Theorem 4.2]{ValiantV17}}]
+        \label{theo:vv:lb}
+    Given a distribution $\p$ over $\N$, and associated values $\alpha_i$ such that $\alpha_i \in [0,1]$ for all $i\in\N$, define the distribution over distributions $Q$ by the following process: independently for each $i\in\N$, uniformly choose $z_i\in\{-1,1\}$, set $\tilde{\q}_i=(1+z_i\alpha_i)\p(i)$,and then normalize $\tilde{\q}$ to obtain a distribution $\q$. Then there exists an absolute constant $c>0$ such that it takes at least $c(\sum_i \alpha_i^4\p(i)^2)^{-1/2}$ samples to distinguish $\p$ from $Q$ with success probability $2/3$. Further, with probability at least $1/2$, the total variation distance between a random distribution from $Q$ and $\p$ is at least 
+$
+    \frac{1}{2}\min\left( \sum_{i\in\N} \alpha_i\p(i) - \max_{i} \alpha_i\p(i), \frac{1}{2}\sum_{i\in\N} \alpha_i\p(i) \right)\,.
+$
+\end{theorem}
+\begin{proof}
+The proof almost identically follows that of~\cite[Theorem 4.2]{ValiantV17}. We first argue the first part of the statement, about indistinguishability. Instead of considering directly $\p$ and the mixture $\bigq \eqdef \shortexpect_{\q\sim Q}[\q]$, we will, fixing a target number of samples $\ns$, focus on the related Poisson processes $\Pi_\p,\Pi_{\bigq}$ defined as follows:
+\begin{itemize}
+  \item $\Pi_\p$ is the product distribution $\bigotimes_{i=1}^\infty \poisson{\ns\p(i)}$ over $\N^{\N}$ (i.e., each coordinate $i$ is independent of all others, and is a $\poisson{\ns\p(i)}$ r.v.);
+  \item $\Pi_{\bigq}$ is the mixture of product distributions $\shortexpect_{\q\sim Q}[\bigotimes_{i=1}^\infty \poisson{\ns\tilde{\q}(i)}]$ over $\N^{\N}$ (i.e., each coordinate $i$ is independent of all others and is a $\poisson{\ns(1+z_i\alpha_i)\p(i)}$ r.v., where $z_i$ is u.a.r. in $\{-1,1\}$).
+\end{itemize}
+We first argue that, given a draw from $\Pi_\p$ (resp. $\Pi_{\bigq}$), one can generate, with probability at least $1/2$, $\ns$ i.i.d.\ samples from $\p$ (resp. $\bigq$) as follows. Given a draw $\mathbf{x}\in\N^{\N}$ from either $\Pi_\p$ or $\Pi_{\bigq}$:
+\begin{itemize}
+  \item if $\sum_{i=1}^\infty \mathbf{x}_i < \ns$, then output \fail.
+  \item Otherwise, create a (finite)\footnote{Note that $\sum_{i=1}^\infty \mathbf{x}_i$ is itself a $\poisson{\ns}$ random variable, so finite a.s.} multiset $T$ of length $\sum_{i=1}^\infty \mathbf{x}_i\geq \ns$ containing $\mathbf{x}_i$ occurrences of each $i\in\N$, and select u.a.r. a multiset $S$ of $T$ of size $\ns$. Output $S$.
+\end{itemize}
+It is not hard to see that, conditioned on not outputting $\fail$, the above process outputs a set of $\ns$ i.i.d.\ samples distributed exactly according to $\p$ (resp. $\bigq$). Thus, it suffices to show that the probability of outputting \fail is at most $1/2$. This itself is a consequence of the fact that $\sum_{i=1}^\infty \mathbf{x}_i\sim \poisson{\ns}$, so that, $\ns$ being an integer, its median is exactly $\ns$.
+
+Suppose that, for a given $\ns$, one cannot distinguish $\Pi_\p$ and $\Pi_{\bigq}$ with advantage $1/12$; that is, given a sample drawn from either $\Pi_\p$ or $\Pi_{\bigq}$ (each with probability $1/2$), the probability to guess correctly which one is less than $1/2+1/12=7/12$: then we claim that, given $\ns$ samples, one cannot distinguish $\p$ from $\bigq$ with advantage $1/6$. Indeed, by contradiction, suppose we have an tester $\Tester$ for the latter task with sample complexity $\ns$ and advantage at least $1/6$:
+\begin{equation}
+      \probaDistrOf{ \substack{b\sim\bernoulli{1/2}\\ \mathbf{h}\sim b\p+(1-b)\bigq } }{ \Tester, \text{ given }\ns\text{ samples from }\mathbf{h},\text{ outputs } b } \geq \frac{2}{3}\,.
+\end{equation}
+Then we can get a distinguisher $\Tester'$ between $\Pi_\p$ and $\Pi_{\bigq}$ with advantage $1/12$: given a sample a draw $\mathbf{x}\in\N^{\N}$ from either $\Pi_\p$ or $\Pi_{\bigq}$, $\Tester'$ tries to generate $\ns$ i.i.d.\ samples as described above. If the output is \fail, then it outputs a bit uniformly at random; otherwise, it runs $\Tester$ on the resulting $\ns$ samples and outputs what $\Tester$ returns. It follows that
+\begin{equation}
+      \probaDistrOf{ \substack{b\sim\bernoulli{1/2}\\ \mathbf{x}\sim b\Pi_\p+(1-b)\Pi_\bigq } }{ \Tester', \text{ given } \mathbf{x},\text{ outputs } b }
+      \geq \frac{1}{2}\probaOf{\fail} + \frac{2}{3}(1-\probaOf{\fail})      
+       \geq \frac{7}{12}\,,
+\end{equation}
+a contradiction. Therefore, it suffices that one cannot distinguish $\Pi_\p$ and $\Pi_{\bigq}$ with advantage $1/12$; for which it is enough to show that unless $\ns$ is large enough, the total variation distance $\totalvardist{\Pi_\p}{\Pi_{\bigq}}$ is smaller than some absolute constant $c>0$. The crux is that, due to the definition of our two processes, both $\Pi_\p$ and $\Pi_{\bigq}$ are product distributions. Therefore, using the subadditivity of Hellinger distance for product distributions, we can now bound
+\begin{equation}
+      \totalvardist{\Pi_\p}{\Pi_{\bigq}}^2 \leq \hellinger{\Pi_\p}{\Pi_{\bigq}}^2 \leq \sum_{i\in\N}\hellinger{ \poisson{\ns\p(i)} }{ \Pi_{\bigq,i} }^2
+\end{equation}
+where $\Pi_{\bigq,i} = \frac{1}{2}\left( \poisson{\ns(1+\alpha_i)\p(i)}+\poisson{\ns(1-\alpha_i)\p(i)} \right)$. This is where we invoke~\autoref{lemma:hellinger:poisson}, leading to
+\begin{equation}
+      \totalvardist{\Pi_\p}{\Pi_{\bigq}}^2 \leq \sum_{i\in\N} \alpha_i^4 (\ns\p_i)^2 = \ns^2 \sum_{i\in\N} \alpha_i^4\p_i^2\,.
+\end{equation}
+For the total variation to be at least $c$, we thus need $\ns \geq c^{1/2}\left(\sum_{i\in\N} \alpha_i^4\p_i^2\right)^{-1/2}$, concluding the proof of indistinguishability.\smallskip
+
+We now turn to the second part of the claim about the distance. To ease notation, set $w_i \eqdef \alpha_i\p(i)$ for all $i\in\N$, and assume without loss of generality that the sequence $w$ is non-increasing; our goal is then to show 
+\[
+    \probaDistrOf{\q\sim Q}{ \totalvardist{\p}{\q} \geq \frac{1}{2}\min( \normone{w} - \norminf{w}, \frac{1}{2}\normone{w}) } \geq \frac{1}{2}\,.
+\] 
+Observe that for any $\q$ (defined from the corresponding sequence $z\in\N^{\N}$), we have, since $\q = \tilde{\q}/\sum_i \tilde{\q}(i)$ and $\sum_i \tilde{\q}(i) = 1+\sum_{i} z_iw_i$,
+\begin{equation}
+    2\totalvardist{\p}{\q} = \sum_{i\in\N} \abs{ \p(i) - \q(i) } \geq \sum_{i\in\N} \abs{ \p(i) - \tilde{\q}(i) } - \sum_{i\in\N} \abs{ \tilde{\q}(i) - \q(i) }
+    = \normone{w} - \dabs{\sum_{i\in\N} z_iw_i}\,.
+\end{equation}
+Therefore, it suffices to show that $\dabs{\sum_{i\in\N} z_i w_i} \leq \norminf{w} \lor \frac{1}{2}\normone{w}$ with probability at least $1/2$. We proceed by a distinction of cases: first, suppose $w_0 = \norminf{w} \geq \frac{1}{2}\normone{w}$. Then 
+\[
+    \probaOf{ \Big| \sum_{i\geq 0} z_i w_i \Big| \leq \norminf{w} } = \probaOf{ \Big| z_0\norminf{w} + \sum_{i\geq 1} z_i w_i \Big| \leq \norminf{w} } = 
+    \probaOf{ \sum_{i\geq 1} z_i w_i \leq 0 } = \frac{1}{2}
+\]
+by symmetry.
+
+ Otherwise, assume $\norminf{w} < \frac{1}{2}\normone{w}$, and consider the index $t\geq 1$ such that $\sum_{i=0}^{t-1} w_i \leq \frac{1}{2}\normone{w} < \sum_{i=0}^{t} w_i$. Note that this implies $\sum_{i=0}^{t-1} w_i-\sum_{i=t}^{\infty} w_i \geq -\frac{1}{2}\normone{w}$, as otherwise we could write
+ \[
+    \normone{w} \geq w_0 + \sum_{i=t}^{\infty} w_i \geq a_t + \sum_{i=t}^{\infty} w_i > a_t + \sum_{i=0}^{t-1} w_i + \frac{1}{2}\normone{w} > \normone{w}\,,
+\]
+ a contradiction. Then, since $\sum_{i=0}^{t-1} z_i w_i$ and $\sum_{i=t}^\infty z_i w_i$ have opposite signs with probability $1/2$,
+ \[
+    \probaOf{ \Big| \sum_{i\geq 0} z_i w_i \Big| \leq \frac{1}{2}\normone{w} } = \probaOf{ \Big| \sum_{i=0}^{t-1} z_i w_i + \sum_{i=t}^\infty z_i w_i \Big| \leq \frac{1}{2}\normone{w} } \geq \frac{1}{2}
+\]
+concluding the proof.
+\end{proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Bounding distances between a Poisson and a mixture}
+\begin{lemma}[Hellinger bound]
+  \label{lemma:hellinger:poisson}
+Let $\lambda>0$, and $\alpha\in[0,1]$. Define $\bigq\eqdef \frac{1}{2}(\poisson{(1+\alpha)\lambda} +\poisson{ (1-\alpha)\lambda) }$. Then $\hellinger{ \poisson{\lambda} }{ \bigq } \leq \alpha^2\lambda$.
+\end{lemma}
+(Note that proving the quadratically weaker bound $\hellinger{ \poisson{\lambda} }{ \bigq }^2 \lesssim \alpha^2\lambda$ is straightforward, but insufficient to our purposes.) \autoref{lemma:hellinger:poisson} will follow from the analogous (but easier to prove) claim for chi-squared distance, along with~\autoref{fact:hellinger:chisquare}. Note that as the chi-squared distance is not symmetric, the order of the distributions matters in~\autoref{lemma:chisquare:poisson}.
+\begin{lemma}[$\chi^2$ bound]
+  \label{lemma:chisquare:poisson}
+Let $\lambda>0$, and $\alpha\in[0,1]$. Define $\bigq\eqdef \frac{1}{2}(\poisson{(1+\alpha)\lambda} +\poisson{ (1-\alpha)\lambda) }$. Then $1\land \chisquare{ \bigq }{ \poisson{\lambda} } \leq \alpha^4\lambda^2$.
+\end{lemma}
+\begin{proof}
+  We can assume in the rest of the proof that $\alpha^2\lambda \leq 1$, as otherwise there is nothing to prove (the LHS being at most $1$ due to the minimum). For convenience, write $\bigp\eqdef \poisson{\lambda}$. We can express the pmf of $\bigq$ as 
+  \begin{equation}
+      \bigq(n) = \frac{1}{2}\left( e^{-\lambda(1+\alpha)}\frac{\lambda^n(1+\alpha)^n}{n!} + e^{-\lambda(1-\alpha)}\frac{\lambda^n(1-\alpha)^n}{n!} \right)
+      = \bigp(n)\cdot\frac{e^{-\lambda\alpha}(1+\alpha)^n + e^{\lambda\alpha}(1-\alpha)^n}{2}
+  \end{equation}
+  for $n\in \N$. It follows that
+  \begin{equation}
+    \label{eq:expr:chisquare}
+      \chisquare{ \bigq }{ \bigp } = -1 + \sum_{n\in\N} \frac{\bigq(n)^2}{\bigp(n)} = -1 + e^{-\lambda}\sum_{n\in\N} \frac{\lambda^n}{n!}\left( \frac{e^{-\lambda\alpha}(1+\alpha)^n + e^{\lambda\alpha}(1-\alpha)^n}{2}\right)^2
+  \end{equation}
+  Focusing on the last sum, we expand the square and compute it explicitly:
+  \begin{align*}
+  \sum_{n\in\N} \frac{\lambda^n}{n!}\left( \frac{e^{-\lambda\alpha}(1+\alpha)^n + e^{\lambda\alpha}(1-\alpha)^n}{2}\right)^2
+  &= \sum_{n\in\N} \frac{\lambda^n}{n!} \frac{e^{-2\lambda\alpha}(1+\alpha)^{2n} + e^{2\lambda\alpha}(1-\alpha)^{2n} + 2(1-\alpha^2)^n}{4}\\
+  &= \frac{e^{-2\lambda\alpha}e^{\lambda(1+\alpha)^{2}} + e^{2\lambda\alpha}e^{\lambda(1-\alpha)^{2}} + 2e^{\lambda(1-\alpha^2)}}{4}\\
+  &= e^{\lambda}\cdot\frac{e^{\lambda\alpha^2} + e^{-\lambda\alpha^2}}{2}\,.
+  \end{align*}
+  Plugging this in~\eqref{eq:expr:chisquare}, we get
+  \begin{equation}
+      \chisquare{ \bigq }{ \bigp } = -1 + \frac{e^{\lambda\alpha^2} + e^{-\lambda\alpha^2}}{2} \leq \lambda^2\alpha^4
+  \end{equation}
+  where for the last inequality we used our bound $\lambda\alpha^2\leq 1$, and the fact that $\cosh x \leq 1+x^2$ for $|x|\leq 1$. This concludes the proof.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why $\chi^2$ instead of Hellinger}\label{sec:hell:yeah:chisquare}
+At first glance, our choice to use the chi-squared distance instead of Hellinger distance for the key technical lemma may seem peculiar. After all, the chi-squared distance (which is, at the end of the day, merely a first-order approximation to the Kulllback--Leibler divergence\footnote{Indeed, for the KL divergence in nats,
+\[
+    \kldiv{\p}{\q} = \sum_{i} \p(i)\ln\frac{\p(i)}{\q(i)} = \sum_{i} \p(i)\ln\mleft(1+\frac{\p(i)-\q(i)}{\q(i)} \mright) \approx \sum_{i} \frac{\p(i)^2}{\q(i)} - 1 = \chisquare{\p}{\q}
+\]
+since $\ln(1+x) \approx x$ and $\chisquare{\p}{\q} = \sum_{i} \frac{(\p(i)-\q(i))^2}{\q(i)} = \sum_{i} \frac{\p(i)^2}{\q(i)} - 1$.
+}) is not bounded, and not even a distance (being asymmetric); while the Hellinger distance is bounded, behaves nicey with respect to product distributions (e.g., via subadditivity of its square), and overall looks clean and appealing.
+
+However, a pervasice technique in proving sample complexity lower bounds involves reference distribution $\p$ and a family of \emph{perturbations} of $\p$, $(\p_z)_{z\in\mathcal{Z}}$ (for some suitable parameter set $\mathcal{Z}$), such that $\p_z(i) = (1+\delta(i,z))\p(i)$ for all $i$. The key then is to upper bound the total variation distance between the reference distribution and the \emph{mixture} of perturbations,
+\[
+    \totalvardist{ \p }{ \shortexpect_Z[\p_Z] }
+\]
+(instead of the looser $\shortexpect_Z[ \totalvardist{ \p }{ \p_Z } ]$, which lacks a lot of useful cancellations and is typically much bigger). But using the Hellinger distance as a proxy will then involve a rather nasty square root: even assuming that $\bigq \eqdef \shortexpect_Z[\p_Z]$
+\[
+    \hellinger{ \p }{ \shortexpect_Z[\p_Z] }^2 = \sum_i \left( \sqrt{\p(i)} - \sqrt{\shortexpect_Z[\p_Z(i)]} \right)^2
+    = \sum_i \p(i)\left( 1 - \sqrt{1+\shortexpect_Z[\delta(i,Z)]} \right)^2
+\]
+which is generally \emph{not} a fun task. Yet, bounding the total variation distance by the (now bounded) quantity $1\land \chisquare{ \shortexpect_Z[\p_Z] }{ \p }$ leads to an expression of the form
+\[
+    \chisquare{ \shortexpect_Z[\p_Z] }{ \p } = \sum_i \frac{\left( \shortexpect_Z[\p_Z(i)] - \p(i) \right)^2}{\p(i)}
+    = \sum_i \p(i)\shortexpect_Z[\delta(i,Z)]^2
+\]
+(the order of the distributions in the chi-squared distance will typically matter a lot: mixture first). Squares are in my experience nicer to handle than square roots. 
+
+Further, we have many other tools to deal with the chi-squared distance; for instance, the handy lemma below, due to~\cite{Pollard03}, which enables us to handle chi-square distances of mixtures with respect to a reference product distribution.
+\begin{lemma}[{\cite[Lemma~8]{AcharyaCT19}}]\label{lem:mixture_chisquare}
+Consider a random variable $Z$ such that for each
+$Z=z$ the distribution $\q_z^\ns$ is defined as
+$\q_{1,z} \times \dots \times \q_{\ns,z}$. Further, let
+$\p^\ns = \p_1 \times \dots \times \p_\ns$ be a fixed product
+distribution. Then,
+\[
+\chisquare{ \shortexpect_Z[\q_Z^\ns] }{ \p^\ns } = \shortexpect_{ZZ'}[ \prod_{j=1}^\ns (1+{\Delta_j(Z,Z')}) ] - 1,
+\]
+where $Z'$ is an independent copy of $Z$, and with
+$\delta_j^z(x_j) = \frac{\q_{j,z}(x_j)-\p_j(x_j)}{\p_j(x_j)}$, $\Delta_j(z,z')$ is the \emph{chi-squared correlation}
+\[
+\Delta_j(z,z') \eqdef \expect{\delta_j^z(X_j)\delta_j^{z'}(X_j)},
+\]
+where the expectation is over $X_j$ distributed according to $\p_j$.
+\end{lemma}
+
+\appendix
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Bounding Hellinger by $\chi^2$}
+For the sake of self-completeness, we give a simple proof of the fact that the chi-squared distance upper bounds the squared Hellinger one.
+\begin{fact}
+  \label{fact:hellinger:chisquare}
+For any two discrete distributions $\p_1,\p_2$, $\hellinger{\p_1}{\p_2}^2 \leq 1\land \frac{1}{2}\chisquare{\p_1}{\p_2}$.
+\end{fact}
+\begin{proof}
+This is easily shown from (i)~$\hellinger{\p_1}{\p_2}\leq 1$, and (ii)~the identity $a-b = (\sqrt{w}-\sqrt{b})(\sqrt{w}+\sqrt{b})$, as
+\[
+    2\hellinger{\p_1}{\p_2}^2 = \sum_i \Big(\sqrt{\p_1(i)}-\sqrt{\p_2(i)}\Big)^2 = \sum_i \frac{(\p_1(i)-\p_2(i))^2}{\Big(\sqrt{\p_1(i)}+\sqrt{\p_2(i)}\Big)^2} \leq \sum_i \frac{(\p_1(i)-\p_2(i))^2}{\p_2(i)}\,,
+\]
+which is exactly $\chisquare{\p_1}{\p_2}$.
+See, e.g.~\cite{GibbsS02} for the continuous case as well, or \cite[Proposition~1]{DaskalakisKW17} for a generalization to subdistributions.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{testinglowerbound-useful}
+\end{document}
