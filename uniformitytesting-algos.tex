@@ -106,12 +106,13 @@ which is\dots{} a thing? Note that under the uniform distribution $\uniform_\ab$
 Now, the annoying issue is that we count the number of \emph{distinct} elements, and it's quite unlikely there can ever be more than $\ab$ of them if the domain size is $\ab$. That explains, intuitively, the condition for the test to work: we need $\ns$ (the number of samples taken) to be smaller than $\ab$ (the maximum number of distinct elements one can ever hope to see), which gives, since we'll get $\ns = \Theta(\sqrt{\ab}/\dst^2)$, the condition $\dst \gg 1/\dst^{1/4}$. (A slight bummer.)
 
 \paragraph{Modified $\chi^2$.} If you are a statistician, or just took Stats 101, or just got lost on Wikipedia at some point and randomly ended up on the wrong page, you may know of Pearson's $\chi^2$ test for goodness-of-fit: for every element $i$ of the domain, count how many times it appeared in the samples, $N_i$. Compute $\sum_{i} \frac{(N_i-\ns/\ab)^2}{\ns/\ab}$. Relax. 
+To analyze that easily, it's helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, as it greatly simplifies the analysis. Then the $N_i$'s become independent, with $N_i\sim\poisson{\ns\p(i)}$ (that not magic, it's Poissonization).
 
-The bad news is that it does not actually lead to the optimal sample complexity: the variance of this thing can be too big, due to the elements we only expect to see zero or once (so, most of them). The \emph{good} news is that a simple correction of that test, of the form
+The bad news is that it does not actually lead to the optimal sample complexity: Poissonization introduces a bit more variance, and so the variance of this $\chi^2$ test can be too big due to the elements we only expect to see zero or once (so, most of them). The \emph{good} news is that a simple correction of that test, of the form
 \begin{equation}
     Z_3 = \sum_{i=1}^\ab \frac{(N_i-\ns/\ab)^2- N_i}{\ns/\ab}
 \end{equation}
-\emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' leads to the right sample complexity. To understand why, it's helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, as it simplifies the variance analysis (and changes roughly nothing else here). Then the $N_i$'s become independent, with $N_i\sim\poisson{\ns\p(i)}$ (that not magic, it's Poissonization). The expectation of $Z_3$ is then just 
+\emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' leads to the right sample complexity. The expectation of $Z_3$ is then just 
 \[
     \expect{Z_3} = \ns\ab \normtwo{\p-\uniform_k}^2
 \]
