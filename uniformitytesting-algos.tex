@@ -43,7 +43,7 @@ denotes the total variation distance between distributions:
   \end{itemize}
 The sample complexity of uniformity testing is then the minimum sample complexity over all uniformity testing algorithms.
 \end{definition}
-A couple remarks are in order: first, the above can be rephrased as a composite hypothesis testing (in a minimax setting), where $\mathcal{H}_0 = \{\uniform_\ab\}$ and $\mathcal{H}_1 = \setOfSuchThat{\p}{\totalvardist{\p}{\uniform_\ab} > \dst}$. Second, for simplicity, we focused in the above on a constant error probability (equal for both Type I and Type II), set to $1/3$. By standard arguments, one can in all settings considered here decrease this to an arbitrarily small $\errproba\in(0,1]$ at the price of a mere multiplicative $\log(1/\errproba)$ factor in the sample complexity,\footnote{Which is not optimal, as a $\sqrt{\log(1/\errproba)}$ is achievable instead~\cite{DiakonikolasGPP18}; but is good enough.} by repeating the test independently and taking the majority outcome.
+A couple remarks are in order: first, the above can be rephrased as a composite hypothesis testing (in a minimax setting), where $\mathcal{H}_0 = \{\uniform_\ab\}$ and $\mathcal{H}_1 = \setOfSuchThat{\p}{\totalvardist{\p}{\uniform_\ab} > \dst}$. Second, for simplicity, we focused in the above on a constant error probability (equal for both Type I and Type II), set to $1/3$. By standard arguments, one can in all settings considered here decrease this to an arbitrarily small $\errproba\in(0,1]$ at the price of a mere multiplicative $\log(1/\errproba)$ factor in the sample complexity,\footnote{Which is not optimal, as a $\sqrt{\log(1/\errproba)}$ is achievable instead~\cite{HuangM13,DiakonikolasGPP18}; but is good enough.} by repeating the test independently and taking the majority outcome.
 
 It is known~\cite{Paninski08} that the sample complexity of uniformity testing with distance parameter $\dst\in(0,1]$ is $\Theta(\sqrt{\ab}/\dst^2)$. That's nice. Now, \emph{how do we perform uniformity testing, though?} 
 There are several things to consider in a testing algorithm. For instance:
@@ -69,7 +69,7 @@ There are several things to consider in a testing algorithm. For instance:
     \bf Unique elements & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/4}$ & \cite{Paninski08} \\\hline
     \bf Modified $\chi^2$ & $\dfrac{\ab^{1/2}}{\dst^2}$ & Nope & \cite{ValiantV17,AcharyaDK15,DiakonikolasKN15} \\\hline
     \bf Empirical distance to uniform & $\dfrac{\ab^{1/2}}{\dst^2}$ & Biased & \cite{DiakonikolasGPP18} \\\hline
-    \bf Random binary hashing & $\dfrac{\ab}{\dst^2}$ & Fun & \cite{AcharyaCT19b} \\\hline
+    \bf Random binary hashing & $\dfrac{\ab}{\dst^2}$ & Fun (+ fast, small space) & \cite{AcharyaCT19b} \\\hline
     \bf Bipartite collisions & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/10}$ & \cite{DiakonikolasGKR19} \\\hline
     \bf Empirical subset weighting & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/4}$ &  \\\hline
   \end{tabular}
@@ -493,6 +493,25 @@ MRREVIEWER = {Martin Anthony},
   MRNUMBER = {3964546},
        DOI = {10.1007/978-3-030-17653-2_13},
        URL = {https://doi.org/10.1007/978-3-030-17653-2_13},
+}
+
+@article {HuangM13,
+    AUTHOR = {Huang, Dayu and Meyn, Sean},
+     TITLE = {Generalized error exponents for small sample universal
+              hypothesis testing},
+   JOURNAL = {IEEE Trans. Inform. Theory},
+  FJOURNAL = {Institute of Electrical and Electronics Engineers.
+              Transactions on Information Theory},
+    VOLUME = {59},
+      YEAR = {2013},
+    NUMBER = {12},
+     PAGES = {8157--8181},
+      ISSN = {0018-9448},
+   MRCLASS = {62G10 (60F10 62G20)},
+  MRNUMBER = {3142287},
+MRREVIEWER = {Yoshihiko Maesono},
+       DOI = {10.1109/TIT.2013.2283266},
+       URL = {https://doi.org/10.1109/TIT.2013.2283266},
 }
 
 % To update once published in ToC
