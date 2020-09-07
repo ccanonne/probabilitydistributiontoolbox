@@ -1,0 +1,124 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\def\withindex{0}
+\input{packages}
+\input{preamble}
+
+\newcommand{\dst}{\varepsilon}
+\newcommand{\ab}{k}
+\newcommand{\ns}{n}
+\newcommand{\dims}{d}
+
+\newcommand{\p}{\mathbf{p}}
+\newcommand{\q}{\mathbf{q}}
+
+\usepackage{filecontents}
+
+\title{Lest I forget it: $\lp[\infty]$ mean estimation of high-dimensional distributions}
+\date{September, 2020}
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+
+The goal of this short note is to record the following lower bounds on $\lp[\infty]$ mean estimation of $\dims$-dimensional spherical Gaussians and product binary distributions:
+\begin{theorem}
+  For $\dims\geq 1$ and $\dst\in(0,1]$, estimating the mean of (i)~an identity-covariance $\dims$-dimensional Gaussian and (ii)~a product distribution over $\{-1,1\}^\dims$ to $\lp[\infty]$ distance $\dst$ both has sample complexity $\bigTheta{\frac{\log\dims}{\dst^2}}$.
+\end{theorem}
+For convenience, we denote by $\operatorname{Rad}(\lambda)$ the distribution over $\{-1,1\}$ with expectation $\lambda\in[-1,1]$, and let $\mathcal{G}_\dims \eqdef \setOfSuchThat{\gaussian{\mu}{I_\dims}}{\mu\in\R^\dims}$ and $\mathcal{B}_\dims \eqdef \setOfSuchThat{ \otimes_{i=1}^\dims \operatorname{Rad}(\mu_i) }{\mu\in[-1,1]^\dims}$ be the families of identity-covariance Gaussians and product binary distributions considered, respectively.
+
+\paragraph{Upper bound.} The upper bound, for both $\mathcal{G}_\dims$ and $\mathcal{B}_\dims$, follow from the following simple scheme: given $\ns=\bigO{(\log\dims)/\dst^2}$ i.i.d.\ samples from an unknown $\p\in\mathcal{G}_\dims$ (resp., $\p\in\mathcal{B}_\dims$), we can estimate independently the mean $\mu_i$ of each marginal to an additive $\dst$, with probability at least $1-\frac{1}{3\dims}$, by using the corresponding coordinate of the $\ns$ samples. By a union bound over all $\dims$ coordinates, the resulting $\hat{\mu}\in\R^\dims$ satisfies $\norminf{\hat{\mu}-\mu} \leq \dst$ with probability at least $1/3$.
+
+\paragraph{Lower bound.} The lower bound is the more interesting part, and shows that this very naive approach (independently deal with each coordinate, then apply a union bound) is essentially the best one can do.
+
+The following argument, which applies to both $\mathcal{G}_\dims$ and $\mathcal{B}_\dims$, was communicated to me by \href{https://people.ece.cornell.edu/acharya/}{Jayadev Acharya}. It shows the even stronger statement about \emph{testing} the mean of a Gaussian or product binary distribution, even under the promise that this mean is \emph{$1$-sparse}.
+\begin{lemma}[Gaussian Hide-and-Seek]
+  \label{lemma:hs:gaussian}
+  For $\dims\geq 1$ and $\dst\in(0,1]$, distinguishing between $\gaussian{0}{I_\dims}$ and $\gaussian{\mu}{I_\dims}$ \emph{where $\mu$ is promised to satisfy $\mu=\dst e_i$ for some $i\in[\dims]$} requires $\bigOmega{\frac{\log\dims}{\dst^2}}$ samples.
+\end{lemma}
+\begin{proof}
+  Fix any number of samples $\ns$. Denote by $\p^{(\ns)}$ the $\ns$-fold product of the standard Gaussian $\gaussian{0}{I_\dims}^{\otimes \ns} = \gaussian{0}{I_{\ns\dims}}$, and by $\q^{(\ns)}$ the uniform mixture $\q^{(\ns)} = \frac{1}{\dims}\sum_{i=1}^\dims \gaussian{\dst e_i}{I_\dims}^{\otimes \ns}$.  By a standard Le Cam-type argument, any $\ns$-sample test for the original problem can be used to distinguish $\p^{(\ns)}$ and $\q^{(\ns)}$, which is only possible if $\totalvardist{\p^{(\ns)}}{\q^{(\ns)}} \gtrsim 1$. Since
+  \[
+      \totalvardist{\p^{(\ns)}}{\q^{(\ns)}}^2 \leq \frac{1}{4}\chisquare{\q^{(\ns)}}{\p^{(\ns)}}
+  \]
+  it suffices to bound $\chisquare{\q^{(\ns)}}{\p^{(\ns)}}$. Which is convenient, as we can invoke~\autoref{lem:mixture_chisquare} to compute this explicitly. Indeed, for any $j\in[\ns]$ and any $i\in[\dims]$, the corresponding $\delta_j^i$ is independent of $j$ (as all marginals are the same) and equal to
+  \[
+      \delta_j^i(x) = \frac{\gaussian{\dst e_i}{I_\dims}(x)-\gaussian{0}{I_\dims}(x)}{\gaussian{0}{I_\dims}(x)} = e^{-\frac{\dst^2}{2}}e^{\dst x_i}-1,\,\quad x\in\R^\dims,
+  \]
+  so that for any two $i_1,i_2$, the $H_j(i_1,i_2)$ of~\autoref{lem:mixture_chisquare} (again independent of $j$) is equal to
+  \[
+      H_j(i_1,i_2) = \shortexpect_{X\sim\gaussian{0}{I_\dims}}[ (e^{-\frac{\dst^2}{2}}e^{\dst X_{i_1}}-1)(e^{-\frac{\dst^2}{2}}e^{\dst X_{i_2}}-1) ] = (e^{\dst^2}-1)\indic{i_1=i_2}\,.
+  \]
+  This is great as now we get from~\autoref{lem:mixture_chisquare} that
+  \[
+      \chisquare{\q^{(\ns)}}{\p^{(\ns)}} = \shortexpect_{i_1,i_2}[ (1+(e^{\dst^2}-1)\indic{i_1=i_2})^\ns ] -1 = \frac{\dims-1}{\dims}+\frac{e^{\ns\dst^2}}{\dims}-1 = \frac{e^{\ns\dst^2}-1}{\dims}
+  \]
+  and for this to be $\Omega(1)$ we need $\ns = \bigOmega{\frac{\log\dims}{\dst^2}}$.
+\end{proof}
+This was for Gaussians though. What about product binary distributions? As it turns out, the same argument goes through, nearly unchanged.
+\begin{lemma}[Bernoullli Hide-and-Seek]
+  \label{lemma:hs:bernoulli}
+  For $\dims\geq 1$ and $\dst\in(0,1]$, distinguishing between the uniform distribution $\operatorname{Rad}(0)^{\otimes \dims}$ and $\otimes_{i=1}^\dims \operatorname{Rad}(\mu_i)$ \emph{where $\mu$ is promised to satisfy $\mu=\dst e_i$ for some $i\in[\dims]$} requires $\bigOmega{\frac{\log\dims}{\dst^2}}$ samples.
+\end{lemma}
+\begin{proof}
+  Fix any number of samples $\ns$. Denote by $\p^{(\ns)}$ the $\ns$-fold product of the uniform distribution, $(\operatorname{Rad}(0)^{\otimes \dims})^{\otimes \ns} = \operatorname{Rad}(0)^{\otimes \ns\dims}$, and by $\q^{(\ns)}$ the uniform mixture $\q^{(\ns)} = \frac{1}{\dims}\sum_{i=1}^\dims \frac{1}{2^{\dims-1}}\operatorname{Rad}(\dst)$.\footnote{Note that for $\mu=\dst e_i$, we have $\otimes_{i=1}^\dims \operatorname{Rad}(\mu_i) = \frac{1}{2^{\dims-1}}\operatorname{Rad}(\dst)$ as all coordinates are uniform except one.}  As in the proof of~\autoref{lemma:hs:gaussian}, it suffices to bound $\chisquare{\q^{(\ns)}}{\p^{(\ns)}}$, and to do so we will compute it explicitly using~\autoref{lem:mixture_chisquare}. Indeed, for any $j\in[\ns]$ and any $i\in[\dims]$, the corresponding $\delta_j^i$ is independent of $j$ and can be seen to be equal to
+  \[
+      \delta_j^i(x) = \frac{\frac{1}{2^{\dims-1}}\operatorname{Rad}(\dst)(x)-\frac{1}{2^{\dims}}}{\frac{1}{2^{\dims}}} = \dst x_i,\,\quad x\in\R^\dims,
+  \]
+  so that for any two $i_1,i_2$, $H_j(i_1,i_2) = \dst^2\shortexpect_{X}[X_{i_1}X_{i_2} ] = \dst^2\indic{i_1=i_2}$ (where the expectation is over $X$ u.a.r. from $\{-1,1\}^\dims$).
+  From~\autoref{lem:mixture_chisquare}, it follows that
+  \[
+      \chisquare{\q^{(\ns)}}{\p^{(\ns)}} = \shortexpect_{i_1,i_2}[ (1+\dst^2\indic{i_1=i_2})^\ns ] -1 
+      %= \frac{\dims-1}{\dims}+\frac{(1+\dst^2)^\ns}{\dims}-1 
+      = \frac{(1+\dst^2)^\ns-1}{\dims}
+  \]
+  and for this to be $\Omega(1)$ we again need $\ns = \bigOmega{\frac{\log\dims}{\dst^2}}$.
+\end{proof}
+
+We finally state the (relatively standard lemma) which allowed us to easily handle the chi square distance between a mixture and a product distribution.
+\begin{lemma}[{See, e.g.,~\cite[Lemma III.5]{AcharyaCT18}}]\label{lem:mixture_chisquare}
+Consider a random variable $\theta$ such that for each
+$\theta=\vartheta$ the distribution $Q_\vartheta^\ns$ is defined as
+$Q_{1,\vartheta} \times \dots \times Q_{n,\vartheta}$. Further, let
+$P^\ns = P_1 \times \dots \times P_\ns$ be a fixed product
+distribution. Then,
+\[
+\chi^2(\shortexpect_{\theta}[Q_\theta^\ns], P^\ns) = \shortexpect_{\theta\theta'}{\mleft[\prod_{j=1}^\ns (1+{H_j(\theta,\theta')})\mright]} - 1,
+\]
+where $\theta'$ is an independent copy of $\theta$, and with
+$\delta_j^\vartheta(X_j) = (Q_{j,\vartheta}(X_j)-P_j(X_j))/P_j(X_j)$,
+\[
+H_j(\vartheta,\vartheta') \eqdef \dotprod{\delta_j^\vartheta}{\delta_j^{\vartheta'}}=\expect{\delta_j^\vartheta(X_j)\delta_j^{\vartheta'}(X_j)},
+\]
+where the expectation is over $X_j$ distributed according to $P_j$.
+\end{lemma}
+
+%%%%%%%%%% Bibliography
+\begin{filecontents}{references-mean-estimation-linfty.bib}
+@article{AcharyaCT18,
+  author    = {Jayadev Acharya and
+               Cl{\'{e}}ment L. Canonne and
+               Himanshu Tyagi},
+  title     = {Inference under Information Constraints {I:} Lower Bounds from Chi-Square
+               Contraction},
+  journal   = {CoRR},
+  volume    = {abs/1812.11476},
+  year      = {2018},
+  url       = {http://arxiv.org/abs/1812.11476},
+  archivePrefix = {arXiv},
+  eprint    = {1812.11476},
+  timestamp = {Wed, 02 Jan 2019 14:40:18 +0100},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-1812-11476.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+\end{filecontents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{references-mean-estimation-linfty}
+\end{document}
