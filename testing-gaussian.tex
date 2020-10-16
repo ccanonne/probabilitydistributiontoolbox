@@ -195,8 +195,6 @@ Each such $\p_z$ has mean with $\lp[2]$ norm exactly $2\dst$, so an algorithm fo
 The $\bigO{\sqrt{\dims}/\dst^2}$ upper bound for~\autoref{problem:mean:identitycov} is also ``folklore,''\footnote{Meaning it is awfully hard to track down a published reference for it, as nobody appears to know any but will swear there must be dozens.} but is achieved by the empirical estimator (considering the squared $\lp[2]$ norm of the empirical estimator, that is, $\normtwo{\frac{1}{\ns}\sum_{i=1}^\ns X^{(j)}}^2$, and doing an expectation+variance+Chebyshev analysis). The analysis is not horrendous, although my preference is to divide the $\ns$ samples in two sets $(X^{(j)})_{j=1}^{\ns/2}$ and $(Y^{(j)})_{j=1}^{\ns/2}$ and to use the estimator $\frac{2}{\ns}\sum_{i=1}^{\ns/2} \dotprod{X^{(j)}}{Y^{(j)}}$. I find the computations cleaner.
   \item
 The $\bigO{\sqrt{\dims}/\dst^2}$ upper bound for~\autoref{problem:mean:testing:standard} is, oddly, very recent, and can be found in~\cite[Section~4]{CanonneCKLW19}. I find that proof rather suprising and cute.
-  \item
-The $\bigTheta{\dims/\dst^2}$ upper and lower bound for~\autoref{problem:mean:identitycov:learn} (a question also known as Gaussian Location Model, or GLM) have many proofs, but I strongly recommend~\cite[Section~9.1]{Wu17}, which provides a more general statement and establishes it in an incredibly elegant way.
 
   \item
 The $\bigO{\dims/\dst^2}$ upper and lower bound for~\autoref{problem:mean:identitycov:learn} (a question also known as Gaussian Location Model, or GLM) have many proofs, but I strongly recommend~\cite[Section~9.1]{Wu17}, which provides a more general statement and establishes it in an incredibly elegant way.
