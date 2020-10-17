@@ -63,25 +63,25 @@ The goal of this short note is to record tight bounds on various testing problem
 
 \begin{problem}[Covariance Norm Estimation, Operator Norm]
   \label{problem:cov:learn:norm:op}
-  Given $\dst \in(0,1], \kappa >0$ and i.i.d.\ samples from some $\p\eqdef\gaussian{\mu}{\Sigma}$ with unknown $\mu,\Sigma$ such that $\norm{\Sigma- I_\dims}_{\rm op}\leq \kappa$, learn $\norm{\Sigma - I_\dims}_{\rm op}$ to an additive $\dst$.
+  Given $\dst \in(0,1], \kappa\geq 1$ and i.i.d.\ samples from some $\p\eqdef\gaussian{\mu}{\Sigma}$ with unknown $\mu,\Sigma$ such that $\norm{\Sigma}_{\rm op}\leq \kappa$, learn $\norm{\Sigma - I_\dims}_{\rm op}$ to an additive $\dst$.
 \end{problem}
 \hfill \textbf{Sample complexity:} $\bigTheta{\kappa^2\dims/\dst^2}$. 
 
 \begin{problem}[Covariance Estimation, Operator Norm]
   \label{problem:cov:learn:op}
-  Given $\dst \in(0,1], \kappa >0$ and i.i.d.\ samples from some $\p\eqdef\gaussian{\mu}{\Sigma}$ with unknown $\mu,\Sigma$ such that $\norm{\Sigma- I_\dims}_{\rm op}\leq \kappa$, learn $\Sigma$ to $\norm{\cdot}_{\rm op}$ norm $\dst$.
+  Given $\dst \in(0,1], \kappa\geq 1$ and i.i.d.\ samples from some $\p\eqdef\gaussian{\mu}{\Sigma}$ with unknown $\mu,\Sigma$ such that $\norm{\Sigma}_{\rm op}\leq \kappa$, learn $\Sigma$ to $\norm{\cdot}_{\rm op}$ norm $\dst$.
 \end{problem}
 \hfill \textbf{Sample complexity:} $\bigTheta{\kappa^2\dims/\dst^2}$. 
 
 \begin{problem}[Covariance Norm Estimation, Frobenius Norm]
   \label{problem:cov:learn:norm:frob}
-  Given $\dst \in(0,1], \kappa >0$ and i.i.d.\ samples from some $\p\eqdef\gaussian{\mu}{\Sigma}$ with unknown $\mu,\Sigma$ such that $\norm{\Sigma- I_\dims}_{F}\leq \kappa$, learn $\norm{\Sigma-I_\dims}_{F}$ to an additive $\dst$.
+  Given $\dst \in(0,1], \kappa\geq 1$ and i.i.d.\ samples from some $\p\eqdef\gaussian{\mu}{\Sigma}$ with unknown $\mu,\Sigma$ such that $\norm{\Sigma}_{\rm op}\leq \kappa$, learn $\norm{\Sigma-I_\dims}_{F}$ to an additive $\dst$.
 \end{problem}
 \hfill \textbf{Sample complexity:} $\bigTheta{\kappa^2\dims/\dst^2}$. 
 
 \begin{problem}[Covariance Estimation, Frobenius Norm]
   \label{problem:cov:learn:frob}
-  Given $\dst \in(0,1], \kappa>0$ and i.i.d.\ samples from some $\p\eqdef\gaussian{\mu}{\Sigma}$ with unknown $\mu,\Sigma$ such that $\norm{\Sigma - I_\dims}_{F}\leq \kappa$, learn $\Sigma$ to $\norm{\cdot}_{F}$ norm $\dst$.
+  Given $\dst \in(0,1], \kappa\geq 1$ and i.i.d.\ samples from some $\p\eqdef\gaussian{\mu}{\Sigma}$ with unknown $\mu,\Sigma$ such that $\norm{\Sigma}_{\rm op}\leq \kappa$, learn $\Sigma$ to $\norm{\cdot}_{F}$ norm $\dst$.\footnote{A different, more general question, is to learn in \emph{relative} Frobenius norm (a.k.a.\ Mahalanobis). That is, to output $\widehat{\Sigma}$ such that $\norm{\Sigma^{-1/2}\widehat{\Sigma}\Sigma^{-1/2}-I_\dims}_F \leq \dst$. This also has sample complexity $\bigTheta{\dims^2/\dst^2}$, also achieved by the empirical covariance matrix, and is useful for learning a high-dimensional Gaussian in total variation distance (essentially, we are considering Frobenius here, instead of that relative Frobenius distance, because we specialized this to the case we are focusing on: the reference distribution has identity covariance).}
 \end{problem}
 \hfill \textbf{Sample complexity:} $\bigTheta{\kappa^2\dims^2/\dst^2}$. 
 
@@ -206,7 +206,7 @@ The $\bigO{\dims/\dst^2}$ upper bound for~\autoref{problem:cov:learn:op} can als
   \item
 The $\bigO{\dims/\dst^2}$ and $\bigO{\kappa^2\dims/\dst^2}$ upper bounds for~\autoref{problem:cov:test:norm:frob} and~\autoref{problem:cov:learn:norm:frob} can be found or follow from~\cite{CaiM13}; they are achieved by a unbiased statistic for $\norm{\Sigma-I_\dims}_F^2 = \operatorname{Tr}\mleft((\Sigma-I_\dims)^2\mright)$.
   \item
-  All that remains are the $\bigO{\dims^2/\dst^2}$ upper and lower bounds for~\autoref{problem:cov:learn:frob}. I am not sure which reference is best, but~\cite[Section~4.2.2]{DiakonikolasKKLMS16}, or~\cite[Corollary~2.1.12]{Li2018} both show that the upper bound is achieving (again) by the empirical covariance $\widehat{\Sigma}\eqdef \frac{1}{\ns}\sum_{j=1}^\ns X^{(j)}{X^{(j)}}^\top$. I am still tracking down a self-contained reference for the lower bound.
+  All that remains are the $\bigO{\dims^2/\dst^2}$ upper and lower bounds for~\autoref{problem:cov:learn:frob}. I am not sure which reference is best, but~\cite[Section~4.2.2]{DiakonikolasKKLMS16}, or~\cite[Corollary~2.1.12]{Li2018} both show that the upper bound is achieved (again) by the empirical covariance $\widehat{\Sigma}\eqdef \frac{1}{\ns}\sum_{j=1}^\ns X^{(j)}{X^{(j)}}^\top$. I am still tracking down a self-contained reference for the lower bound.
 \end{itemize}
 
 %%%%%%%%%% Bibliography
