@@ -1,0 +1,559 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\def\withindex{0}
+\input{packages}
+\input{preamble}
+\usepackage{pgfplots}
+\usepgfplotslibrary{fillbetween}
+\pgfplotsset{compat=1.17} 
+\usepackage{framed}
+
+\newcommand{\dst}{\varepsilon}
+\newcommand{\ab}{k}
+\newcommand{\ns}{n}
+
+\renewcommand{\eqdef}{\coloneqq}
+
+\usepackage{filecontents}
+
+\title{A short note on an inequality between KL and TV}
+\date{December, 2020}
+
+\newcommand{\p}{\mathbf{p}}
+\newcommand{\q}{\mathbf{q}}
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+
+The goal of this short note is to discuss the relation between Kullback--Leibler divergence and total variation distance, starting with the celebrated Pinsker's inequality relating the two, before switching to a simple, yet (arguably) more useful inequality, apparently not as well known. We summarize the gist of it below:
+
+\begin{theorem}[The BH Bound]
+  \label{theo:bh}
+    For every two probability distributions $\p,\q$, we have the simple yet never vacuous bound
+    \begin{equation}
+        \totalvardist{\p}{\q} \leq \sqrt{1-e^{-\kldiv{\p}{\q}}}
+    \end{equation}
+    and this is never worse than Pinsker's inequality (except for a factor $\sqrt{2}$ for $\kldiv{\p}{\q}\ll 1$.)
+\end{theorem}
+While establishing this bound and discussing its various aspects, we will consider probability distributions over some set $\domain$, and conveniently ignore any measurability or absolute continuity issue~--~the reader is encouraged to think of discrete $\domain$ for concreteness. Everything does however apply to the general setting, given the suitable insertion of the words ``Radon--Nikodym derivative'' and ``measurable'' in appropriate locations.
+
+\paragraph{Total variation distance and Kullback--Leibler divergence.}
+
+The TV distance and KL divergence (in nats) between two probability distributions $\p,\q$ over $\domain$ are given respectively by
+\[
+    \totalvardist{\p}{\q} = \sup_{S\subseteq \domain} (\p(S)-\q(S)) = \frac{1}{2}\normone{\p-\q}\in[0,1]
+\]
+and
+\[
+    \kldiv{\p}{\q}  = \sum_{x\in\domain} \p(x)\log\frac{\p(x)}{\q(x)} \in [0,\infty)
+\]
+where $\log$ is the natural logarithm, with the convention that $0\log 0 = 0$. Both TV distance and KL divergence are special cases of what is known as \emph{$f$-divergences}, and they both enjoy a lot of crucial properties, such as the data processing inequality, which we will not get into here.\footnote{The KL divergence, annoyingly, is not symmetric in its arguments and thus not a real metric, but it makes up for it sometimes.}
+
+\paragraph{Organisation.}
+We start by a (very brief) review of Pinsker's inequality, and its shortcomings, in~\autoref{sec:pinsker}, before stating and deriving the BH bound in~\autoref{sec:bh}. The reader asking themselves why we should care at all about this improved bound can skip directly to~\autoref{sec:applications} for some motivation and applications, and those keen on the Donsker--Varadhan formula (or looking for an open question) might enjoy~\autoref{sec:tfl}. Finally,~\autoref{sec:discussion} provides some pointers, and discusses a slightly more refined (albeit much more unwieldy) bounds.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Pinsker's inequality}
+  \label{sec:pinsker}
+  
+  We first state our baseline, Pinsker's inequality, a fundamental relation between KL divergence and total variation distance originally due to, well, Pinsker~\cite{Pinsker64}, although in a weaker form and with suboptimal constants: the constant was then independently improved to the optimal $1/\sqrt{2}$ by Kullback, Csizs\'ar, and Kemperman. See~\cite[Section~2.8]{Tsybakov09} for a discussion.
+\begin{lemma}[Pinsker's Inequality]
+  \label{lemma:pinsker}
+For every $\p,\q$ on $\domain$, 
+\begin{equation}
+  \label{eq:pinsker}
+  \totalvardist{\p}{\q} \leq \sqrt{\frac{1}{2}\kldiv{\p}{\q}}\,.
+\end{equation}
+\end{lemma}
+There are many proofs of Pinsker's inequality: e.g., \cite[Lemma~2.5]{Tsybakov09}, or a very clever argument due to Pollard, or even in~\autoref{sec:tfl} of this very note, using the Donsker--Varadhan formula (also known by me as ``Thomas' Favourite Lemma''). One can for instance consult~\cite{IlyaRaz:MO} for a list; we will here follow an argument from Yihong Wu's lecture notes~\cite[Theorem~4.5]{Wu20}, which has the advantage of being nearly magical.
+\begin{proof}
+Consider first the binary case, i.e., where $\p$,$\q$ are Bernoulli distributions $\bernoulli{p}$ and $\bernoulli{q}$, respectively. Then 
+$
+    \totalvardist{\p}{\q} = \abs{p-q}
+$
+and so we are left to prove
+\begin{equation}
+  \label{eq:proving:pinsker:binary}
+    2(p-q)^2 \leq p\log\frac{p}{q} + (1-p)\log\frac{1-p}{1-q}
+\end{equation}
+Note that the cases where either $p$ or $q$ is in $\{0,1\}$ are easily checked \textit{(verify it!)}, so we can assume $p,q\in(0,1)$. 
+To prove~\eqref{eq:proving:pinsker:binary} in this case, we introduce the function $f\colon(0,1)\to\R$ defined by $f(x) = p\log x + (1-p)\log(1-x)$, and observe that the RHS of~\eqref{eq:proving:pinsker:binary} is exactly $f(p)-f(q)$. We then can write
+\[
+    f(p)-f(q) = \int_{q}^p f'(x)dx = \int_{q}^p \frac{p-x}{x(1-x)}dx \geq 4\int_{q}^p (p-x)dx = 4\cdot \frac{1}{2}(p-q)^2
+\]
+establishing~\eqref{eq:proving:pinsker:binary} (note that we used the fact that $x(1-x) \leq 1/4$ for $x\in(0,1)$).\smallskip
+
+Turning to the general case, let $\p,\q$ be distributions on an arbitrary domain $\domain$, and fix any measurable subset $S\subseteq \domain$. For $X,Y$ distributed according to $\p$ and $\q$, the random variables $\indicSet{S}(X)$ and $\indicSet{S}(Y)$ are have distributions $\p'\eqdef \bernoulli{\p(S)}$ and $\q' \eqdef \bernoulli{\q(S)}$ respectively, and therefore
+\[
+    2(\p(S)-\q(S))^2 = 2\totalvardist{\p'}{\q'}^2 \leq \kldiv{\p'}{\q'} \leq \kldiv{\p}{\q}
+\]
+where the first inequality is~\eqref{eq:proving:pinsker:binary}, and the second is the data processing inequality. Since this inequality holds for every $S$, taking a supremum over $S$ leads to
+\[
+    2\totalvardist{\p}{\q}^2 = 2\sup_{S\subseteq\domain}(\p(S)-\q(S))^2 \leq \kldiv{\p}{\q}\,,
+\]
+establishing Pinsker's inequality.
+\end{proof}
+Before we try to improve upon Pinsker's inequality, let us note that one particular avenue is doomed: specifically, the constant $1/\sqrt{2}$ in~\eqref{eq:pinsker} cannot be replaced by any $c<1/\sqrt{2}$. To see why, fix any $\eps\in(0,1/4)$, and observe that for $\p=\bernoulli{1/2}$ and $\q=\bernoulli{1/2+\eps}$ we have $\totalvardist{\p}{\q} = \eps$ and $\kldiv{\p}{\q}=\frac{1}{2}\log\frac{1}{1-4\eps^2}$, so that
+\begin{equation}
+  \frac{\kldiv{\p}{\q}}{\totalvardist{\p}{\q}^2} = -\frac{\log(1-4\eps^2)}{2\eps^2} \xrightarrow[\eps\to 0^+]{}2\,.
+\end{equation}
+Still, in spite of its multiple applications in Statistics and information theory and its ``optimality'' shown above, Pinsker's inequality suffers a major drawback: by definition, the TV distance is always at most $1$, yet the RHS of~\eqref{eq:pinsker} grows unbounded with the KL divergence. In other terms, the bound is totally and utterly useless for any $\kldiv{\p}{\q}>2$, as depicted in~\autoref{fig:pinsker}.
+%%%%%%%%%%%%%
+\begin{figure}[H]\centering
+\begin{tikzpicture}
+  \begin{axis}[ 
+    xlabel={KL},
+    ylabel={Upper bound on TV},
+    xmin=0, xmax=5, ymin=0, ymax=1.25,
+    width=0.8\textwidth,
+    height=\axisdefaultheight,
+    legend pos=south east,
+  ] 
+    \addlegendentry{Trivial bound}
+    \addlegendentry{Pinsker}
+    \addplot[samples=100, color=black, dashed] {1}; 
+    \addplot[samples=400, color=ForestGreen] {sqrt(x/2)};
+  \end{axis}
+\end{tikzpicture} 
+\caption{\label{fig:pinsker}Pinsker's inequality becomes vacuous for $\kldiv{\p}{\q}>2$. That's a downer.}
+\end{figure}
+%%%%%%%%%%%%%
+To see why one would care about this issue (without jumping yet to~\autoref{sec:applications}), consider the following very simple and intuitive fact: \emph{``if $\kldiv{\p}{\q}<\infty$, then $\totalvardist{\p}{\q} < 1$.''}  While absolutely true, this claim cannot be proven from Pinsker's inequality. Even worse, using Pinsker's one cannot even establish that if $\kldiv{\p}{\q}< 2.01$ then the two distributions $\p$ and $\q$ have TV distance bounded away from $1$!
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Bretagnolle--Huber bound}
+In view of the above, can we hope for some better inequality which does not leap into vacuousness when the KL divergence gets large? The answer is, thankfully, yes.
+  \label{sec:bh}
+\begin{lemma}[The BH Bound]
+  \label{lemma:bh}
+For every $\p,\q$ on $\domain$, 
+\begin{equation}
+  \label{eq:bh}
+  \totalvardist{\p}{\q} \leq \sqrt{1-e^{-\kldiv{\p}{\q}}}\,.
+\end{equation}
+\end{lemma}
+\begin{proof}
+We follow the original argument of~\cite[Lemma~2.1]{BretagnolleH78}: fixing $\p,\q$, we define, for $X$ distributed according to $\p$, the random variables $U\eqdef \frac{\q(X)}{\p(X)}$, $V\eqdef (U-1)_+$, and $W\eqdef 1+V-U=(1-U)_+$. One can check that
+\[
+    \totalvardist{\p}{\q} = \frac{1}{2}\shortexpect_{\p}[\abs{U-1}] = \shortexpect_{\p}[V] = \shortexpect_{\p}[W]
+\]
+and that by construction $(1+V)(1-W)=U$, so that $\log U = \log(1+V)+\log(1-W)$. Moreover, since
+$
+  \kldiv{\p}{\q} = -\sum_{x\in\domain}\p(x)\log\frac{\q(x)}{\p(x)} = -\shortexpect_{\p}[\log U]
+$, we get by Jensen's inequality that
+\[
+  -\kldiv{\p}{\q} = \shortexpect_{\p}[\log(1+V)]+\shortexpect_{\p}[\log(1-W)] \leq \log(1+\shortexpect_{\p}[V])+\log(1-\shortexpect_{\p}[W])
+  %= \log(1+\totalvardist{\p}{\q})+\log(1-\totalvardist{\p}{\q})
+  = \log(1-\totalvardist{\p}{\q}^2)
+\]
+which, exponentiating both sides, rearranging and taking the square root, proves the lemma.
+\end{proof}
+Now, instead of the above bound, one may encounter the following weaker one, for instance in Tsybakov's monograph~\cite{Tsybakov09}.\footnote{which is worth reading by itself, as it countains many gems, insights, and useful discussions.} It is unclear to me what advantage this looser inequality holds over~\eqref{lemma:bh}, but as we shall see in~\autoref{fig:bounds:pinsker:bh:tsybakov} it at least behaves in a satisfying way for large values of $\kldiv{\p}{\q}$, and is never bigger than the trivial bound of $1$.
+\begin{corollary}[Tsybakov's version]
+  \label{lemma:bh:tsybakov}
+For every $\p,\q$ on $\domain$, 
+\begin{equation}
+  \label{eq:bh:tsybakov}
+  \totalvardist{\p}{\q} \leq 1-\frac{1}{2}e^{-\kldiv{\p}{\q}}\,.
+\end{equation}
+\end{corollary}
+\begin{proof}
+  This readily frollows from~\autoref{lemma:bh}, upon noting that $\sqrt{1-e^{-x}} \leq 1-\frac{1}{2}e^{-x}$ for all $x\in[0,\infty)$ (just square both sides and expand the RHS).
+\end{proof}
+
+Because it is somewhat fun to do, we also reproduce Tsybakov's proof of~\autoref{lemma:bh:tsybakov}, and show how it can be used to derive~\autoref{lemma:bh} (so I am at a loss as to why Tsybakov would only state the weaker version in his monograph).\footnote{We observe that the same ``extension'' of Tsybakov's argument can be found in the proof of~\cite[Lemma 6]{GaoHRZ19}.}
+\begin{proof}[Proof of~\autoref{lemma:bh} from the argument of~\cite{Tsybakov09}, Lemma~2.6]
+Fix $\p,\q$. First, we observe that one can write 
+\begin{equation}
+  \totalvardist{\p}{\q}=1-\sum_{x\in\domain} \min(\p(x),\q(x)) = \sum_{x\in\domain} \max(\p(x),\q(x)) - 1
+\end{equation}
+\emph{(this is a useful trick, check it!)}, and therefore by Cauchy--Schwarz
+\begin{align}
+    1-\totalvardist{\p}{\q}^2 
+    &= (1+\totalvardist{\p}{\q})(1-\totalvardist{\p}{\q})
+    = \mleft(\sum_{x\in\domain} \max(\p(x),\q(x))\mright)\mleft(\sum_{x\in\domain} \min(\p(x),\q(x))\mright) \notag\\
+    &\geq \mleft(\sum_{x\in\domain} \sqrt{\max(\p(x),\q(x))\min(\p(x),\q(x))}\mright)^2
+    = \mleft(\sum_{x\in\domain} \sqrt{\p(x)\q(x)}\mright)^2 \label{eq:tsybakov:step1}
+\end{align}
+which will come handy very soon. Indeed, what Tsybakov does show is the following:
+\begin{align}
+    \mleft(\sum_{x\in\domain} \sqrt{\p(x)\q(x)}\mright)^2
+    &= e^{2\log \sum_{x} \sqrt{\p(x)\q(x)}}
+    = e^{2\log \sum_{x} \p(x)\sqrt{\frac{\q(x)}{\p(x)}}} \notag\\
+    &= e^{2\log \shortexpect_\p\mleft[\sqrt{\frac{\q(X)}{\p(X)}}\mright]} 
+    \geq e^{2\shortexpect_\p\mleft[\log \sqrt{\frac{\q(X)}{\p(X)}}\mright]} \tag{Jensen's inequality}\notag\\
+    &= e^{\shortexpect_\p\mleft[\log \frac{\q(X)}{\p(X)}\mright]} 
+    = e^{-\kldiv{\p}{\q}} \label{eq:tsybakov:step2}
+\end{align}
+(to be precise, sums and expectations are restricted to the support of $\p$, to avoid dividing by zero). Combining~\eqref{eq:tsybakov:step1} and~\eqref{eq:tsybakov:step2} yields~\autoref{lemma:bh}.
+\end{proof}
+
+\noindent To see how these bounds \eqref{eq:pinsker}, \eqref{eq:bh}, and \eqref{eq:bh:tsybakov} compare, let us look at a plot.
+%%%%%%%%%%%%%
+\begin{figure}[H]\centering
+\begin{tikzpicture}
+  \begin{axis}[ 
+    xlabel={KL},
+    ylabel={Upper bound on TV},
+    xmin=0, xmax=5, ymin=0, ymax=1.25,
+    width=0.8\textwidth,
+    height=\axisdefaultheight,
+    legend pos=south east,
+  ] 
+    \addlegendentry{Trivial bound}
+    \addlegendentry{Pinsker}
+    \addlegendentry{Bretagnolle--Huber}
+    \addlegendentry{Tsybakov}
+    \addplot[samples=5, color=black, dashed] {1}; 
+    \addplot[samples=1000, color=ForestGreen, name path=Pinsker] {sqrt(x/2)};
+    \addplot[samples=1000, color=blue, name path=BH] {sqrt(1-e^(-x))}; 
+    \addplot[samples=1000, color=red, name path=Tsybakov] {1-1/2*e^(-x)}; 
+    
+    \addplot[draw=none,mark=none,name path=Baseline] {0};     % “fictional” curve
+    \addplot[ForestGreen,fill opacity=0.1] fill between[of=Pinsker and Baseline];
+    \addplot[blue,fill opacity=0.1] fill between[of=BH and Baseline];
+    \addplot[red,fill opacity=0.1] fill between[of=Tsybakov and Baseline];
+  \end{axis}
+\end{tikzpicture} 
+\caption{\label{fig:bounds:pinsker:bh:tsybakov}The four upper bounds we have: shaded regions correspond to values of TV still allowed by the corresponding bounds (so smaller shaded areas are better). As we can see, Pinsker's bound~\eqref{eq:pinsker} is useful for small values of $\kldiv{\p}{\q}$ only. Tsybakov's bound~\eqref{eq:bh:tsybakov} is much better for large $\kldiv{\p}{\q}$, and in particular have the right behaviour as $\kldiv{\p}{\q}\to\infty$, never becoming worse than the trivial bound. However, it is now useless for small $\kldiv{\p}{\q}$, and does not even go to $0$ as $\kldiv{\p}{\q}\to 0^+$. The clear winner is the Bretagnolle--Huber bound~\eqref{eq:bh}, which not only is never worse than Tsybakov's (obviously), but also has the right behaviour for small values of $\kldiv{\p}{\q}$, being essentially equivalent (up to a constant factor) to Pinsker's in that regime.}
+\end{figure}
+%%%%%%%%%%%%%
+\autoref{fig:bounds:pinsker:bh:tsybakov} clearly hints that the BH bound obtained in~\autoref{lemma:bh} is never much worse than the one from Pinsker's inequality, but let us make this formal. First, a Taylor approximation shows that $\sqrt{1-e^{-x}} = \sqrt{x} + o(\sqrt{x})$ as $x\to 0^+$, so for small TV our new bound is worse than Pinsker's by only a factor $\sqrt{2}$. It is actually easy to see that this is always the case, as the inequality $\sqrt{1-e^{-x}} \leq \sqrt{2}\cdot \sqrt{\frac{x}{2}}$ (for $x\geq 0$) is equivalent  to $1-x\leq e^{-x}$, which holds by convexity. We can summarize this as follows:
+\begin{framed}
+\noindent The BH bound~\eqref{eq:bh} is never vacuous, has the right behaviour when $\kldiv{\p}{\q}\to\infty$ \emph{and} $\kldiv{\p}{\q}\to 0^+$, and is at worst a $\sqrt{2}$ factor off from Pinsker's bound~\eqref{eq:pinsker}.
+\end{framed}
+To provide a complementary view of the depiction of the bounds from~\autoref{fig:bounds:pinsker:bh:tsybakov} (which showed the \emph{upper} bounds on TV, as a function of KL, implied by the Pinsker, BH, and Tsybakov inequalities), we give in~\autoref{fig:bounds:pinsker:bh:tsybakov:reciprocal} the corresponding \emph{lower} bounds on KL as a function of TV.
+
+%%%%%%%%%%%%%
+\begin{figure}[ht!]\centering
+\begin{tikzpicture}
+  \begin{axis}[ 
+    xlabel={TV},
+    ylabel={Lower bound on KL},
+    xmin=0, xmax=1, ymin=0, ymax=5,
+    width=0.8\textwidth,
+    height=\axisdefaultheight,
+    legend pos=north west,
+  ] 
+    %\addlegendentry{Trivial bound}
+    \addlegendentry{Pinsker}
+    \addlegendentry{Bretagnolle--Huber}
+    \addlegendentry{Tsybakov}
+    \addplot[samples=500, color=ForestGreen,name path=Pinsker] {2*x*x};
+    \addplot[samples=2000, color=blue,name path=BH] {-ln(1-x*x)}; 
+    \addplot[samples=2000, color=red,name path=Tsybakov] {-ln(2*(1-x))}; 
+    \addplot[samples=5, color=black, dotted] {2}; 
+    
+    \addplot[draw=none,mark=none,name path=Baseline] {5};     % “fictional” curve
+    \addplot[ForestGreen,fill opacity=0.1] fill between[of=Pinsker and Baseline];
+    \addplot[blue,fill opacity=0.1] fill between[of=BH and Baseline];
+    \addplot[red,fill opacity=0.1] fill between[of=Tsybakov and Baseline];
+  \end{axis}
+\end{tikzpicture} 
+\caption{\label{fig:bounds:pinsker:bh:tsybakov:reciprocal}The lower bounds which~\eqref{eq:pinsker},~\eqref{eq:bh}, and~\eqref{eq:bh:tsybakov} give on the KL divergence. The shaded areas are the values of KL (as a function of TV) still allowed by the corresponding inqualities, so smaller shaded area is better: as one can see, Pinsker's inequality is unable to rule out any value of KL greater than 2, while the bound given by Tsybakov only kicks in for $\text{TV}\geq 1/2$.}
+\end{figure}
+%%%%%%%%%%%%%
+
+
+\paragraph{So close, yet so far?}
+Interestingly, one can derive an inequality looking similar to the BH bound from Pinsker's inequality, with a major caveat. Note that~\eqref{eq:pinsker} can be equivalently rephrased as follows:
+\begin{equation}
+  1-e^{-2\totalvardist{\p}{\q}^2} \leq 1-e^{-\kldiv{\p}{\q}}\,.
+\end{equation}
+Using the (tight) inequality $x\leq (1-e^{-2})^{-1}(1-e^{-2x})$, which holds for all $x\in[0,1]$, we then get
+\begin{equation}
+  \label{eq:bh:weak}
+  \totalvardist{\p}{\q} \leq \frac{1}{\sqrt{1-e^{-2}}}\cdot\sqrt{1-e^{-\kldiv{\p}{\q}}}\,,
+\end{equation}
+which, except for this leading factor $\frac{1}{\sqrt{1-e^{-2}}} \approx 1.075$, looks very much like~\eqref{eq:bh}. Unfortunately, this leading factor is exactly what makes~\eqref{eq:bh:weak} useless, as the bound is still vacuous whenever $\kldiv{\p}{\q}>2$, and further is strictly weaker than Pinsker's for $\kldiv{\p}{\q}<2$. See~\autoref{fig:bh:weak} for an illustration.
+
+%%%%%%%%%%%%%
+\begin{figure}[ht!]\centering
+\begin{tikzpicture}
+  \begin{axis}[ 
+    xlabel={KL},
+    ylabel={Upper bound on TV},
+    xmin=0, xmax=5, ymin=0, ymax=1.25,
+    width=0.8\textwidth,
+    height=\axisdefaultheight,
+    legend pos=south east,
+  ] 
+    \addlegendentry{Trivial bound}
+    \addlegendentry{Pinsker}
+    \addlegendentry{Bretagnolle--Huber}
+    \addlegendentry{``Weak Bretagnolle--Huber''}
+    \addplot[samples=100, color=black, dashed] {1}; 
+    \addplot[samples=400, color=ForestGreen] {sqrt(x/2)}; 
+    \addplot[samples=400, color=blue] {sqrt(1-e^(-x))}; 
+    \addplot[samples=400, color=orange] {sqrt(1/(1-e^(-2)))*sqrt(1-e^(-x))}; 
+  \end{axis}
+\end{tikzpicture} 
+\caption{\label{fig:bh:weak}A ``weak Bretagnolle--Huber bound''~\eqref{eq:bh:weak} can be derived from Pinsker's inequality, but it is not a good idea.}
+\end{figure}
+%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why do we care?}
+  \label{sec:applications}
+As we saw, the BH bound~\eqref{eq:bh} and the weaker bound~\eqref{eq:bh:tsybakov} both improve on Pinsker's inequality~\eqref{eq:pinsker} in the regime of large KL. Since for vanishingly small KL Pinsker's inequality is tight in general, and provides a good bound for small constant values as well, it is natural to wonder why we may care about the regime $\operatorname{KL}\gg 1$. One example lies in proving sample complexity lower bounds. As an example and motivation, consider the following (true) fact:
+\begin{fact}
+  \label{fact:test:bernoulli}
+  The number of independent tosses required to distinguish with probability at least $1-\delta$ between a fair coin (i.e., $\bernoulli{1/2}$) and an $\eps$-biased coin (i.e., $\bernoulli{1/2+\eps}$) is $\bigOmega{\log(1/\delta)/\eps^2}$.
+\end{fact}
+To prove this for constant $\delta>0$, say $\delta=1/10$, the standard way to proceed is to observe that, by a relatively standard argument, we need the number $\ns$ of samples (tosses) to satisfy
+\begin{equation}
+    \totalvardist{\bernoulli{1/2}^{\otimes\ns}}{\bernoulli{1/2+\eps}^{\otimes\ns}} \geq 1-2\delta
+\end{equation}
+and we can then use Pinsker's inequality and additivity of KL divergence for product distributions to get
+\begin{align*}
+    (1-2\delta)^2 
+    &\leq \totalvardist{\bernoulli{1/2}^{\otimes\ns}}{\bernoulli{1/2+\eps}^{\otimes\ns}}^2    \\
+    &\leq \frac{1}{2}\kldiv{\bernoulli{1/2}^{\otimes\ns}}{\bernoulli{1/2+\eps}^{\otimes\ns}}  \tag{Pinsker}\\
+    &= \ns\cdot \frac{1}{2}\kldiv{\bernoulli{1/2}}{\bernoulli{1/2+\eps}}  \\
+    &= \ns\cdot \frac{1}{2}\log\frac{1}{1-4\eps^2}  \tag{Direct computation of KL}
+\end{align*}
+which is at most $4\ns\eps^2$ for $\eps$ small enough, e.g., $0<\eps<1/3$. This shows the $\bigOmega{1/\eps^2}$ for constant $\delta\in(0,1/2)$. It is not hard to see, unfortunately, that this approach will never yield any bound better than $\bigOmega{1/\eps^2}$, even as $\delta\to 0^+$; exactly because Pinsker's inequality does not allow us to discrimate between ``moderately large KL'' and ''KL going to $\infty$.'' But if we were to use the BH bound instead, then the exact same argument shows that we need
+\begin{align*}
+    (1-2\delta)^2 
+    &\leq \totalvardist{\bernoulli{1/2}^{\otimes\ns}}{\bernoulli{1/2+\eps}^{\otimes\ns}}^2    \\
+    &\leq 1- e^{-\kldiv{\bernoulli{1/2}^{\otimes\ns}}{\bernoulli{1/2+\eps}^{\otimes\ns}}}  \tag{BH}\\
+    &= 1-e^{-\ns\cdot \frac{1}{2}\kldiv{\bernoulli{1/2}}{\bernoulli{1/2+\eps}}}  \\
+    &= 1-e^{-\ns\cdot \frac{1}{2}\log\frac{1}{1-4\eps^2}}
+\end{align*}
+or, reorganizing, $\ns\geq \frac{2}{\log\frac{1}{1-4\eps^2}}\log\frac{1}{1-(1-2\delta)^2} \geq \frac{1}{2\eps^2}\log\frac{1}{2\delta}$ (the last inequality again for $\eps\in(0,1/3)$), which proves~\autoref{fact:test:bernoulli}.
+
+\begin{remark}
+  One can also use~\eqref{eq:bh:tsybakov} to prove~\autoref{fact:test:bernoulli} in a similar fashion, which turns out to be even (marginally) simpler: verify it!
+\end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The TFL}
+  \label{sec:tfl}
+Let us switch gears a little, and consider the relation between these inequalities and the fundamental lemma below, sometimes known as the \emph{Gibbs variational principle}, or the \emph{Donsker--Varadhan formula}~\cite{DonskerV75}, and which I have been told is a special case of Fenchel duality. We will refer to it, succinctly, as \emph{Thomas' Favourite Lemma}, thus named after \href{http://www.thomas-steinke.net/}{Thomas Steinke} and his fondness for this result.
+\begin{lemma}[Thomas' Favourite Lemma (TFL)]
+  \label{lemma:tfl}
+For every $\q\ll\p$, 
+\[
+    \kldiv{\p}{\q} = \sup_f \mleft( \shortexpect_{\p}[f(X)] - \log \shortexpect_{\q}[e^{f(Y)}] \mright)
+\]
+where the supremum is over all (measurable) $f\colon\domain\to\R$.
+\end{lemma}
+
+\paragraph{From TFL to Pinsker.} Consider any bounded function $f\colon\domain\to\R$. From~\autoref{lemma:tfl} followed by an application of Hoeffding's Lemma, we can write
+\begin{align*}
+  \shortexpect_{\p}[f(X)] 
+    &\leq \kldiv{\p}{\q} + \log \shortexpect_{\q}[e^{f(Y)}]  \tag{TFL}\\
+    &\leq \kldiv{\p}{\q} + \shortexpect_{\q}[f(Y)] + \frac{1}{2}\norminf{f}^2 \tag{Hoeffding's Lemma}
+\end{align*}
+so, reorganizing and taking the supremum over all $f$ such that $\norminf{f}=\lambda$ (for some $\lambda>0$ to be carefully chosen), we get
+\begin{equation}
+  \label{eq:from:tfl:to:pinsker}
+    \sup_{f: \norminf{f}=\lambda} \mleft( \shortexpect_{\p}[f(X)] - \shortexpect_{\q}[f(Y)] \mright) \leq \kldiv{\p}{\q} + \frac{1}{2}\lambda^2\,.
+\end{equation}
+Noting then that the LHS is exactly equal to $2\lambda\totalvardist{\p}{\q}$,\footnote{By definition of TV distance as integral probability metric~\cite{Muller97}, or, without using those fancy terms, checking that 
+\[
+  \totalvardist{\p}{\q} = \sup_{S\subseteq \domain} (\shortexpect_{\p}[\indicSet{S}(X)]-\shortexpect_{\q}[\indicSet{S}(Y)]) = \frac{1}{2}\sup_{f:\norminf{f}\leq 1} (\shortexpect_{\p}[f(X)]-\shortexpect_{\q}[f(Y)])\,.
+\]}
+from~\eqref{eq:from:tfl:to:pinsker} we are left with the following, true for all $\lambda>0$:
+\begin{equation}
+  \totalvardist{\p}{\q} \leq \frac{1}{2\lambda}\kldiv{\p}{\q} + \frac{\lambda}{4}\,.
+\end{equation}
+Optimizing for $\lambda>0$, we choose $\lambda \eqdef \sqrt{2\kldiv{\p}{\q}}$ and obtain
+\begin{equation}
+  \totalvardist{\p}{\q} \leq \sqrt{\frac{1}{2}\kldiv{\p}{\q}}\,,
+\end{equation}
+retrieving Pinsker's inequality~\eqref{eq:pinsker}.\smallskip
+
+It is, however, unclear if one can obtain the Bretagnolle--Huber inequality in a similar fashion. At the very least, I do not know how.
+\begin{question}
+  Can one derive~\eqref{eq:bh} from the TFL?
+\end{question}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion and pointers}
+  \label{sec:discussion}
+This note is only a succinct, non-exhaustive discussion of possible improvements to Pinsker's inequality, and barely scratches the surface of the many results on this and related questions. We conclude with a few pointers for the interested and fearless reader: Reid and Williamson~\cite{ReidW09} provide a generalization of Pinsker-type inequalities for other $f$-divergences, as well as an  (optimal) integral form of the inequality. Speaking of inequalities between $f$-divergences, Sason and Verd\'u develop in~\cite{SasonV16} techniques to obtain many bounds, among which the Bretagnolle--Huber one. Finally, the recent book of Lattimore and Szepesv{\'a}ri~\cite{LaSze20} covers the BH bound in its chapter on relative entropy (Theorem~14.2), where it also provides some context and discussion.
+
+We could not conclude without mentioning that the excellent lecture notes of Yihong Wu~\cite{Wu20} devote an entire chapter (Section~5) to inequalities between $f$-divergences, including a wonderful theorem due to Harremo\"es and Vajda (Theorem~5.1), which essentially states that to prove \emph{any} such inequality it suffices to prove it for Bernoulli random variables. Those lecture notes also provide, in Section~5.2.2, a handy (albeit short) discussion of Pinsker's inequality, and states the following improvement due to Vajda~\cite{Vajda70}:
+\begin{equation}
+  \label{eq:vadja}
+  \kldiv{\p}{\q} \geq \log\frac{1+\totalvardist{\p}{\q}}{1-\totalvardist{\p}{\q}} - \frac{2\totalvardist{\p}{\q}}{1+\totalvardist{\p}{\q}}
+\end{equation}
+This is even tighter than the BH bound (\autoref{theo:bh}) we spent so much time covering here, and which only states that $\kldiv{\p}{\q} \geq \log\frac{1}{1-\totalvardist{\p}{\q}^2}$;\footnote{In particular,~\eqref{eq:vadja} does not lose that asymptotic factor $\sqrt{2}$ over Pinsker's for small KL, unlike the BH bound.} however, it is (at least in my eyes) \emph{much} more cumbersome to use.
+
+%%%%%%%%%% Bibliography
+\begin{filecontents}{pinskers-and-beyond.bib}
+@book{Pinsker64,
+    AUTHOR = {Pinsker, M. S.},
+     TITLE = {Information and information stability of random variables and
+              processes},
+    SERIES = {Translated and edited by Amiel Feinstein},
+ PUBLISHER = {Holden-Day, Inc., San Francisco, Calif.-London-Amsterdam},
+      YEAR = {1964},
+     PAGES = {xii+243},
+   MRCLASS = {94.20},
+  MRNUMBER = {0213190},
+}
+
+
+@article{Vajda70,
+    AUTHOR = {Vajda, Igor},
+     TITLE = {Note on discrimination information and variation},
+   JOURNAL = {IEEE Trans. Inform. Theory},
+  FJOURNAL = {Institute of Electrical and Electronics Engineers.
+              Transactions on Information Theory},
+    VOLUME = {IT-16},
+      YEAR = {1970},
+     PAGES = {771--773},
+      ISSN = {0018-9448},
+   MRCLASS = {62.41},
+  MRNUMBER = {275575},
+MRREVIEWER = {S. Kullback},
+       DOI = {10.1109/tit.1970.1054557},
+       URL = {https://doi.org/10.1109/tit.1970.1054557},
+}
+
+@article{DonskerV75,
+    AUTHOR = {Donsker, M. D. and Varadhan, S. R. S.},
+     TITLE = {Asymptotic evaluation of certain {M}arkov process expectations
+              for large time. {I}. {II}},
+   JOURNAL = {Comm. Pure Appl. Math.},
+  FJOURNAL = {Communications on Pure and Applied Mathematics},
+    VOLUME = {28},
+      YEAR = {1975},
+     PAGES = {1--47; ibid. 28 (1975), 279--301},
+      ISSN = {0010-3640},
+   MRCLASS = {60J25 (60J65)},
+  MRNUMBER = {386024},
+MRREVIEWER = {D. W. Stroock},
+       DOI = {10.1002/cpa.3160280102},
+       URL = {https://doi.org/10.1002/cpa.3160280102},
+}
+
+@incollection{BretagnolleH78,
+    AUTHOR = {Bretagnolle, J. and Huber, C.},
+     TITLE = {Estimation des densit\'{e}s: risque minimax},
+ BOOKTITLE = {S\'{e}minaire de {P}robabilit\'{e}s, {XII} ({U}niv. {S}trasbourg,
+              {S}trasbourg, 1976/1977)},
+    SERIES = {Lecture Notes in Math.},
+    VOLUME = {649},
+     PAGES = {342--363},
+ PUBLISHER = {Springer, Berlin},
+      YEAR = {1978},
+   MRCLASS = {62G05},
+  MRNUMBER = {520011},
+MRREVIEWER = {Luc P. Devroye},
+}
+
+@article{Muller97,
+    AUTHOR = {M\"{u}ller, Alfred},
+     TITLE = {Integral probability metrics and their generating classes of
+              functions},
+   JOURNAL = {Adv. in Appl. Probab.},
+  FJOURNAL = {Advances in Applied Probability},
+    VOLUME = {29},
+      YEAR = {1997},
+    NUMBER = {2},
+     PAGES = {429--443},
+      ISSN = {0001-8678},
+   MRCLASS = {60E99 (60B10)},
+  MRNUMBER = {1450938},
+MRREVIEWER = {Juan A. Cuesta-Albertos},
+       DOI = {10.2307/1428011},
+       URL = {https://doi.org/10.2307/1428011},
+}
+
+@book{Tsybakov09,
+    AUTHOR = {Tsybakov, Alexandre B.},
+     TITLE = {Introduction to nonparametric estimation},
+    SERIES = {Springer Series in Statistics},
+      NOTE = {Revised and extended from the 2004 French original,
+              Translated by Vladimir Zaiats},
+ PUBLISHER = {Springer, New York},
+      YEAR = {2009},
+     PAGES = {xii+214},
+      ISBN = {978-0-387-79051-0},
+   MRCLASS = {62-01 (62G05 62G07 62G08 62G20)},
+  MRNUMBER = {2724359},
+       DOI = {10.1007/b13794},
+       URL = {https://doi.org/10.1007/b13794},
+}
+
+@inproceedings{ReidW09,
+  author    = {Mark D. Reid and
+               Robert C. Williamson},
+  title     = {Generalised Pinsker Inequalities},
+  booktitle = {{COLT} 2009 - The 22nd Conference on Learning Theory, Montreal, Quebec,
+               Canada, June 18-21, 2009},
+  year      = {2009},
+  url       = {http://www.cs.mcgill.ca/\%7Ecolt2009/papers/013.pdf\#page=1}
+}
+
+@book{LaSze20,
+  title     = {Bandit algorithms},
+  author    = {Lattimore, T. and Szepesv{\'a}ri, {\relax Cs}.},
+  publisher = {Cambridge U. Press},
+  year = {2020},
+  note = {Available at \url{https://tor-lattimore.com/downloads/book/book.pdf}}
+}
+
+@inproceedings{GaoHRZ19,
+ author = {Gao, Zijun and Han, Yanjun and Ren, Zhimei and Zhou, Zhengqing},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Wallach and H. Larochelle and A. Beygelzimer and F. d\textquotesingle Alch\'{e}-Buc and E. Fox and R. Garnett},
+ pages = {503--513},
+ publisher = {Curran Associates, Inc.},
+ title = {Batched Multi-armed Bandits Problem},
+ url = {https://proceedings.neurips.cc/paper/2019/file/20f07591c6fcb220ffe637cda29bb3f6-Paper.pdf},
+ volume = {32},
+ year = {2019}
+}
+
+@misc{IlyaRaz:MO,
+    TITLE = {{Two reference requests: Pinsker's inequality and Pontryagin duality}},
+    AUTHOR = {Ilya Razenshteyn},
+    HOWPUBLISHED = {MathOverflow},
+    NOTE = {URL:\url{https://mathoverflow.net/q/42667} (version: 2018-11-01)},
+    EPRINT = {https://mathoverflow.net/q/42667},
+    URL = {https://mathoverflow.net/q/42667}
+}
+
+@article{SasonV16,
+    AUTHOR = {Sason, Igal and Verd\'{u}, Sergio},
+     TITLE = {{$f$}-divergence inequalities},
+   JOURNAL = {IEEE Trans. Inform. Theory},
+  FJOURNAL = {Institute of Electrical and Electronics Engineers.
+              Transactions on Information Theory},
+    VOLUME = {62},
+      YEAR = {2016},
+    NUMBER = {11},
+     PAGES = {5973--6006},
+      ISSN = {0018-9448},
+   MRCLASS = {94A17},
+  MRNUMBER = {3565096},
+MRREVIEWER = {Oliver Johnson},
+       DOI = {10.1109/TIT.2016.2603151},
+       URL = {https://doi.org/10.1109/TIT.2016.2603151},
+      NOTE = {Available at \url{https://arxiv.org/abs/1508.00335}}
+}
+
+@misc{Wu20,
+  TITLE = {Lecture notes on: Information-theoretic methods for high-dimensional statistics},
+  AUTHOR = {Wu, Yihong},
+  HOWPUBLISHED = {online},
+  NOTE = {URL:\url{http://www.stat.yale.edu/~yw562/teaching/it-stats.pdf} (accessed 2020-12-18)},
+  YEAR = {2020},
+  URL = {http://www.stat.yale.edu/~yw562/teaching/it-stats.pdf}
+}
+\end{filecontents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{pinskers-and-beyond}
+\end{document}
