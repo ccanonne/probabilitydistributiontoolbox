@@ -1,0 +1,133 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\def\withindex{0}
+\input{packages}
+\input{preamble}
+\usepackage{framed}
+
+\title{A ``Twitter thread'' on anticoncentration}
+\date{May, 2021}
+
+\usepackage{utopia}
+\usepackage{mdframed}
+\newmdtheoremenv{quest}{Q}
+
+\renewcommand{\eqdef}{\coloneqq}
+
+\usepackage{soul}
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today~(Latest version) \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+
+\noindent\textbf{tl;dr:} we cannot say much, in most cases; but Paley--Zygmund is a good friend.\bigskip
+
+\hrule
+\begin{center}\sc
+Questions and Answers
+\end{center}
+\hrule\medskip
+
+\begin{quest}
+Let $X$ be a real-valued random variable with finite expectation $\expect{X}$. What can we say about $\probaOf{X \geq \expect{X}}$?
+\end{quest}
+\begin{proof}[Answer]
+As \newer{55.8\%} of you replied, the answer is a resounding ``not much.'' The probability has to be \hl{strictly positive}, basically by an averaging argument: indeed, suppose that $\probaOf{X \geq \expect{X}}=0$. We can write
+$
+    \{X \geq \expect{X}\} = \bigcap_{n=1}^\infty \{X > \expect{X} - 1/n\}
+$
+which implies that, for any fixed $\eps\in(0,1)$, $\probaOf{X > \expect{X} - 1/n} \leq \eps$ for large enough $n$. But then, fixing any $\eps>0$ and any corresponding such large enough $n$, and letting $p \eqdef \probaOf{X > \expect{X} - 1/n} > 0$,
+\[
+  \expect{X} = \expect{X\indic{X \leq \expect{X} - 1/n}} + \expect{X\indic{X > \expect{X} - 1/n}}
+  \leq (\expect{X} - 1/n)\cdot p + \expect{X}\cdot (1-p) <  \expect{X}
+\]
+contradiction. So $\probaOf{X \geq \expect{X}}>0$.
+
+\noindent However, that's \emph{all} we can say: that probability could be arbitrarily small! Consider, for $n\geq 2$,
+\[
+  X_n = \begin{cases}
+      n & \text{ with probability } \frac{1}{n}\\
+      -\frac{n}{n-1} & \text{ with probability } 1-\frac{1}{n}
+    \end{cases}
+\]
+and check that $\expect{X_n}=0$, but $\probaOf{X_n \geq \expect{X_n}} = \frac{1}{n} \xrightarrow[]{n\to\infty} 0$.
+\end{proof}
+
+\begin{quest}
+Let $X$ be a real-valued r.v. with finite variance $\var[X]$. What can we say about $\probaOf{X \geq \expect{X}}$?
+\end{quest}
+\begin{proof}[Answer]
+This one is really a bummer. It really \emph{feels} like we should be able to say $\probaOf{X \geq \expect{X}} \geq c\cdot \var[X]$, or even $\probaOf{X \geq \expect{X}} \geq c\cdot \sqrt{\var[X]}$ for some absolute constant $c>0$. However, as \newer{47\%} of you answered, we cannot say anything more that for \textbf{Q1}: it's \hl{strictly positive}.
+
+There is a nice counterexample by Iosif Pinellis on \href{https://mathoverflow.net/a/358212/37266}{this MathOverflow answer}, but considering $\probaOf{X > \expect{X}}$; let's modify it a little bit for the case $\probaOf{X \geq \expect{X}}$. First, by replacing $X$ by $X/\sqrt{c\var[X]}$, we can assume the variance is equal to any constant of our choosing, so we'll give something assuming the variance is upper bounded by say $2.1$.\smallskip
+
+\noindent Fix any $n\geq 2$, set $\eps \eqdef \frac{n}{n^2-1}$, and consider $X_n$ given by
+\[
+  X_n = \begin{cases}
+      n & \text{ with probability } \frac{3}{2n^2}\\
+      -\eps_n & \text{ with probability } 1-\frac{1}{n^2}\\
+      -n & \text{ with probability } \frac{1}{2n^2}
+    \end{cases}
+\]
+If I didn't mess up, we have $\expect{X_n}=0$, $\var[X_n] = 2+ \frac{1}{n^2-1} = 2+o(1)$, but $\probaOf{X_n \geq \expect{X_n}} = \frac{3}{n^2} \xrightarrow[]{n\to\infty} 0$.
+\end{proof}
+
+\begin{quest}
+Let $X$ be a real-valued r.v. with finite moments of all orders, and such that $\expect{|X|^k}\leq 1$ for all $k\geq 0$. What can we say about $\probaOf{X \geq \expect{X}}$?
+\end{quest}
+\begin{proof}[Answer]
+Sorry, did I say the \emph{previous} question was a bummer? That one must be the bummest then. I really, really wanted to believe we could say something like $\probaOf{X \geq \expect{X}} \geq c]$ for some absoltue constant $c>0$, but as \newer{34.2\%} of you answered, it's still only as good as \textbf{Q1}: it's \hl{strictly positive}, we cannot say more.
+
+How come? Well, the link to the \href{https://mathoverflow.net/a/358212/37266}{MathOverflow post by Iosif Pinellis} above shows that, given our assumptions (which imply $X \in [-1,1]$ a.s.) we have
+\[
+    \probaOf{X \geq \expect{X}} \geq \probaOf{X > \expect{X}} \geq \frac{\var[X]}{2}
+\]
+which, frankly, looked promising (\emph{also, it's a neat proof, check it out!)}. But our assumption is on the raw moments, not the centered ones, so\dots{} $\var[X]$ can still be arbitrarily small (think of $\expect{X^2} \approx \expect{X}^2$, ``when {Jensen} is tight-ish.''). For instance:
+fix any $n\geq 1$, and consider $X_n$ given by
+\[
+  X_n = \begin{cases}
+      0 & \text{ with probability } \frac{1}{n}\\
+      -1 & \text{ with probability } 1-\frac{1}{n}
+    \end{cases}
+\]
+We have $\expect{X_n}=-(1-\frac{1}{n})$, $\expect{|X_n|^k} \leq 1$ for all $k$, but $\probaOf{X_n \geq \expect{X_n}} = \frac{1}{n} \xrightarrow[]{n\to\infty} 0$.
+\end{proof}
+
+\begin{quest}
+Let $X$ be a non-negative real-valued r.v. with finite variance. What can we say about $\probaOf{X \geq \frac{1}{2}\expect{X}}$?
+\end{quest}
+\begin{proof}[Answer]
+I have good and bad news. The good news is that there \emph{is} something we can say here. The bad news is that the best option, among those suggested, is still the very disappointing \hl{strictly positive}, as \newer{34.8\%} of you answered.
+
+It cannot be $\probaOf{X \geq \frac{1}{2}\expect{X}}\geq 1/2$, as taking $X$ to be Bernoulli with parameter $p < 1/2$ shows. It cannot be $\probaOf{X \geq \frac{1}{2}\expect{X}}\geq c\cdot \var[X]$ some some absolute constant $c>0$, as the variance could be arbitrarily big, but probabilities tend to be at most one. \emph{(They're stubborn like that.)}
+
+But we \emph{still} can say something! Just something not in the list. Namely, the wonderful--yet--basic--yet--so--useful \emph{Paley--Zygmund inequality}, essentially the single most useful anticoncentration inequality I know, guarantees that for non-negative $X$, letting $\rho(X)\eqdef \frac{\var[X]}{\expect{X}^2}$,
+\[
+    \probaOf{X > \theta\expect{X}} \geq \frac{(1-\theta)^2}{\rho(X)+(1-\theta)^2}, \quad \theta \in [0,1]
+\]
+which in our case boilds down to
+\[
+    \probaOf{X > \frac{1}{2}\expect{X}} \geq \frac{1}{4\rho(X)+1}\,.
+\]
+Thinking of it differently: ``if the standard deviation and the expectation are comparable, then the random variable cannot be \emph{too} small all the time.''
+\end{proof}
+
+\noindent Finally, last question: let's no longer assume $X\geq 0$, and ask for an \emph{anti-Chebyshev}:
+\begin{quest}
+Let $X$ be a real-valued r.v. with finite variance. What can we say about $\probaOf{|X-\expect{X}| \geq \frac{\sqrt{\var[X]}}{100}}$?
+\end{quest}
+\begin{proof}[Answer]
+  First, recall that Chebyshev's inequality ensures that $\probaOf{|X-\expect{X}| \geq 100\sqrt{\var[X]}} \leq \frac{1}{100^2}$, so we're really asking if some non-trivial converse-type statement holds in general. 
+  
+  I am so, so sorry. The answer is no, as \newer{40.6\%}. It's \hl{strictly positive}, we cannot say more. One quick and sad way to see it is to consider the non-negative random variable $Y\eqdef (X-\expect{X})^2$, which has $\expect{Y} = \var[X]$ by definition. Then we are asking about 
+  \[
+    \probaOf{\sqrt{Y} \geq \frac{\sqrt{\expect{Y}}}{100}} = \probaOf{Y \geq \frac{\expect{Y}}{10000}}
+  \]
+  and then it's clear we cannot say more without extra assumptions on $Y$ (such as an almost sure upper bound, or if we want to use our new friend Paley--Zygmund, some bound on $\var[Y] = \expect{(X-\expect{X}^4}$). For instance, one could take $Y$ to be $0$ with probability $1-1/n$ and $n \expect{Y}$ with probability $1/n$, for arbitrarily large $n$\dots
+\end{proof}
+\end{document}
