@@ -66,15 +66,15 @@ This one is really a bummer. It really \emph{feels} like we should be able to sa
 
 There is a nice counterexample by Iosif Pinellis on \href{https://mathoverflow.net/a/358212/37266}{this MathOverflow answer}, but considering $\probaOf{X > \expect{X}}$; let's modify it a little bit for the case $\probaOf{X \geq \expect{X}}$. First, by replacing $X$ by $X/\sqrt{c\var[X]}$, we can assume the variance is equal to any constant of our choosing, so we'll give something assuming the variance is upper bounded by say $2.1$.\smallskip
 
-\noindent Fix any $n\geq 2$, set $\eps \eqdef \frac{n}{n^2-1}$, and consider $X_n$ given by
+\noindent Fix any $n\geq 2$, set $\eps \eqdef \frac{n}{n^2-2}$, and consider $X_n$ given by
 \[
   X_n = \begin{cases}
       n & \text{ with probability } \frac{3}{2n^2}\\
-      -\eps_n & \text{ with probability } 1-\frac{1}{n^2}\\
+      -\eps_n & \text{ with probability } 1-\frac{2}{n^2}\\
       -n & \text{ with probability } \frac{1}{2n^2}
     \end{cases}
 \]
-If I didn't mess up, we have $\expect{X_n}=0$, $\var[X_n] = 2+ \frac{1}{n^2-1} = 2+o(1)$, but $\probaOf{X_n \geq \expect{X_n}} = \frac{3}{n^2} \xrightarrow[]{n\to\infty} 0$.
+If I didn't mess up, we have $\expect{X_n}=0$, $\var[X_n] = 2+ \frac{1}{n^2-2} = 2+o(1)$, but \mbox{$\probaOf{X_n \geq \expect{X_n}} = \frac{3}{2n^2} \xrightarrow[]{n\to\infty} 0$.}
 \end{proof}
 
 \begin{quest}
