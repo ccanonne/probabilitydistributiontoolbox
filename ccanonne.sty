@@ -1,0 +1,379 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+%% Eye-candy
+\usepackage{lmodern}
+\usepackage{xspace}                                     % Smart spacing with \xspace
+\usepackage[protrusion=true,expansion=true]{microtype}  % Improve font rendering
+
+% Striking out text
+\usepackage[normalem]{ulem}
+
+%% Math
+\usepackage{amsfonts, amsthm, mathtools,amssymb}
+\usepackage{thm-restate}
+\usepackage{dsfont} % For the indicator symbol
+
+% Algorithm environment
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+% Colors (with names)
+\usepackage[usenames,dvipsnames,table]{xcolor}
+
+% Quotes: \blockquote command
+\usepackage{csquotes}
+
+% Relative sizes for text
+\usepackage{relsize}
+
+% Bibliography
+%\usepackage[numbers]{natbib}
+\usepackage[backref=true,backend=biber,style=alphabetic]{biblatex}
+
+% Required for the table of results
+\usepackage{multirow}
+\usepackage{chngpage} % allows for temporary adjustment of side margins
+
+% For the commands such as \capitalisewords
+\usepackage{mfirstuc}
+
+% Graphics
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc,decorations.pathmorphing,patterns}
+
+% References and links
+\usepackage[colorlinks,citecolor=blue,bookmarks=true,linktocpage]{hyperref}
+\urlstyle{same}
+\usepackage{aliascnt}
+\usepackage[numbered]{bookmark}
+\usepackage[capitalise]{cleveref}
+
+% Full pages
+\usepackage{fullpage}
+
+% Titling
+% \usepackage{titling}
+
+% Compressed lists
+% \usepackage[shortlabels]{enumitem}
+%   \setitemize{noitemsep,topsep=3pt,parsep=2pt,partopsep=2pt} % Uncomment for compact item lists
+%   \setenumerate{itemsep=1pt,topsep=2pt,parsep=2pt,partopsep=2pt}
+%   \setdescription{itemsep=1pt}
+  
+% Package for todo notes.
+ \ifnum\withnotes=1
+   \usepackage[colorinlistoftodos,textsize=scriptsize]{todonotes}
+\fi
+
+% {framed} environment
+\usepackage{framed}
+
+% Resizable parentheses that work (without the space between \left(#1\right)
+\usepackage{mleftright} % \mleft( #1 \mright)
+
+% \RequirePackage{pgfplots, tikz, pgflibraryplotmarks}
+%
+% \usepackage{tikz,forest}
+% \usetikzlibrary{arrows.meta}
+% \PassOptionsToPackage{hyphens}{url}
+% \usepackage{hyperref}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ \makeatletter
+ \@ifundefined{theorem}{%
+   % Theorems (each with its own style, all same counter). Cf. http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/hyperref/doc/manual.pdf, p.17
+   \theoremstyle{plain} %% Style
+   	\newtheorem{theorem}{Theorem}[section]
+   	\newtheorem*{theorem*}{Theorem} % Unnumbered
+   	\newaliascnt{coro}{theorem}
+   	  \newtheorem{corollary}[coro]{Corollary}
+   	\aliascntresetthe{coro}
+   	\newaliascnt{lem}{theorem}
+   		\newtheorem{lemma}[lem]{Lemma}
+   	\aliascntresetthe{lem}
+   	\newaliascnt{clm}{theorem}
+   		\newtheorem{claim}[clm]{Claim}
+ 	\aliascntresetthe{clm}
+% 	\newaliascnt{fact}{theorem}
+  	 	\newtheorem{fact}[theorem]{Fact}
+% 	\aliascntresetthe{fact}
+   	\newtheorem*{unnumberedfact}{Fact}
+   \newaliascnt{prop}{theorem}
+   		\newtheorem{proposition}[prop]{Proposition}
+ 	\aliascntresetthe{prop}
+ 	\newaliascnt{conj}{theorem}
+   		\newtheorem{conjecture}[conj]{Conjecture}
+ 	\aliascntresetthe{conj}
+  	 \newtheorem{problem}[theorem]{Problem}
+   	\newtheorem{question}[theorem]{Question}
+   \theoremstyle{remark} %% Style
+   	\newtheorem{remark}[theorem]{Remark}
+   	\newtheorem*{notation}{Notation}
+  	 \newtheorem{example}[theorem]{Example}
+   \theoremstyle{definition} %% Style
+   	\newaliascnt{defn}{theorem}
+  		 \newtheorem{definition}[defn]{Definition}
+  	 \aliascntresetthe{defn}
+  	 \newtheorem{observation}[theorem]{Observation}
+  	 
+  	 \newtheorem{openquestion}{Open Problem}
+}{}
+\makeatother
+\newenvironment{proofof}[1]{\begin{proof}[\bf Proof of {#1}]}{\end{proof}}
+
+%% \email{} command
+\providecommand{\email}[1]{\href{mailto:#1}{\nolinkurl{#1}\xspace}}
+
+%% Remarks and notes
+\ifnum\withcolors=1
+  \newcommand{\new}[1]{{\color{red} {#1}}} % new
+  \newcommand{\newer}[1]{{\color{blue} {#1}}} % even newer
+  \newcommand{\newest}[1]{{\color{orange} {#1}}} % even even newer
+  \newcommand{\newerest}[1]{{\color{blue!10!black!40!green} {#1}}} % you get the idea.
+  \newcommand{\ccolor}[1]{{\color{red}#1}} % Clement
+\else
+  \newcommand{\new}[1]{{{#1}}}
+  \newcommand{\newer}[1]{{{#1}}}
+  \newcommand{\newest}[1]{{{#1}}}
+  \newcommand{\newerest}[1]{{{#1}}}
+  \newcommand{\ccolor}[1]{{#1}}
+\fi
+
+\ifnum\withnotes=1
+  \newcommand{\cnote}[1]{\par\ccolor{\textbf{C: }\sf #1}} % Clement
+  \newcommand{\cfootnote}[1]{\footnote{{\bf \ccolor{Cl\'ement}}: {#1}}}
+
+
+  \newcommand{\todonote}[2][]{\todo[size=\scriptsize,color=red!40,#1]{#2}}  
+	\newcommand{\questionnote}[2][]{\marginpar{\tiny#2}}
+	\newcommand{\todonotedone}[2][]{\todo[size=\scriptsize,color=green!40]{$\checkmark$ #2}}
+	\newcommand{\todonoteinline}[2][]{\todo[inline,size=\scriptsize,color=orange!40,#1]{#2}}  
+  \newcommand{\marginnote}[1]{\todo[color=white,linecolor=black]{{#1}}}
+\else
+  \newcommand{\cnote}[1]{}
+  \newcommand{\cfootnote}[1]{}
+  \newcommand{\todonote}[2][]{\ignore{#2}}
+	\newcommand{\questionnote}[2][]{\ignore{#2}}
+	\newcommand{\todonotedone}[2][]{\ignore{#2}}
+	\newcommand{\todonoteinline}[2][]{\ignore{#2}}
+  \newcommand{\marginnote}[1]{\ignore{#1}}
+\fi
+\newcommand{\ignore}[1]{\leavevmode\unskip} % eat unnecessary spaces before
+\newcommand{\cmargin}[1]{\questionnote{\ccolor{#1}}} % Clement
+
+% Shortcuts
+\newcommand{\eps}{\ensuremath{\varepsilon}\xspace}
+\newcommand{\Algo}{\ensuremath{\mathcal{A}}\xspace} % Algorithm A
+\newcommand{\Tester}{\ensuremath{\mathcal{T}}\xspace} % Testing algorithm T
+\newcommand{\Learner}{\ensuremath{\mathcal{L}}\xspace} % Learning algorithm L
+\newcommand{\property}{\ensuremath{\mathcal{P}}\xspace} % Property P
+\newcommand{\task}{\ensuremath{\mathcal{P}}\xspace} % Task P
+\newcommand{\class}{\ensuremath{\mathcal{C}}\xspace} % Class C
+%\newcommand{\eqdef}{\stackrel{\rm def}{=}}
+\newcommand{\eqdef}{\coloneqq}
+\newcommand{\eqlaw}{\stackrel{\mathcal{L}}{=}}
+\newcommand{\accept}{\textsf{accept}\xspace}
+\newcommand{\fail}{\textsf{fail}\xspace}
+\newcommand{\reject}{\textsf{reject}\xspace}
+\newcommand{\opt}{{\textsc{opt}}\xspace}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\domain}{\ensuremath{\mathcal{X}}\xspace} % Domain of a distribution (default notation)
+\newcommand{\distribs}[1]{\Delta\mleft(#1\mright)} % Domain of a distribution (default notation)
+\newcommand{\yes}{{\sf{}yes}\xspace}
+\newcommand{\no}{{\sf{}no}\xspace}
+\newcommand{\dyes}{{\cal Y}}
+\newcommand{\dno}{{\cal N}}
+
+\newcommand{\Testing}{\ensuremath{\mathcal{T}}\xspace} % Testing problem
+\newcommand{\UTesting}{\ensuremath{\mathcal{T}^{\rm u}}\xspace} % Uniformity testing problem
+\newcommand{\Learning}{\ensuremath{\mathcal{L}}\xspace} % Learning problem
+
+% Complexity
+\newcommand{\littleO}[1]{{o\mleft( #1 \mright)}}
+\newcommand{\bigO}[1]{{O\mleft( #1 \mright)}}
+\newcommand{\bigOSmall}[1]{{O\big( #1 \big)}}
+\newcommand{\bigTheta}[1]{{\Theta\mleft( #1 \mright)}}
+\newcommand{\bigOmega}[1]{{\Omega\mleft( #1 \mright)}}
+\newcommand{\bigOmegaSmall}[1]{{\Omega\big( #1 \big)}}
+\newcommand{\tildeO}[1]{\tilde{O}\mleft( #1 \mright)}
+\newcommand{\tildeTheta}[1]{\operatorname{\tilde{\Theta}}\mleft( #1 \mright)}
+\newcommand{\tildeOmega}[1]{\operatorname{\tilde{\Omega}}\mleft( #1 \mright)}
+\providecommand{\poly}{\operatorname*{poly}}
+
+% Influence
+\newcommand{\totinf}[1][f]{{\mathbf{Inf}[#1]}}
+\newcommand{\infl}[2][f]{{\mathbf{Inf}_{#1}(#2)}}
+\newcommand{\infldeg}[3][f]{{\mathbf{Inf}_{#1}^{#2}(#3)}}
+
+% Sets and indicators
+\newcommand{\setOfSuchThat}[2]{ \left\{\; #1 \;\colon\; #2\; \right\} } 			% sets such as "{ elems | condition }"
+\newcommand{\indicSet}[1]{\mathds{1}_{#1}}                                              % indicator function
+\newcommand{\indic}[1]{\indicSet{\left\{#1\right\}}}                                             % indicator function
+\newcommand{\disjunion}{\amalg}%\coprod, \dotcup...
+
+% Distance
+\newcommand{\dtv}{\operatorname{d}_{\rm TV}}
+\newcommand{\hellinger}[2]{{\operatorname{d_{\rm{}H}}\mleft({#1, #2}\mright)}}
+\newcommand{\kolmogorov}[2]{{\operatorname{d_{\rm{}K}}\mleft({#1, #2}\mright)}}
+\newcommand{\totalvardistrestr}[3][]{{\dtv^{#1}\mleft({#2, #3}\mright)}}
+\newcommand{\totalvardist}[2]{\totalvardistrestr[]{#1}{#2}}
+\newcommand{\kldiv}[2]{{\operatorname{KL}\mleft({#1 \mid\mid #2}\mright)}}
+\newcommand{\kldivsym}[2]{{\operatorname{KL}^{\rm sym}\mleft({#1 \mid\mid #2}\mright)}}
+%\newcommand{\chisquarerestr}[3][]{{\operatorname{d}^{#1}_{\chi^2}\mleft({#2 \mid\mid #3}\mright)}}
+\newcommand{\chisquare}[2]{\chi^2\mleft({#1 \mid\mid #2}\mright)}
+%\newcommand{\chisquaresym}[2]{\chisquarerestr[\rm sym]{#1}{#2}}
+\newcommand{\dist}[2]{\operatorname{dist}\mleft({#1, #2}\mright)}
+
+% Restriction (functions, sequences, etc.)
+\newcommand\restr[2]{{% we make the whole thing an ordinary symbol
+  \left.\kern-\nulldelimiterspace % automatically resize the bar with \right
+  #1 % the function
+  \vphantom{\big|} % pretend it's a little taller at normal size
+  \right|_{#2} % this is the delimiter
+  }}
+
+% Probability
+\newcommand{\proba}{\Pr}
+\newcommand{\probaOf}[1]{\proba\mleft[\, #1\, \mright]}
+\newcommand{\probaCond}[2]{\proba\mleft[\, #1 \;\middle\vert\; #2\, \mright]}
+\newcommand{\probaDistrOf}[2]{\proba_{#1}\mleft[\, #2\, \mright]}
+\newcommand{\probaDistrOfCond}[3]{\proba_{#1}\mleft[\, #2 \;\middle\vert\; #3\, \mright]}
+\newcommand{\bPr}[1]{\Pr\mleft[#1\mright]}
+\newcommand{\bP}[2]{\Pr_{#1}\mleft[#2\mright]}
+\newcommand{\bPP}[1]{P_{#1}}
+\newcommand{\bQQ}[1]{Q_{#1}}
+
+% Support of a distribution/function
+\newcommand{\supp}[1]{\operatorname{supp}\mleft(#1\mright)}
+
+% Expectation & variance
+\newcommand{\expect}[1]{\mathbb{E}\mleft[#1\mright]}
+\newcommand{\expectCond}[2]{\mathbb{E}\mleft[\, #1 \;\middle\vert\; #2\, \mright]}
+\newcommand{\shortexpect}{\mathbb{E}}
+\newcommand{\var}{\operatorname{Var}}
+\newcommand{\cov}{\operatorname{Cov}}
+\newcommand{\bE}[2]{\shortexpect_{#1}\mleft[#2\mright]}
+\newcommand{\bEE}[1]{\bE{}{#1}}
+\newcommand{\bEEC}[2]{\bE{}{ #1 \;\middle\vert\; #2 }}
+
+% Distributions
+\newcommand{\uniform}{\ensuremath{\mathbf{u}}}
+\newcommand{\uniformOn}[1]{\ensuremath{\uniform_{ #1 } }}
+\newcommand{\geom}[1]{\ensuremath{\operatorname{Geom}\mleft( #1 \mright)}}
+\newcommand{\bernoulli}[1]{\ensuremath{\operatorname{Bern}( #1 ) }}
+\newcommand{\binomial}[2]{\ensuremath{\operatorname{Bin}\mleft( #1, #2 \mright)}}
+\newcommand{\poisson}[1]{\ensuremath{\operatorname{Poisson}\mleft( #1 \mright) }}
+\newcommand{\gaussian}[2]{\ensuremath{ \mathcal{N}\mleft(#1,#2\mright) }}
+\newcommand{\gaussianpdf}[2]{\ensuremath{ g_{#1,#2}}}
+\newcommand{\betadistr}[2]{\ensuremath{ \operatorname{Beta}\mleft( #1, #2 \mright) }}
+
+% Information theory
+\newcommand{\condmutualinfo}[3]{ I\mleft(#1 \land #2\mid #3\mright) }
+\newcommand{\mutualinfo}[2]{ I\mleft(#1\land #2\mright) }
+\newcommand{\entropy}[1]{ H\mleft(#1\mright) }
+\newcommand{\condentropy}[2]{ H\mleft(#1 \mid #2 \mright) }
+% Norms
+\newcommand{\norm}[1]{\lVert#1{\rVert}}
+\newcommand{\normone}[1]{{\norm{#1}}_1}
+\newcommand{\normtwo}[1]{{\norm{#1}}_2}
+\newcommand{\norminf}[1]{{\norm{#1}}_\infty}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\dabs}[1]{\lvert #1 \rvert}
+\newcommand{\dotprod}[2]{ \left\langle #1,\xspace #2 \right\rangle } 			% <a,b>
+\newcommand{\ip}[2]{\dotprod{#1}{#2}} 			% shortcut
+
+\newcommand{\vect}[1]{\mathbf{#1}} 			% shortcut
+
+% Ceiling and floor
+\newcommand{\clg}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\flr}[1]{\left\lfloor #1 \right\rfloor}
+
+% Common sets
+\newcommand{\R}{\ensuremath{\mathbb{R}}\xspace}
+\newcommand{\C}{\ensuremath{\mathbb{C}}\xspace}
+\newcommand{\Q}{\ensuremath{\mathbb{Q}}\xspace}
+\newcommand{\Z}{\ensuremath{\mathbb{Z}}\xspace}
+\newcommand{\N}{\ensuremath{\mathbb{N}}\xspace}
+\newcommand{\cont}[1]{\ensuremath{\mathcal{C}^{#1}}}
+
+% L_p norms
+\newcommand{\lp}[1][1]{\ell_{#1}}
+
+% Convolution
+\DeclareMathOperator{\convolution}{\ast}
+
+%% Terminology
+\newcommand{\D}{\ensuremath{D}}
+\newcommand{\distrD}{\ensuremath{\mathcal{D}}}
+\newcommand{\birge}[2][\D]{\Phi_{#2}(#1)}
+\newcommand{\iid}{i.i.d.\xspace}
+
+\newcommand{\bool}{\{\pm 1\}}
+
+% Sign
+\DeclareMathOperator{\sign}{sign}
+
+%% Roman numerals
+\makeatletter
+\newcommand{\rom}[1]{\romannumeral #1}
+\newcommand{\Rom}[1]{\expandafter\@slowromancap\romannumeral #1@}
+\newcommand{\century}[2][th]{\Rom{#2}\textsuperscript{#1}}
+\makeatother
+
+% Hyperref and \autoref{} -- names
+\renewcommand{\sectionautorefname}{Section} % To have "Section 5" instead of "section 5" with \autoref{}
+\renewcommand{\chapterautorefname}{Chapter} % To have "Chapter 5" instead of "chapter 5" with \autoref{}
+\renewcommand{\subsectionautorefname}{Section} % To have "Section 5" instead of "subsection 5" with \autoref{}
+\renewcommand{\subsubsectionautorefname}{Section} % To have "Section 5" instead of "subsubsection 5" with \autoref{}
+\def\algorithmautorefname{Algorithm}
+
+% Line comments
+\algnewcommand{\LineComment}[1]{\Statex \(\triangleright\) #1}
+
+
+\newcommand{\p}{\mathbf{p}}
+\newcommand{\q}{\mathbf{q}}
+\newcommand{\h}{\mathbf{h}}
+\newcommand{\one}{\mathbf{1}}
+
+% Channel/mechanism
+\newcommand{\mech}{W}
+
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\hY}{{\hat{Y}}}
+\newcommand{\cJ}{\mathcal{J}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cZ}{\mathcal{Z}}
+\newcommand{\cW}{\mathcal{W}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cM}{\mathcal{M}}
+
+\newcommand{\transp}{\intercal}
+%\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclareMathOperator{\Tr}{Tr}
+
+\newcommand{\eg}{\textit{e.g.},\xspace}
+\newcommand{\ie}{\textit{i.e.},\xspace}
+
+
+\newcommand{\Paren}[1]{\mleft(#1\mright)}
+%\newcommand{\Brace}[1]{\left[#1\right]}
+
+\newcommand{\ns}{{\textcolor{red}{n}}} % Number of samples
+\newcommand{\ab}{\textcolor{cyan!80!black}{k}} % alphabet (domain) size
+\newcommand{\numbits}{{\textcolor{orange}{\ell}}}
+\newcommand{\dims}{{\textcolor{cyan!70!blue!100}{d}}}
+\newcommand{\pbits}{{\textcolor{pink}{s}}}
+\newcommand{\priv}{{\textcolor{orange}{\varrho}}}
+\newcommand{\dst}{{\textcolor{ForestGreen!80!black}{\eps}}}
+\newcommand{\errprob}{{\textcolor{brown}{\delta}}}
+

@@ -1,0 +1,208 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\usepackage{ccanonne}
+\usepackage{palatino}
+
+\usepackage{filecontents} % Bibliography
+\addbibresource{references-basic.bib}
+
+\begin{document}
+
+\section{A few useful probabilistic facts}
+Let $X$ be a random variable (r.v.) taking real values: for instance, in $\R$ or $\N$. We assume $X$ has an expectation and a variance.\footnote{This is not necessarily always true! Some random variables do not even have a well-defined expectation. For instance, the random variable defined on $\Z$ by $\probaOf{X=k} = \frac{1}{C}\cdot \frac{1}{1+k^2}$ with $C = 1+\pi\coth \pi$ (so that the probabilities sum to 1) is well-defined, but does not have an expectation since $\sum_{k\in\Z}k\cdot \probaOf{X=k}$ is not defined (does not converge).} A few useful things:
+\begin{fact}
+If $X$ takes values in $\N = \{0,1,2,\dots,\}$,
+\[
+\bEE{X} = \sum_{n=0}^\infty n\probaOf{X=n} = \sum_{n=1}^\infty\probaOf{X \geq n}
+\]
+\end{fact}
+To remember whether the sum in the last expression starts at $n=0$ or $n=1$: either reprove it (a bit time-consuming), or take $X$ to be the ``useless'' random variable equal to 0 with probability 1. Then $\bEE{X}=0$, but $\sum_{n=0}^\infty\probaOf{X \geq n} = \probaOf{X \geq 0} = 1$. So we shouldn't have the term $n=0$.
+
+\begin{fact}
+If $X$ takes values in $\N = \{0,1,2,\dots,\}$,
+\[
+\var[X] = \bEE{(X-\bEE{X})^2} = \bEE{X^2}-\bEE{X}^2
+\]
+\end{fact}
+As a direct consequence, $\var[X]\leq \bEE{X^2}$ (sometimes useful).
+
+\begin{lemma}[Jensen's Inequality]
+If $f\colon\R\to\R$ is convex (and $\bEE{f(X)}$ is well-defined)
+\[
+f(\bEE{X}) \leq \bEE{f(X)}\,.
+\]
+For $f$ concave, the inequality is reversed.
+\end{lemma}
+To remember the direction: check with $f(x)=x^2$ (convex). The variance is non-negative, so $0 \leq \var[X] = \bEE{X^2}-\bEE{X}^2$.
+
+\begin{fact}[Linearity of Expectation]
+For any $X,Y$ and $a, b \in \R$,
+\[
+\bEE{aX+bY} = a\bEE{X}+b\bEE{Y}
+\]
+(We do \emph{not} need $X,Y$ to be independent!)
+\end{fact}
+\noindent This extends to more random variables: for instance, $\bEE{\sum_{i=1}^n X_i} = \sum_{i=1}^n \bEE{X_i}$. (No independence needed!)
+
+\begin{fact}[Variance]
+For any $X$ and $a \in \R$,
+\[
+\var[aX] = a^2 \var[X]\,.
+\]
+Moreover, if $X,Y$ are \emph{independent}, 
+\[
+\var[aX+bY] = a^2 \var[X]+b^2 \var[Y]\,.
+\]
+\end{fact}
+More generally, \textbf{if} $X_1,\dots, X_n$ are mutually independent (or, weaker condition, \emph{pairwise independent}: any two $X_i,X_j$ with $i\neq j$ are independent, but $X_1,\dots, X_n$ as a whole might not be mutually independent.), then
+\begin{equation}
+\var\mleft[\sum_{i=1}^n X_i\mright] = \sum_{i=1}^n \var[X_i].
+\end{equation}
+The proof is not too hard: basically, since $\var[X] = \bEE{(X-\bEE{X})^2}$, consider 
+$\bEE{\Paren{\sum_{i=1}^n (X_i-\bEE{X_i})}^2}$ and expand the square, then use linearity of expectation:
+\begin{align*}
+\var\mleft[\sum_{i=1}^n X_i\mright] 
+&= \bEE{\sum_{i=1}^n\sum_{j=1}^n (X_i-\bEE{X_i})(X_j-\bEE{X_j})}
+= \bEE{\sum_{i=1}^n(X_i-\bEE{X_i})^2} + \bEE{\sum_{i\neq j} (X_i-\bEE{X_i})(X_j-\bEE{X_j})}\\
+&=\sum_{i=1}^n\bEE{(X_i-\bEE{X_i})^2} + \sum_{i\neq j} \bEE{(X_i-\bEE{X_i})(X_j-\bEE{X_j})}
+\end{align*}
+The first term is exactly $\sum_{i=1}^n\var[X_i]$; the second, by pairwise independence, is 0, since $\bEE{(X_i-\bEE{X_i})(X_j-\bEE{X_j})} = \bEE{(X_i-\bEE{X_i})}\bEE{(X_j-\bEE{X_j})} = 0\cdot 0$.\medskip
+
+
+Now, a few very trivial-looking (but useful!) facts. Suppose $X$ takes values in $\{0,1\}$, with $\probaOf{X=1}=p$ (this is a Bernoulli random variable). Then
+\begin{itemize}
+    \item $X^2=X$ (of course!), so $\bEE{X^2}=\bEE{X}=\probaOf{X=1}=p$
+    \item That implies $\var[X] = \bEE{X^2}-\bEE{X}^2 = p-p^2 = p(1-p)$, which is at most $1/4$ (check it! $x(1-x)\leq 1/4$ for $x\in[0,1]$, and the maximum is at $x=1/2$).
+    \item That implies that for a Binomial $X\sim\binom{n}{p}$, which is just the sum of $n$ \emph{independent, and identically distributed} (\iid) Bernoullis with parameter $p$,
+    \[
+        \bEE{X} = np, \qquad \var[X] = np(1-p)\,.
+    \]
+\end{itemize}
+Finally, an \emph{indicator} random variable (for some ``event'' $E$) is just a Bernoulli random variable which is equal to 1 if the event occurs, and 0 otherwise (so, Bernoulli with parameter $\proba(E)$). Usually denoted $\indicSet{E}$.
+
+\clearpage
+\section{Concentration inequalities}
+We only mention here a few good bounds that we found to be useful, and sufficient in many or most settings. There are, of course, many others, and many refinements or variants of the bounds we present here. We refer the reader to, \eg \cite[Chapter~2]{Vershynin18} or~\cite{BoucheronLM13} for a much more comprehensive and insightful coverage. 
+
+We start with the mother of all concentration inequalities, Markov's inequality:
+\begin{theorem}[Markov's inequality]
+  \label{theo:markov}
+Let $X$ be a non-negative random variable with $\bEE{X} < \infty$. For any $t > 0$, we have
+\[  
+  \bPr{ X \geq t } \leq \frac{\bEE{X}}{t}
+\]
+\end{theorem}
+\noindent Applying this to $(X-\bEE{X})^2$, we get 
+\begin{theorem}[Chebyshev's inequality]
+  \label{theo:chebyshev}
+Let $X$ be a random variable with $\bEE{X^2} < \infty$. For any $t > 0$, we have
+\[  
+  \bPr{ \abs{X-\bEE{X}} \geq t } \leq \frac{\var[X]}{t^2}
+\]
+\end{theorem}
+By applying Markov's inequality to the moment-generating function (MGF) of $\sum_{i=1}^n X_i$ in various ways, one can also obtain the following statements:
+\begin{theorem}[Hoeffding bound]
+  \label{theo:hoeffding}
+Let $X_1,\dots,X_n$ be independent random variables, where $X_i$ takes values in $[a_i,b_i]$. For any $t \geq 0$, we have
+\begin{align}
+\bPr{ \sum_{i=1}^n X_i   > \sum_{i=1}^n \bEE{X_i} + t }  
+&\leq \exp(-\frac{2 t^2}{\sum_{i=1}^n (b_i-a_i)^2}) \\
+\bPr{\sum_{i=1}^n X_i  < \sum_{i=1}^n \bEE{X_i} - t }
+ &\leq \exp(-\frac{2 t^2}{\sum_{i=1}^n (b_i-a_i)^2})
+ \end{align}
+\end{theorem}
+
+\begin{corollary}[Hoeffding bound]
+  \label{coro:hoeffding}
+Let $X_1,\dots,X_n$ be \iid random variables taking value in $[0,1]$, with mean $\mu$. For any $\gamma \in (0,1]$ we have
+\begin{align}
+\bPr{ \abs{\frac{1}{n}\sum_{i=1}^n X_i  - \mu} > \gamma }
+ &\leq 2\exp(-2 \gamma^2 n)
+\end{align}
+\end{corollary}
+
+\begin{theorem}[Chernoff bound]
+  \label{theo:chernoff}
+Let $X_1,\dots,X_n$ be independent random variables taking value in $[0,1]$, and let $P \eqdef \sum_{i=1}^n \bEE{X_i}$ For any $\gamma \in (0,1]$ we have
+\begin{align}
+\bPr{\sum_{i=1}^n X_i > (1+\gamma)P } &< \exp(-\gamma^2 P/3)\\
+\bPr{\sum_{i=1}^n X_i < (1-\gamma)P } &< \exp(-\gamma^2 P/2)
+\end{align}
+In particular, if $X_1,\dots,X_n$ are \iid with mean $\mu$, then for any $\gamma \in (0,1]$ we have
+\begin{align}
+\bPr{ \abs{\frac{1}{n}\sum_{i=1}^n X_i  - \mu} > \gamma\mu }
+ &\leq 2\exp(-\gamma^2 n \mu/3) \label{eq:chernoff:iid}
+\end{align}
+\end{theorem}
+As a rule of thumb, the ``multiplicative'' (Chernoff) from~\cref{theo:chernoff} is preferable to the ``additive'' bound (Hoeffding) from~\cref{coro:hoeffding} whenever $\mu  \eqdef P/n \ll 1$. In case one only has an upper or lower bound on the quantity $P = \sum_{i=1}^n \bEE{X_i}$, the following version of the Chernoff bound can come in handy:
+\begin{theorem}[Chernoff bound (upper and lower bound version)]
+  \label{theo:chernoff:with:ublb}
+In the setting of~\cref{theo:chernoff}, suppose that
+$P_L \leq P \leq P_H.$ Then for any $\gamma \in (0,1]$, we have
+\begin{align}
+\bPr{\sum_{i=1}^n X_i > (1+\gamma)P_H } &< \exp(-\gamma^2 P_H/3) \\
+\bPr{\sum_{i=1}^n X_i < (1-\gamma)P_L } &< \exp(-\gamma^2 P_L/2)
+\end{align}
+\end{theorem}
+
+\begin{theorem}[Bernstein's inequality] \label{theo:bernstein}
+	Let $X_1,\dots, X_n$ be independent random variables taking values in $[-a,a]$, and such that $\bEE{X_i^2} \leq v_i$ for all $i$. Then, for every $t\geq 0$, we have
+	\[
+	\bPr{ \abs{\sum_{i=1}^n X_i-\sum_{i=1}^n \bEE{X_i}} \geq t } \leq \exp\Paren{-\frac{t^2}{2(\sum_{i=1}^n v_i+\frac{a}{3}t)}}\,.
+	\]
+	In particular, if $X_1,\dots,X_n$ are \iid with mean $\mu$ and $\bEE{X_1^2} \leq v$, then for any $\gamma \geq 0$ we have
+	\[
+	\bPr{ \abs{\frac{1}{n}\sum_{i=1}^n X_i-\mu} \geq \gamma } \leq \exp\Paren{-\frac{\gamma^2n}{2(v+\frac{a}{3}\gamma)}}\,.
+	\]
+\end{theorem}
+Observe that this tail bound exhibits both behaviours: it decays in a subgaussian fashion for small $\gamma$, before switching to a subexponential tail bound for large $\gamma$. 
+
+We conclude this section by providing a very convenient bound, specifically for Poisson random variables, which shares the same ``two-tail'' behaviour:
+\begin{theorem}[Poisson concentration]\label{theo:main:poisson:bounds}
+Let $X$ be a $\poisson{\lambda}$ random variable, where $\lambda > 0$. Then, for any $t>0$, we have
+\begin{equation}\label{eq:poisson:upper:tail}
+    \probaOf{ X \geq \lambda + t} \leq e^{-\frac{t^2}{2\lambda}\psi\Paren{\frac{t}{\lambda}}} \leq e^{-\frac{t^2}{2(\lambda+t)}}
+\end{equation}
+and, for any $0<t< \lambda$,
+\begin{equation}\label{eq:poisson:lower:tail}
+  \probaOf{ X \leq \lambda - t} \leq e^{-\frac{t^2}{2\lambda}\psi\Paren{-\frac{t}{\lambda}}} \leq e^{-\frac{t^2}{2(\lambda+t)}}\,,
+\end{equation}
+where $\psi(u)\eqdef 2\frac{(1+u)\ln(1+u)-u}{u^2}$ for $u\geq -1$.
+In particular, for any $t\geq 0$,
+\begin{equation}\label{eq:poisson:both:tail}
+  \probaOf{ \abs{X -\lambda} \geq t} \leq 2e^{-\frac{t^2}{2(\lambda+t)}}\,.
+\end{equation}
+\end{theorem}
+\cmargin{Is the proof needed?}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% Bibliography
+\begin{filecontents}{references-basic.bib}
+@book{BoucheronLM13,
+  title={Concentration inequalities: A nonasymptotic theory of independence},
+  author={Boucheron, St{\'e}phane and Lugosi, G{\'a}bor and Massart, Pascal},
+  year={2013},
+  publisher={Oxford University Press}
+}
+@book{Vershynin18,
+    AUTHOR = {Vershynin, Roman},
+     TITLE = {High-dimensional probability},
+    SERIES = {Cambridge Series in Statistical and Probabilistic Mathematics},
+    VOLUME = {47},
+      NOTE = {An introduction with applications in data science,
+              With a foreword by Sara van de Geer},
+ PUBLISHER = {Cambridge University Press, Cambridge},
+      YEAR = {2018},
+     PAGES = {xiv+284},
+      ISBN = {978-1-108-41519-4},
+   MRCLASS = {60-01 (60B05 60B20 60E15 60Fxx 62H25)},
+  MRNUMBER = {3837109},
+MRREVIEWER = {Sasha Sodin},
+       DOI = {10.1017/9781108231596},
+       URL = {https://doi.org/10.1017/9781108231596},
+}
+\end{filecontents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\printbibliography
+\end{document}
+
