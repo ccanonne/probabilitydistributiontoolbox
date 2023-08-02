@@ -377,6 +377,34 @@ It is, however, unclear if one can obtain the Bretagnolle--Huber inequality in a
   Can one derive~\eqref{eq:bh} from the TFL?
 \end{question}
 
+\paragraph{Update (Aug 2, 2023)} The answer is yes! Here is a very elegant proof, communicated to me by Hao-Chung Cheng.\medskip
+
+First, reparameterizing the TFL by setting $g = e^f$, we can write, for any two $\p,\q$,
+\[
+    \kldiv{\p}{\q} = \sup_{g\colon \Omega\to\R_+} \mleft( \shortexpect_{\p}[\log g(X)] - \log \shortexpect_{\q}[g(Y)] \mright)
+\]
+and so
+\begin{align*}
+	e^{-\kldiv{\p}{\q}} &= e^{\inf_{g\colon \Omega\to\R_+} \mleft( \shortexpect_{\p}[-\log g(X)] + \log \shortexpect_{\q}[g(Y)] \mright)}\\
+	&= \inf_{g\colon \Omega\to\R_+} e^{\shortexpect_{\p}[-\log g(X)]}\cdot \shortexpect_{\q}[g(Y)] \\
+	&\leq \inf_{g\colon \Omega\to\R_+} \shortexpect_{\p}[\tfrac{1}{g(X)}]\cdot \shortexpect_{\q}[g(Y)] \tag{Jensen}
+\end{align*}
+Since the RHS is an infimum, any choice of $g$ will give an upper bound. So ``all that remains'' to obtain the BH bound~\eqref{eq:bh} is to ``magically'' find a good function $g$ such that $\shortexpect_{\p}[\tfrac{1}{g(X)}]\cdot \shortexpect_{\q}[g(Y)] = 1- \totalvardist{\p}{\q}^2$. Or, factorizing, it would be enough to find $g$ such that $\shortexpect_{\p}[\tfrac{1}{g(X)}] =1 + \totalvardist{\p}{\q}$ and $\shortexpect_{\q}[g(Y)] = 1- \totalvardist{\p}{\q}$. 
+
+Recalling the convenient fact that $\totalvardist{\p}{\q} = 1 - \int_\Omega \min(\p,\q)$, one then chooses 
+\[
+g(x) = \min\mleft( 1, \frac{\p(x)}{\q(x)}\mright)
+\]
+(assuming for simplicity here that $\q(x),\p(x)>0$ for all $x$), and\dots{} \emph{that just works}. This gives
+\begin{align*}
+	e^{-\kldiv{\p}{\q}} &\leq 
+	\mleft(\int \max(\p,\q)\mright) \mleft(\int \min(\p,\q)\mright) \\
+	&= \mleft(\int \mleft(\p+\q - \min(\p,\q)\mright)\mright) \mleft(\int \min(\p,\q)\mright) \\
+	&= \mleft(1 + \totalvardist{\p}{\q}\mright) \mleft(1- \totalvardist{\p}{\q}\mright) \\
+	&= 1- \totalvardist{\p}{\q}^2\,
+\end{align*}
+using that $\p$, $\q$ both integrate to one. Reorganizing the terms, this establishes~\eqref{eq:bh}. $\qed$
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion and pointers}
   \label{sec:discussion}
