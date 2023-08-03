@@ -1,0 +1,197 @@
+\documentclass[10pt]{article}
+\def\withcolors{1}
+\def\withnotes{1}
+\def\withindex{0}
+\input{packages}
+\input{preamble}
+
+\usepackage{filecontents}
+
+\renewcommand{\eqdef}{\coloneqq}
+\usepackage{utopia}
+\newcommand{\p}{\mathbf{p}}
+\newcommand{\q}{\mathbf{q}}
+\newcommand{\errproba}{\delta}
+\newcommand{\ns}{n}
+\newcommand{\errexp}{\mathcal{E}}
+
+
+\title{A short note on simple hypothesis testing, Hellinger distance, and Chernoff information}
+\date{August, 2023}
+
+\begin{document}
+\begin{flushleft}\sf\footnotesize
+\makeatletter
+\@date~- \today \hfill \@title
+\makeatother
+\end{flushleft}
+\vspace{5mm}
+
+The goal of this short note is to explain the relation between two ``folklore'' results on simple hypothesis testing, and, quite crucially, how they square with each other. Thanks to \href{https://www.ee.ntu.edu.tw/bio1.php?id=1080917}{Hao-Chung Cheng} for illuminating discussions.\bigskip
+
+For two \emph{fixed} probability distributions $\p,\q\in\distribs{\domain}$ over a known arbitrary domain $\Omega$, we write $\Psi(\p,\q,\errproba)$ for the sample complexity of deciding, with probability of error at most $\errproba$, which of these two distributions a sequence of i.i.d. samples from an (unknown) probability distribution $\q\in\{\p_0,\p_1\}$ originates from: specifically, given a uniform prior\footnote{One can generalize this to a non-uniform prior; the characterization of the error exponent as Chernoff information will remain the same, as the prior ``disappears'' asymptotically.} on $(\p_0,\p_1)$, the error of a test $T\colon \Omega^\ns \to \{0,1\}$ taking $\ns$ samples is
+\begin{equation}
+	\label{eq:err:proba:total}
+	\errproba \eqdef \frac{1}{2}\probaDistrOf{\p_0}{T(X_1,\dots, X_\ns) = 1} + \frac{1}{2}\probaDistrOf{\p_1}{T(X_1,\dots, X_\ns) = 0}
+\end{equation}
+It is well-known (and described in one of these ``short notes'') that $\Psi(\p,\q,\errproba)$ is characterized by the \emph{squared Hellinger distance} between $\p$ and $\q$:
+\begin{fact}[Sample complexity of simple hypothesis testing]
+	\label{fact:sample:complexity:sht}
+	For any $\p_0,\p_1$ and $\errproba\in(0,1]$, 
+	\[
+		\Psi(\p_0,\p_1,\errproba) = \bigTheta{\frac{\log(1/\errproba)}{\hellinger{\p_0}{\p_1}^2}}
+	\]
+	where $\hellinger{\p_0}{\p_1} = \frac{1}{\sqrt{2}} \normtwo{\sqrt{\p_0}-\sqrt{\p_1}}$ is the Hellinger distance.
+\end{fact} 
+Flipping things around, one could ask, given $\ns$ samples, what the best achievable probability of error $\errproba^\ast$ (as in~\eqref{eq:err:proba:total})) is as a function of $\ns,\p_0,\p_1$. Let's write $\errexp_\ns(\p_0,\p_1) \eqdef \frac{1}{\ns}\ln\frac{1}{\errproba^\ast(\ns,\p_0,\p_1)}$ for this ``finite-sample'' \emph{error exponent}, so that 
+\begin{equation}
+\errproba^\ast = e^{-\ns \errexp_\ns(\p_0,\p_1)}
+\end{equation}
+ Then,~\autoref{fact:sample:complexity:sht} appears to state that
+\begin{equation}
+	\label{eq:error:exp:hell}
+\errexp_\ns(\p_0,\p_1) = \bigTheta{\hellinger{\p_0}{\p_1}^2}\,.
+\end{equation}
+This is, however, quite annoying, as a classsical result in information theory and statistics, the Chernoff bound,\footnote{No, not \emph{that} Chernoff bound.} states that $\lim_{\ns\to\infty} \errexp_\ns(\p_0,\p_1) = C(\p_0,\p_1)$, where 
+\begin{equation}
+	C(\p_0,\p_1) \eqdef - \min_{\lambda\in[0,1]}\ln \sum_{x\in\domain} \p_0(x)^\lambda \p_1(x)^{1-\lambda} 
+\end{equation}
+is the \emph{Chernoff information} between $\p_0$ and $\p_1$ (with the straightforward generalization if $\domain$ is not a discrete domain). \emph{Annoying}, because $C(\p_0,\p_1)$ and $\hellinger{\p_0}{\p_1}^2$ are clearly not the same thing, and having two different (and seemingly \emph{wildly} different) things characterize the same quantity is very confusing at best. So, erm, \textbf{how come?}
+
+\section{Hellinger distance:~\eqref{eq:error:exp:hell} is not wrong\dots}
+We first provide a self-contained proof of~\eqref{eq:error:exp:hell}; actually, of a stronger version of it, with explicit constants. This is adapting and combining the contents from another of these short notes, ``A short note on distinguishing discrete distributions'' (2017), and~\cite[Theorem 4.7]{BarYossef:02}.
+\begin{lemma}
+	\label{lemma:errexponent:hell}
+For any $\p_0,\p_1$, and $\ns \geq 1$, we have
+$
+	e^{2\ns\ln(1-\hellinger{\p_0}{\p_1}^2)} \leq 2\errproba^\ast(\ns,\p_0,\p_1) \leq e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
+$, 
+\emph{i.e.,}
+\begin{equation}
+			-\ln(1-\hellinger{\p_0}{\p_1}^2) + \frac{\ln 2}{\ns} \leq \errexp_\ns(\p_0,\p_1)  \leq -2\ln(1-\hellinger{\p_0}{\p_1}^2) + \frac{\ln 2}{\ns}\,,
+\end{equation}
+which implies~\eqref{eq:error:exp:hell}.
+\end{lemma}
+\begin{proof}
+By the standard interpretation of total variation distance as characterization of the minimal sum of Type I and Type II errors, we have that 
+ \begin{equation}
+  	\label{eq:tv:typeI:II}
+	1-2\errproba^\ast(\ns,\p_0,\p_1) = \totalvardist{\p_0^{\otimes n}}{\p_1^{\otimes \ns}}^2
+\end{equation}
+since $\errproba^\ast(\ns,\p_0,\p_1)$ was defined in~\eqref{eq:err:proba:total} as the optimal average error probability when distinguishing $\p_0$ and $\p_1$ from $\ns$ i.i.d.\, samples. So our task boils down to establishing good enough upper and lower bounds on $\totalvardist{\p_0^{\otimes n}}{\p_1^{\otimes \ns}}^2$.
+
+ 
+To do so, we will rely on the following two relatively straightforward facts about Hellinger distance, with respect to total variation:
+  \begin{equation}
+  	\label{eq:tv:hellinger}
+    1-\sqrt{1-\totalvardist{\p_0}{\p_1}^2} \leq \hellinger{\p_0}{\p_1}^2 \leq \totalvardist{\p_0}{\p_1}
+  \end{equation}
+ and products (tensoring):
+\begin{equation}
+	\label{eq:hellinger:product}
+\hellinger{\p_0^{\otimes \ns}}{\p_1^{\otimes \ns}}^2 = 1 - \mleft(1-\hellinger{\p_0}{\p_1}^2\mright)^{\ns}\,.
+\end{equation}
+By~\eqref{eq:hellinger:product}, this implies 
+$
+    \hellinger{\p_0^{\otimes n}}{\p_1^{\otimes \ns}}^2 = 1 - \mleft(1-\hellinger{\p_0}{\p_1}^2\mright)^\ns = 1-e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)} 
+$, 
+and therefore , by~\eqref{eq:tv:hellinger},
+\begin{equation}
+\totalvardist{\p_0^{\otimes n}}{\p_1^{\otimes \ns}}^2 \geq 1-e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
+\end{equation}
+\noindent Conversely, from the lower bound from~\eqref{eq:tv:hellinger} and using~\eqref{eq:hellinger:product}, we get
+\begin{align}
+	\totalvardist{\p_0^{\otimes n}}{\p_1^{\otimes \ns}}^2 
+	\leq 1- \mleft( 1-\hellinger{\p_0^{\otimes \ns}}{\p_1^{\otimes \ns}}^2 \mright)^2
+	= 1 - \mleft(1-\hellinger{\p_0}{\p_1}^2\mright)^{2\ns}
+	= 1 - e^{2\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
+\end{align}
+and so, combining the two and recalling~\eqref{eq:tv:typeI:II}, we finally get
+\begin{equation}
+e^{2\ns\ln(1-\hellinger{\p_0}{\p_1}^2)} \leq 2\errproba^\ast(\ns,\p_0,\p_1) \leq e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
+\end{equation}
+as claimed.
+ \end{proof}
+
+\section{\dots{} yet Chernoff is correct.}
+To square~\autoref{lemma:errexponent:hell} with the Chernoff bound, which states that
+\begin{equation}
+	\lim_{\ns\to \infty}\errexp_\ns(\p_0,\p_1) = C(\p_0,\p_1)
+\end{equation}
+we need to argue that, while maybe not \emph{equal}, $-\ln(1-\hellinger{\p_0}{\p_1}^2)$ and $C(\p_0,\p_1)$ are always within a factor 2 of each other. Basically, that constant factors \emph{do}, after all, matter.
+
+The first observation is to rewrite $1-\hellinger{\p_0}{\p_1}^2$ in an equivalent (and standard-ish) form involving the \emph{Bhattacharyya coefficient},
+\begin{equation}
+	\operatorname{BC}(\p_0,\p_1) \eqdef \sum_{x\in\domain} \sqrt{\p_0(x) \p_1(x)}\,.
+\end{equation}
+Namely, one can check that 
+$
+1-\hellinger{\p_0}{\p_1}^2 = 1 - \operatorname{BC}(\p_0,\p_1)$. This is very convenient, as now we want to compare
+\[
+	-\ln(1-\hellinger{\p_0}{\p_1}^2)
+	= -\ln \operatorname{BC}(\p_0,\p_1)
+\]
+to
+\[
+	C(\p_0,\p_1) 
+	= -\min_{\lambda\in[0,1]} \ln \sum_{x\in\domain} \p_0(x)^\lambda\p_1(x)^{1-\lambda} 
+	= - \ln  \min_{\lambda\in[0,1]} \sum_{x\in\domain} \p_0(x)^\lambda\p_1(x)^{1-\lambda}\,. 
+\]
+Getting rid of the logarithms, it would be enough to show that 
+$\min_{\lambda\in[0,1]} \sum_{x\in\domain} \p_0(x)^\lambda\p_1(x)^{1-\lambda}$
+and 
+$
+\sum_{x\in\domain} \sqrt{\p_0(x) \p_1(x)}
+$
+are within a quadratic factor of each other. Big if true! And, fortunately, true. 
+\begin{lemma}[Skewed Bhattacharyya coefficients are quadratically related]
+For any $\p_0,\p_1$ and $\lambda\in[0,1]$, we have
+\begin{equation}
+		\mleft(\sum_{x\in\domain} \sqrt{\p_0(x) \p_1(x)}\mright)^2 \leq \sum_{x\in\domain} \p_0(x)^\lambda\p_1(x)^{1-\lambda} \leq 1\,.
+\end{equation}
+In particular, we have
+\begin{equation}
+\operatorname{BC}(\p_0,\p_1)^2 \leq \min_{\lambda\in[0,1]} \operatorname{BC}_\lambda(\p_0,\p_1) \leq \operatorname{BC}(\p_0,\p_1)
+\end{equation}
+where $\operatorname{BC}_\lambda(\p_0,\p_1) = \sum_{x\in\domain} \p_0(x)^\lambda\p_1(x)^{1-\lambda}$ denotes the \emph{$\lambda$-skewed Bhattacharyya coefficient}.
+\end{lemma}
+\begin{proof}
+Fix any $\lambda \in(0,1)$ (the cases $\lambda\in\{0,1\}$ being immediate). First, we have
+\[
+\sum_{x\in\domain} \p_0(x)^\lambda\p_1(x)^{1-\lambda}
+ = \sum_{x\in\domain} \p_1(x)\cdot \mleft(\frac{\p_0(x)}{\p_1(x)}\mright)^\lambda
+ \leq \mleft(\sum_{x\in\domain} \p_1(x)\cdot \frac{\p_0(x)}{\p_1(x)}\mright)^\lambda
+ = \mleft(\sum_{x\in\domain} \p_0(x)\mright)^\lambda = 1
+\] 
+using Jensen's inequality for the concave function $x\mapsto x^\lambda$. 
+
+Second, let's use H\"older's (the generalized version, with 3 vectors) with exponents $(2/(1-\lambda), 2, 2/\lambda, 2)$, which satisfy $\frac{1-\lambda}{2}+\frac{1}{2}+\frac{\lambda}{2}=1$. We have
+\begin{align*}
+\sum_{x\in\domain} \p_0(x)^{1/2}\p_1(x)^{1/2}
+ &= \sum_{x\in\domain} \p_0(x)^{\frac{1-\lambda}{2}}\cdot \p_0(x)^{\frac{\lambda}{2}}\p_1(x)^{\frac{1-\lambda}{2}}\cdot \p_1(x)^{\frac{\lambda}{2}}\\
+ &\leq \mleft(\sum_{x\in\domain} \p_0(x)\mright)^{\frac{1-\lambda}{2}}\mleft(\sum_{x\in\domain} \p_0(x)^{\lambda}\p_1(x)^{1-\lambda} \mright)^{\frac{1}{2}}\mleft(\sum_{x\in\domain} \p_1(x)\mright)^{\frac{\lambda}{2}} \tag{H\"older}\\
+ &= \mleft(\sum_{x\in\domain} \p_0(x)^{\lambda}\p_1(x)^{1-\lambda} \mright)^{\frac{1}{2}}\,,
+\end{align*}
+concluding the proof.
+\end{proof}
+This readily implies that, for every $\p_0,\p_1$,
+\begin{equation}
+-\ln(1-\hellinger{\p_0}{\p_1}^2) \leq C(\p_0,\p_1) \leq -2\ln(1-\hellinger{\p_0}{\p_1}^2)
+\end{equation}
+and sanity is restored.
+
+
+%%%%%%%%%% Bibliography
+\begin{filecontents}{references1.bib}
+@phdthesis{BarYossef:02,
+  author = {Bar-Yossef, Ziv},
+  title = {The Complexity of Massive Data Set Computations},
+  school = {UC Berkeley},
+  year = {2002},
+  note = {Adviser: Christos Papadimitriou. Available at~\url{http://webee.technion.ac.il/people/zivby/index_files/Page1489.html}.}
+}
+\end{filecontents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{references1}
+\end{document}
