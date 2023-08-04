@@ -64,11 +64,11 @@ We first provide a self-contained proof of~\eqref{eq:error:exp:hell}; actually, 
 	\label{lemma:errexponent:hell}
 For any $\p_0,\p_1$, and $\ns \geq 1$, we have
 $
-	e^{2\ns\ln(1-\hellinger{\p_0}{\p_1}^2)} \leq 2\errproba^\ast(\ns,\p_0,\p_1) \leq e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
+	\frac{1}{2}e^{2\ns\ln(1-\hellinger{\p_0}{\p_1}^2)} \leq 2\errproba^\ast(\ns,\p_0,\p_1) \leq e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
 $, 
 \emph{i.e.,}
 \begin{equation}
-			-\ln(1-\hellinger{\p_0}{\p_1}^2) + \frac{\ln 2}{\ns} \leq \errexp_\ns(\p_0,\p_1)  \leq -2\ln(1-\hellinger{\p_0}{\p_1}^2) + \frac{\ln 2}{\ns}\,,
+			-\ln(1-\hellinger{\p_0}{\p_1}^2) - \frac{2\ln 2}{\ns} \leq \errexp_\ns(\p_0,\p_1)  \leq -2\ln(1-\hellinger{\p_0}{\p_1}^2) - \frac{\ln 2}{\ns}\,,
 \end{equation}
 which implies~\eqref{eq:error:exp:hell}.
 \end{lemma}
@@ -76,7 +76,7 @@ which implies~\eqref{eq:error:exp:hell}.
 By the standard interpretation of total variation distance as characterization of the minimal sum of Type I and Type II errors, we have that 
  \begin{equation}
   	\label{eq:tv:typeI:II}
-	1-2\errproba^\ast(\ns,\p_0,\p_1) = \totalvardist{\p_0^{\otimes n}}{\p_1^{\otimes \ns}}^2
+	1-2\errproba^\ast(\ns,\p_0,\p_1) = \totalvardist{\p_0^{\otimes n}}{\p_1^{\otimes \ns}}
 \end{equation}
 since $\errproba^\ast(\ns,\p_0,\p_1)$ was defined in~\eqref{eq:err:proba:total} as the optimal average error probability when distinguishing $\p_0$ and $\p_1$ from $\ns$ i.i.d.\, samples. So our task boils down to establishing good enough upper and lower bounds on $\totalvardist{\p_0^{\otimes n}}{\p_1^{\otimes \ns}}^2$.
 
@@ -97,7 +97,7 @@ $
 $, 
 and therefore , by~\eqref{eq:tv:hellinger},
 \begin{equation}
-\totalvardist{\p_0^{\otimes n}}{\p_1^{\otimes \ns}}^2 \geq 1-e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
+\totalvardist{\p_0^{\otimes n}}{\p_1^{\otimes \ns}} \geq 1-e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
 \end{equation}
 \noindent Conversely, from the lower bound from~\eqref{eq:tv:hellinger} and using~\eqref{eq:hellinger:product}, we get
 \begin{align}
@@ -108,9 +108,9 @@ and therefore , by~\eqref{eq:tv:hellinger},
 \end{align}
 and so, combining the two and recalling~\eqref{eq:tv:typeI:II}, we finally get
 \begin{equation}
-e^{2\ns\ln(1-\hellinger{\p_0}{\p_1}^2)} \leq 2\errproba^\ast(\ns,\p_0,\p_1) \leq e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
+1-\sqrt{1-e^{2\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}} \leq 2\errproba^\ast(\ns,\p_0,\p_1) \leq e^{\ns\ln(1-\hellinger{\p_0}{\p_1}^2)}
 \end{equation}
-as claimed.
+and observing that $1-\sqrt{1-x} \geq x/2$ gives the claim.
  \end{proof}
 
 \section{\dots{} yet Chernoff is correct.}
