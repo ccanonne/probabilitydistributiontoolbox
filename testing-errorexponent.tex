@@ -145,6 +145,7 @@ $
 $
 are within a quadratic factor of each other. Big if true! And, fortunately, true. 
 \begin{lemma}[Skewed Bhattacharyya coefficients are quadratically related]
+	\label{lemma:bhattacharyya}
 For any $\p_0,\p_1$ and $\lambda\in[0,1]$, we have
 \begin{equation}
 		\mleft(\sum_{x\in\domain} \sqrt{\p_0(x) \p_1(x)}\mright)^2 \leq \sum_{x\in\domain} \p_0(x)^\lambda\p_1(x)^{1-\lambda} \leq 1\,.
@@ -178,7 +179,7 @@ This readily implies that, for every $\p_0,\p_1$,
 \begin{equation}
 -\ln(1-\hellinger{\p_0}{\p_1}^2) \leq C(\p_0,\p_1) \leq -2\ln(1-\hellinger{\p_0}{\p_1}^2)
 \end{equation}
-and sanity is restored.
+and sanity is restored. Note that the quantum generalization of~\autoref{lemma:bhattacharyya}, with essentially the same proof, can be found in~\cite[Theorem~6]{Audenaert:2008}.
 
 
 %%%%%%%%%% Bibliography
@@ -189,6 +190,23 @@ and sanity is restored.
   school = {UC Berkeley},
   year = {2002},
   note = {Adviser: Christos Papadimitriou. Available at~\url{http://webee.technion.ac.il/people/zivby/index_files/Page1489.html}.}
+}
+@article{Audenaert:2008,
+    AUTHOR = {Audenaert, K. M. R. and Nussbaum, M. and Szko\l a, A. and
+              Verstraete, F.},
+     TITLE = {Asymptotic error rates in quantum hypothesis testing},
+   JOURNAL = {Comm. Math. Phys.}, 
+  FJOURNAL = {Communications in Mathematical Physics},
+    VOLUME = {279},
+      YEAR = {2008},
+    NUMBER = {1},
+     PAGES = {251--283},
+      ISSN = {0010-3616},
+   MRCLASS = {81P15 (81P68 94A15)},
+  MRNUMBER = {2377635},
+MRREVIEWER = {Daniel R. Terno},
+       DOI = {10.1007/s00220-008-0417-5},
+       URL = {https://doi.org/10.1007/s00220-008-0417-5},
 }
 \end{filecontents}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
