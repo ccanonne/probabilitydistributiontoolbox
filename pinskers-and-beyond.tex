@@ -2,16 +2,12 @@
 \def\withcolors{1}
 \def\withnotes{1}
 \def\withindex{0}
-\input{packages}
-\input{preamble}
+\usepackage{ccanonne}
 \usepackage{pgfplots}
 \usepgfplotslibrary{fillbetween}
 \pgfplotsset{compat=1.17} 
 \usepackage{framed}
-
-\newcommand{\dst}{\varepsilon}
-\newcommand{\ab}{k}
-\newcommand{\ns}{n}
+\bibliography{pinskers-and-beyond}
 
 \renewcommand{\eqdef}{\coloneqq}
 \usepackage{utopia}
@@ -20,9 +16,6 @@
 
 \title{A short note on an inequality between KL and TV}
 \date{December, 2020}
-
-\newcommand{\p}{\mathbf{p}}
-\newcommand{\q}{\mathbf{q}}
 
 \begin{document}
 \begin{flushleft}\sf\footnotesize
@@ -584,6 +577,5 @@ MRREVIEWER = {Oliver Johnson},
 }
 \end{filecontents}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\bibliographystyle{alpha}
-\bibliography{pinskers-and-beyond}
+\printbibliography
 \end{document}
